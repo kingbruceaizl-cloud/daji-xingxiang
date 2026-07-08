@@ -138,6 +138,8 @@ pnpm run release:package
 
 还会生成 `dist/daji-xingxiang-vercel-handoff.md`，用于核对 Vercel 导入时的框架、Node、安装命令、构建命令、环境变量和部署后检查。
 
+还会生成 `dist/daji-xingxiang-model-handoff.md`，用于核对 KIE、OpenAI、即梦、可灵、通义等模型通道的密钥、回调地址和部署后验证步骤。
+
 交付目录还会生成 `dist/daji-xingxiang-launch-summary.md`，用于快速查看当前提交、交付物、剩余外部配置和下一步上线动作。
 
 部署完成后运行线上冒烟测试：
@@ -175,6 +177,12 @@ http://localhost:3000/auth/update-password
 ```env
 KIE_API_KEY=
 KIE_CALLBACK_SECRET=
+```
+
+配置模型前可先生成模型通道交接单：
+
+```bash
+pnpm run release:model-handoff
 ```
 
 后续预留：

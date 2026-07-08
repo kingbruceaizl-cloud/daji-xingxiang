@@ -43,6 +43,7 @@ jobs:
             dist/daji-xingxiang-env-handoff.md
             dist/daji-xingxiang-github-handoff.md
             dist/daji-xingxiang-launch-summary.md
+            dist/daji-xingxiang-model-handoff.md
             dist/daji-xingxiang-supabase-init.sql
             dist/daji-xingxiang-vercel-handoff.md
           if-no-files-found: error

@@ -74,6 +74,7 @@ for (const script of [
   "release:env-handoff",
   "release:github-handoff",
   "release:launch-summary",
+  "release:model-handoff",
   "release:package",
   "release:supabase-sql",
   "release:vercel-handoff",
@@ -142,6 +143,7 @@ requireIncludes("scripts/create-release-archive.mjs", releaseArchive, [
   "release:github-handoff",
   "release:supabase-sql",
   "release:vercel-handoff",
+  "release:model-handoff",
   "release:launch-summary",
   "release:verify-handoff",
   "只包含 Git 已提交文件",
@@ -166,6 +168,16 @@ requireIncludes("scripts/create-env-handoff.mjs", envHandoff, [
   "KIE_API_KEY",
   "Supabase Auth 回调地址",
   "不输出任何真实密钥值",
+]);
+
+const modelHandoff = requireFile("scripts/create-model-handoff.mjs");
+requireIncludes("scripts/create-model-handoff.mjs", modelHandoff, [
+  "大吉形象 AI 模型通道交接单生成",
+  "daji-xingxiang-model-handoff.md",
+  "KIE_CALLBACK_SECRET",
+  "/api/provider-callback/kie",
+  "gpt-image-2-text-to-image",
+  "OPENAI_API_KEY",
 ]);
 
 const githubHandoff = requireFile("scripts/create-github-handoff.mjs");
@@ -200,6 +212,7 @@ requireIncludes("scripts/create-launch-summary.mjs", launchSummary, [
   "daji-xingxiang-launch-summary.md",
   "daji-xingxiang-env-handoff.md",
   "daji-xingxiang-github-handoff.md",
+  "daji-xingxiang-model-handoff.md",
   "daji-xingxiang-supabase-init.sql",
   "daji-xingxiang-vercel-handoff.md",
   "daji-xingxiang-release-",
@@ -235,6 +248,7 @@ requireIncludes("scripts/verify-handoff-artifacts.mjs", verifyHandoff, [
   "大吉形象交付物完整性校验",
   "daji-xingxiang-github-handoff.md",
   "daji-xingxiang-launch-summary.md",
+  "daji-xingxiang-model-handoff.md",
   "daji-xingxiang-supabase-init.sql",
   "daji-xingxiang-vercel-handoff.md",
   "shortCommit",
@@ -278,6 +292,7 @@ requireIncludes(".github/workflows/release-package.yml", releasePackageWorkflow,
   "dist/daji-xingxiang-env-handoff.md",
   "dist/daji-xingxiang-github-handoff.md",
   "dist/daji-xingxiang-launch-summary.md",
+  "dist/daji-xingxiang-model-handoff.md",
   "dist/daji-xingxiang-supabase-init.sql",
   "dist/daji-xingxiang-vercel-handoff.md",
 ]);

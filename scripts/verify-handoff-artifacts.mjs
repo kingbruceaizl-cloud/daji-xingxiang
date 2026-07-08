@@ -91,6 +91,7 @@ if (!findings.length) {
     "daji-xingxiang-env-handoff.md",
     "daji-xingxiang-github-handoff.md",
     "daji-xingxiang-launch-summary.md",
+    "daji-xingxiang-model-handoff.md",
     "daji-xingxiang-supabase-init.sql",
     "daji-xingxiang-vercel-handoff.md",
   ];
@@ -119,6 +120,7 @@ if (!findings.length) {
     "release:github-handoff",
     "release:supabase-sql",
     "release:vercel-handoff",
+    "release:model-handoff",
     "release:launch-summary",
   ]);
 
@@ -146,7 +148,17 @@ if (!findings.length) {
     archiveFile,
     "GitHub 仓库交接单",
     "Vercel 部署交接单",
+    "AI 模型通道交接单",
     "Supabase 初始化 SQL",
+  ]);
+
+  const modelHandoff = readDistFile("daji-xingxiang-model-handoff.md");
+  requireIncludes("daji-xingxiang-model-handoff.md", modelHandoff, [
+    "大吉形象 AI 模型通道交接单",
+    "KIE_API_KEY",
+    "/api/provider-callback/kie",
+    "gpt-image-2-text-to-image",
+    "OPENAI_API_KEY",
   ]);
 
   const supabaseSql = readDistFile("daji-xingxiang-supabase-init.sql");
