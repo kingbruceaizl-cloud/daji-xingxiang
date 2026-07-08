@@ -69,6 +69,7 @@ for (const script of [
   "check:release",
   "check:deploy",
   "release:check",
+  "release:archive",
   "publish:status",
   "smoke:admin-demo",
   "smoke:prod",
@@ -115,6 +116,16 @@ requireIncludes("scripts/check-secret-safety.mjs", secretSafetyCheck, [
   "OPENAI_API_KEY",
   "KIE_API_KEY",
   "PRIVATE KEY",
+]);
+
+const releaseArchive = requireFile("scripts/create-release-archive.mjs");
+requireIncludes("scripts/create-release-archive.mjs", releaseArchive, [
+  "大吉形象源码交付包生成",
+  "git",
+  "archive",
+  "daji-xingxiang-source-",
+  "dist",
+  "只包含 Git 已提交文件",
 ]);
 
 const vercelConfig = requireFile("vercel.json");
@@ -255,6 +266,7 @@ requireIncludes(".gitignore", gitignore, [
   ".env",
   ".env.production",
   ".vercel",
+  "/dist",
 ]);
 requireExcludes(".gitignore", gitignore, ["next-env.d.ts"]);
 

@@ -29,6 +29,20 @@ git remote remove origin
 git remote add origin https://github.com/你的账号/你的仓库.git
 ```
 
+如果暂时不能配置 GitHub 远程仓库，也可以生成干净源码交付包：
+
+```bash
+pnpm run release:archive
+```
+
+生成位置：
+
+```text
+dist/daji-xingxiang-source-<提交号>.zip
+```
+
+该压缩包只包含 Git 已提交文件，不包含 `node_modules`、`.next`、`.env` 或 `.vercel`。
+
 ## Vercel 导入设置
 
 - Framework：Next.js

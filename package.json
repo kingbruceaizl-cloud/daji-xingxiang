@@ -18,6 +18,7 @@
     "check:release": "node scripts/check-release-package.mjs",
     "check:deploy": "node scripts/check-deploy-target.mjs",
     "release:check": "node scripts/release-check.mjs",
+    "release:archive": "node scripts/create-release-archive.mjs",
     "publish:status": "node scripts/publish-status.mjs",
     "supabase:sql": "node scripts/print-supabase-sql.mjs",
     "smoke:admin-demo": "node scripts/smoke-admin-demo.mjs",
