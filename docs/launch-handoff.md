@@ -32,8 +32,7 @@ git remote add origin https://github.com/你的账号/你的仓库.git
 如果暂时不能配置 GitHub 远程仓库，也可以生成干净源码交付包：
 
 ```bash
-pnpm run release:archive
-pnpm run release:verify-archive
+pnpm run release:package
 ```
 
 生成位置：
@@ -44,7 +43,7 @@ dist/daji-xingxiang-source-<提交号>.zip.sha256
 dist/daji-xingxiang-release-<提交号>.json
 ```
 
-该压缩包只包含 Git 已提交文件，不包含 `node_modules`、`.next`、`.env` 或 `.vercel`。`.sha256` 文件用于校验压缩包完整性，JSON 清单记录提交号、生成时间、文件大小和校验摘要。`release:verify-archive` 会复核源码包、校验文件和清单是否一致，并确认压缩包内包含上线所需的关键源码、文档和 Supabase 初始化文件。
+该压缩包只包含 Git 已提交文件，不包含 `node_modules`、`.next`、`.env` 或 `.vercel`。`.sha256` 文件用于校验压缩包完整性，JSON 清单记录提交号、生成时间、文件大小和校验摘要。`release:package` 会生成源码包后立即复核源码包、校验文件和清单是否一致，并确认压缩包内包含上线所需的关键源码、文档和 Supabase 初始化文件。需要排查时，可拆开运行 `release:archive` 和 `release:verify-archive`。
 
 ## Vercel 导入设置
 

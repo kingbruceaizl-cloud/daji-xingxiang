@@ -125,11 +125,10 @@ ALLOW_MANUAL_VERCEL_DEPLOY=1 pnpm run check:deploy
 如果暂时不能推送 GitHub，也可以生成并校验源码交付包：
 
 ```bash
-pnpm run release:archive
-pnpm run release:verify-archive
+pnpm run release:package
 ```
 
-校验通过后，`dist/daji-xingxiang-source-<提交号>.zip` 可作为干净源码包交给部署环境使用。
+校验通过后，`dist/daji-xingxiang-source-<提交号>.zip` 可作为干净源码包交给部署环境使用。需要排查时，可拆开运行 `release:archive` 和 `release:verify-archive`。
 
 部署完成后运行线上冒烟测试：
 

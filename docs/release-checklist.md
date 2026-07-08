@@ -4,8 +4,7 @@
 
 ```bash
 pnpm run release:check
-pnpm run release:archive
-pnpm run release:verify-archive
+pnpm run release:package
 pnpm run verify:commit
 pnpm run verify:local
 pnpm run check:secrets

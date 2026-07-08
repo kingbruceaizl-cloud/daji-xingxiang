@@ -70,6 +70,7 @@ for (const script of [
   "check:deploy",
   "release:check",
   "release:archive",
+  "release:package",
   "release:verify-archive",
   "publish:status",
   "smoke:admin-demo",
@@ -129,6 +130,7 @@ requireIncludes("scripts/create-release-archive.mjs", releaseArchive, [
   "sha256",
   ".sha256",
   "dist",
+  "release:verify-archive",
   "只包含 Git 已提交文件",
 ]);
 
@@ -138,6 +140,7 @@ requireIncludes("scripts/verify-release-archive.mjs", verifyReleaseArchive, [
   "RELEASE_MANIFEST",
   "daji-xingxiang-release-",
   "daji-xingxiang-source-",
+  "release:package",
   "SHA256",
   "node_modules",
   ".next",

@@ -35,7 +35,7 @@ function resolveDistPath(fileName) {
 function findLatestManifest() {
   const distDir = resolve(process.cwd(), "dist");
   if (!existsSync(distDir)) {
-    fail("缺少 dist 目录，请先运行 pnpm run release:archive。");
+    fail("缺少 dist 目录，请先运行 pnpm run release:package。");
     return "";
   }
 
@@ -48,7 +48,7 @@ function findLatestManifest() {
     .sort((a, b) => b.mtimeMs - a.mtimeMs);
 
   if (!candidates.length) {
-    fail("缺少发布清单，请先运行 pnpm run release:archive。");
+    fail("缺少发布清单，请先运行 pnpm run release:package。");
     return "";
   }
 
