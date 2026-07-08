@@ -27,6 +27,7 @@ SMOKE_BASE_URL=https://你的域名 pnpm run smoke:url
 - 源码交付包、SHA256 校验文件和 JSON 发布清单。
 - 环境变量交接单。
 - Supabase 初始化 SQL 交付文件。
+- Vercel 部署交接单。
 - 上线摘要。
 - 后台演示模式下商品、风格、视频脚本、音乐、模型、任务和上线体检页面。
 - GitHub/Vercel 导入所需的部署目标条件。
@@ -125,4 +126,4 @@ pnpm run verify:local
 
 建议自动化验证通过后再进入正式部署。
 
-需要从 GitHub 生成源码交付包时，可在 Actions 页面手动运行 `.github/workflows/release-package.yml`。该工作流会先执行 `pnpm run verify:ci`，再执行 `pnpm run release:package`，最后上传源码包、SHA256 校验文件、JSON 发布清单、环境变量交接单、Supabase 初始化 SQL 和上线摘要。
+需要从 GitHub 生成源码交付包时，可在 Actions 页面手动运行 `.github/workflows/release-package.yml`。该工作流会先执行 `pnpm run verify:ci`，再执行 `pnpm run release:package`，最后上传源码包、SHA256 校验文件、JSON 发布清单、环境变量交接单、Supabase 初始化 SQL、Vercel 部署交接单和上线摘要。

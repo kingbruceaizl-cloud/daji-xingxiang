@@ -43,5 +43,6 @@ jobs:
             dist/daji-xingxiang-env-handoff.md
             dist/daji-xingxiang-launch-summary.md
             dist/daji-xingxiang-supabase-init.sql
+            dist/daji-xingxiang-vercel-handoff.md
           if-no-files-found: error
           retention-days: 30

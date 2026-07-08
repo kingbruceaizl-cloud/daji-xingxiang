@@ -74,6 +74,7 @@ for (const script of [
   "release:launch-summary",
   "release:package",
   "release:supabase-sql",
+  "release:vercel-handoff",
   "release:verify-archive",
   "publish:status",
   "smoke:admin-demo",
@@ -136,6 +137,7 @@ requireIncludes("scripts/create-release-archive.mjs", releaseArchive, [
   "release:verify-archive",
   "release:env-handoff",
   "release:supabase-sql",
+  "release:vercel-handoff",
   "release:launch-summary",
   "只包含 Git 已提交文件",
 ]);
@@ -173,6 +175,7 @@ requireIncludes("scripts/create-launch-summary.mjs", launchSummary, [
   "daji-xingxiang-launch-summary.md",
   "daji-xingxiang-env-handoff.md",
   "daji-xingxiang-supabase-init.sql",
+  "daji-xingxiang-vercel-handoff.md",
   "daji-xingxiang-release-",
   "GitHub 远程仓库",
   "剩余上线动作",
@@ -187,6 +190,18 @@ requireIncludes("scripts/create-supabase-sql-bundle.mjs", supabaseSqlBundle, [
   "supabase/migrations/0002_auth_storage_and_indexes.sql",
   "supabase/seed/0001_seed_demo_data.sql",
   "Supabase SQL Editor",
+]);
+
+const vercelHandoff = requireFile("scripts/create-vercel-handoff.mjs");
+requireIncludes("scripts/create-vercel-handoff.mjs", vercelHandoff, [
+  "大吉形象 Vercel 部署交接单生成",
+  "daji-xingxiang-vercel-handoff.md",
+  "Framework Preset",
+  "Node.js Version",
+  "pnpm install --frozen-lockfile",
+  "pnpm run build",
+  "NEXT_PUBLIC_SUPABASE_URL",
+  "SMOKE_BASE_URL=https://你的域名 pnpm run smoke:url",
 ]);
 
 const vercelConfig = requireFile("vercel.json");
@@ -226,6 +241,7 @@ requireIncludes(".github/workflows/release-package.yml", releasePackageWorkflow,
   "dist/daji-xingxiang-env-handoff.md",
   "dist/daji-xingxiang-launch-summary.md",
   "dist/daji-xingxiang-supabase-init.sql",
+  "dist/daji-xingxiang-vercel-handoff.md",
 ]);
 
 const materialCheck = requireFile("scripts/check-material-sources.mjs");

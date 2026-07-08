@@ -74,6 +74,7 @@ pnpm run release:package
 pnpm run release:env-handoff
 pnpm run release:launch-summary
 pnpm run release:supabase-sql
+pnpm run release:vercel-handoff
 pnpm run publish:status
 pnpm run verify:ci
 pnpm run verify:commit
@@ -91,7 +92,7 @@ pnpm run supabase:sql
 pnpm run preflight
 ```
 
-正式上线前优先运行 `release:check`，它会串联后台演示模式冒烟测试、本地发布包验证、生产模式冒烟测试、部署目标审计、正式环境变量预检，并在检测到线上 https 域名后继续检查公网地址。`release:package` 会基于当前 Git 提交生成干净源码交付包、SHA256 校验文件、JSON 发布清单、环境变量交接单、Supabase 初始化 SQL 和上线摘要，并立即校验源码包三件套是否一致；压缩包不包含依赖、构建产物、真实环境变量或 `.vercel`。如需单独生成 Supabase SQL 交付文件，可运行 `release:supabase-sql`，输出文件可直接复制到 Supabase SQL Editor 执行。`publish:status` 会用中文显示 GitHub、Vercel、Supabase、模型密钥和本地配置的发布通道状态，但不会打印任何密钥值。`verify:ci` 会模拟 GitHub Actions，执行完整本地发布验证和生产模式冒烟测试。推送到 GitHub 后，`verify.yml` 会自动运行 `verify:ci`；需要交付源码包时可手动运行 `release-package.yml` 并下载 Actions 附件；部署后可手动运行 `online-smoke.yml` 并输入线上域名。首次提交前优先运行 `verify:commit`，它会用锁文件严格安装依赖，再执行完整本地发布验证。`verify:local` 会检查环境变量模板、密钥安全、中文界面、素材来源、Supabase 初始化文件、发布包基础文件、代码规范和生产构建。`check:secrets` 会扫描待提交文件，防止真实模型密钥、Service Role Key、JWT 或私钥误提交。`check:deploy` 会检查当前项目是否具备 GitHub/Vercel 导入所需的基础条件；如果选择 Vercel CLI 手动部署，可使用 `ALLOW_MANUAL_VERCEL_DEPLOY=1 pnpm run check:deploy` 跳过 Git 远程仓库要求。`smoke:admin-demo` 会清空 Supabase 环境变量并确认后台商品、风格、视频脚本、音乐、模型、任务和上线体检页面都能在演示模式打开。`smoke:prod` 会启动生产模式服务并检查关键页面和接口。`smoke:url` 用于部署后检查线上域名。`supabase:sql` 会按顺序输出初始化 SQL，方便复制到 Supabase SQL Editor。没有配置正式环境变量时，`preflight` 和 `release:check` 会提示缺少的上线配置；本地演示可以继续使用 `pnpm run dev`。
+正式上线前优先运行 `release:check`，它会串联后台演示模式冒烟测试、本地发布包验证、生产模式冒烟测试、部署目标审计、正式环境变量预检，并在检测到线上 https 域名后继续检查公网地址。`release:package` 会基于当前 Git 提交生成干净源码交付包、SHA256 校验文件、JSON 发布清单、环境变量交接单、Supabase 初始化 SQL、Vercel 部署交接单和上线摘要，并立即校验源码包三件套是否一致；压缩包不包含依赖、构建产物、真实环境变量或 `.vercel`。如需单独生成 Vercel 部署交接单，可运行 `release:vercel-handoff`，输出文件会列出导入 Vercel 时的框架、Node、安装命令、构建命令和部署后检查。`publish:status` 会用中文显示 GitHub、Vercel、Supabase、模型密钥和本地配置的发布通道状态，但不会打印任何密钥值。`verify:ci` 会模拟 GitHub Actions，执行完整本地发布验证和生产模式冒烟测试。推送到 GitHub 后，`verify.yml` 会自动运行 `verify:ci`；需要交付源码包时可手动运行 `release-package.yml` 并下载 Actions 附件；部署后可手动运行 `online-smoke.yml` 并输入线上域名。首次提交前优先运行 `verify:commit`，它会用锁文件严格安装依赖，再执行完整本地发布验证。`verify:local` 会检查环境变量模板、密钥安全、中文界面、素材来源、Supabase 初始化文件、发布包基础文件、代码规范和生产构建。`check:secrets` 会扫描待提交文件，防止真实模型密钥、Service Role Key、JWT 或私钥误提交。`check:deploy` 会检查当前项目是否具备 GitHub/Vercel 导入所需的基础条件；如果选择 Vercel CLI 手动部署，可使用 `ALLOW_MANUAL_VERCEL_DEPLOY=1 pnpm run check:deploy` 跳过 Git 远程仓库要求。`smoke:admin-demo` 会清空 Supabase 环境变量并确认后台商品、风格、视频脚本、音乐、模型、任务和上线体检页面都能在演示模式打开。`smoke:prod` 会启动生产模式服务并检查关键页面和接口。`smoke:url` 用于部署后检查线上域名。`supabase:sql` 会按顺序输出初始化 SQL，方便复制到 Supabase SQL Editor。没有配置正式环境变量时，`preflight` 和 `release:check` 会提示缺少的上线配置；本地演示可以继续使用 `pnpm run dev`。
 
 也可以打开 `/admin/launch` 查看中文上线体检页面，确认 Supabase、数据库、存储桶和模型通道是否就绪。
 
