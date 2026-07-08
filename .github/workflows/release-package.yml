@@ -41,5 +41,6 @@ jobs:
             dist/daji-xingxiang-source-*.zip.sha256
             dist/daji-xingxiang-release-*.json
             dist/daji-xingxiang-env-handoff.md
+            dist/daji-xingxiang-launch-summary.md
           if-no-files-found: error
           retention-days: 30

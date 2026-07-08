@@ -89,6 +89,7 @@ const manifest = {
     "pnpm run verify:ci",
     "pnpm run release:verify-archive",
     "pnpm run release:env-handoff",
+    "pnpm run release:launch-summary",
     "pnpm run release:check",
   ],
 };

@@ -71,6 +71,7 @@ for (const script of [
   "release:check",
   "release:archive",
   "release:env-handoff",
+  "release:launch-summary",
   "release:package",
   "release:verify-archive",
   "publish:status",
@@ -133,6 +134,7 @@ requireIncludes("scripts/create-release-archive.mjs", releaseArchive, [
   "dist",
   "release:verify-archive",
   "release:env-handoff",
+  "release:launch-summary",
   "只包含 Git 已提交文件",
 ]);
 
@@ -161,6 +163,17 @@ requireIncludes("scripts/verify-release-archive.mjs", verifyReleaseArchive, [
   ".env.production",
   "supabase/migrations/0001_initial_schema.sql",
   "supabase/seed/0001_seed_demo_data.sql",
+]);
+
+const launchSummary = requireFile("scripts/create-launch-summary.mjs");
+requireIncludes("scripts/create-launch-summary.mjs", launchSummary, [
+  "大吉形象上线摘要生成",
+  "daji-xingxiang-launch-summary.md",
+  "daji-xingxiang-env-handoff.md",
+  "daji-xingxiang-release-",
+  "GitHub 远程仓库",
+  "剩余上线动作",
+  "不输出任何真实密钥值",
 ]);
 
 const vercelConfig = requireFile("vercel.json");
@@ -198,6 +211,7 @@ requireIncludes(".github/workflows/release-package.yml", releasePackageWorkflow,
   "dist/daji-xingxiang-source-*.zip.sha256",
   "dist/daji-xingxiang-release-*.json",
   "dist/daji-xingxiang-env-handoff.md",
+  "dist/daji-xingxiang-launch-summary.md",
 ]);
 
 const materialCheck = requireFile("scripts/check-material-sources.mjs");
