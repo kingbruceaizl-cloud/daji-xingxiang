@@ -71,6 +71,7 @@ cp .env.example .env.local
 ```bash
 pnpm run release:check
 pnpm run publish:status
+pnpm run verify:ci
 pnpm run verify:commit
 pnpm run verify:local
 pnpm run check:env
@@ -86,7 +87,7 @@ pnpm run supabase:sql
 pnpm run preflight
 ```
 
-正式上线前优先运行 `release:check`，它会串联后台演示模式冒烟测试、本地发布包验证、生产模式冒烟测试、部署目标审计、正式环境变量预检，并在检测到线上 https 域名后继续检查公网地址。`publish:status` 会用中文显示 GitHub、Vercel、Supabase、模型密钥和本地配置的发布通道状态，但不会打印任何密钥值。首次提交前优先运行 `verify:commit`，它会用锁文件严格安装依赖，再执行完整本地发布验证。`verify:local` 会检查环境变量模板、密钥安全、中文界面、素材来源、Supabase 初始化文件、发布包基础文件、代码规范和生产构建。`check:secrets` 会扫描待提交文件，防止真实模型密钥、Service Role Key、JWT 或私钥误提交。`check:deploy` 会检查当前项目是否具备 GitHub/Vercel 导入所需的基础条件；如果选择 Vercel CLI 手动部署，可使用 `ALLOW_MANUAL_VERCEL_DEPLOY=1 pnpm run check:deploy` 跳过 Git 远程仓库要求。`smoke:admin-demo` 会清空 Supabase 环境变量并确认后台商品、风格、视频脚本、音乐、模型、任务和上线体检页面都能在演示模式打开。`smoke:prod` 会启动生产模式服务并检查关键页面和接口。`smoke:url` 用于部署后检查线上域名。`supabase:sql` 会按顺序输出初始化 SQL，方便复制到 Supabase SQL Editor。没有配置正式环境变量时，`preflight` 和 `release:check` 会提示缺少的上线配置；本地演示可以继续使用 `pnpm run dev`。
+正式上线前优先运行 `release:check`，它会串联后台演示模式冒烟测试、本地发布包验证、生产模式冒烟测试、部署目标审计、正式环境变量预检，并在检测到线上 https 域名后继续检查公网地址。`publish:status` 会用中文显示 GitHub、Vercel、Supabase、模型密钥和本地配置的发布通道状态，但不会打印任何密钥值。`verify:ci` 会模拟 GitHub Actions，执行完整本地发布验证和生产模式冒烟测试。首次提交前优先运行 `verify:commit`，它会用锁文件严格安装依赖，再执行完整本地发布验证。`verify:local` 会检查环境变量模板、密钥安全、中文界面、素材来源、Supabase 初始化文件、发布包基础文件、代码规范和生产构建。`check:secrets` 会扫描待提交文件，防止真实模型密钥、Service Role Key、JWT 或私钥误提交。`check:deploy` 会检查当前项目是否具备 GitHub/Vercel 导入所需的基础条件；如果选择 Vercel CLI 手动部署，可使用 `ALLOW_MANUAL_VERCEL_DEPLOY=1 pnpm run check:deploy` 跳过 Git 远程仓库要求。`smoke:admin-demo` 会清空 Supabase 环境变量并确认后台商品、风格、视频脚本、音乐、模型、任务和上线体检页面都能在演示模式打开。`smoke:prod` 会启动生产模式服务并检查关键页面和接口。`smoke:url` 用于部署后检查线上域名。`supabase:sql` 会按顺序输出初始化 SQL，方便复制到 Supabase SQL Editor。没有配置正式环境变量时，`preflight` 和 `release:check` 会提示缺少的上线配置；本地演示可以继续使用 `pnpm run dev`。
 
 也可以打开 `/admin/launch` 查看中文上线体检页面，确认 Supabase、数据库、存储桶和模型通道是否就绪。
 

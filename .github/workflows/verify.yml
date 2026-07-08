@@ -9,7 +9,7 @@ on:
 
 jobs:
   verify:
-    name: 中文、初始化、发布包和构建检查
+    name: 中文、初始化、发布包、构建和生产冒烟检查
     runs-on: ubuntu-latest
 
     steps:
@@ -30,5 +30,5 @@ jobs:
       - name: 安装依赖
         run: pnpm install --frozen-lockfile
 
-      - name: 运行本地发布验证
-        run: pnpm run verify:local
+      - name: 运行 CI 发布验证
+        run: pnpm run verify:ci

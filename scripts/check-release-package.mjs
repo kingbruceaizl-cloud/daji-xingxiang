@@ -73,6 +73,7 @@ for (const script of [
   "smoke:admin-demo",
   "smoke:prod",
   "smoke:url",
+  "verify:ci",
   "verify:commit",
   "verify:local",
   "preflight",
@@ -126,7 +127,7 @@ requireIncludes("vercel.json", vercelConfig, [
 const githubWorkflow = requireFile(".github/workflows/verify.yml");
 requireIncludes(".github/workflows/verify.yml", githubWorkflow, [
   "大吉形象发布验证",
-  "pnpm run verify:local",
+  "pnpm run verify:ci",
   "node-version-file: .node-version",
   "pnpm install --frozen-lockfile",
 ]);

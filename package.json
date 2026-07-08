@@ -23,6 +23,7 @@
     "smoke:admin-demo": "node scripts/smoke-admin-demo.mjs",
     "smoke:prod": "node scripts/smoke-prod.mjs",
     "smoke:url": "node scripts/smoke-url.mjs",
+    "verify:ci": "pnpm run verify:local && pnpm run smoke:prod",
     "verify:commit": "pnpm install --frozen-lockfile && pnpm run verify:local",
     "verify:local": "pnpm run check:env && pnpm run check:secrets && pnpm run check:zh && pnpm run check:materials && pnpm run check:supabase && pnpm run check:release && pnpm run lint && pnpm run build",
     "preflight": "node scripts/preflight.mjs"
