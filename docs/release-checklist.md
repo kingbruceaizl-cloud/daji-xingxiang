@@ -4,6 +4,8 @@
 
 ```bash
 pnpm run release:check
+pnpm run release:archive
+pnpm run release:verify-archive
 pnpm run verify:commit
 pnpm run verify:local
 pnpm run check:secrets
@@ -23,6 +25,7 @@ SMOKE_BASE_URL=https://你的域名 pnpm run smoke:url
 - 线上素材来源记录。
 - Supabase 初始化文件。
 - 发布包基础文件。
+- 源码交付包、SHA256 校验文件和 JSON 发布清单。
 - 后台演示模式下商品、风格、视频脚本、音乐、模型、任务和上线体检页面。
 - GitHub/Vercel 导入所需的部署目标条件。
 - 代码规范。

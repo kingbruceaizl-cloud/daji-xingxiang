@@ -33,6 +33,7 @@ git remote add origin https://github.com/你的账号/你的仓库.git
 
 ```bash
 pnpm run release:archive
+pnpm run release:verify-archive
 ```
 
 生成位置：
@@ -43,7 +44,7 @@ dist/daji-xingxiang-source-<提交号>.zip.sha256
 dist/daji-xingxiang-release-<提交号>.json
 ```
 
-该压缩包只包含 Git 已提交文件，不包含 `node_modules`、`.next`、`.env` 或 `.vercel`。`.sha256` 文件用于校验压缩包完整性，JSON 清单记录提交号、生成时间、文件大小和校验摘要。
+该压缩包只包含 Git 已提交文件，不包含 `node_modules`、`.next`、`.env` 或 `.vercel`。`.sha256` 文件用于校验压缩包完整性，JSON 清单记录提交号、生成时间、文件大小和校验摘要。`release:verify-archive` 会复核源码包、校验文件和清单是否一致，并确认压缩包内包含上线所需的关键源码、文档和 Supabase 初始化文件。
 
 ## Vercel 导入设置
 

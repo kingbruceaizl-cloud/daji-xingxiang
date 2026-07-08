@@ -122,6 +122,15 @@ ALLOW_MANUAL_VERCEL_DEPLOY=1 pnpm run check:deploy
 
 项目还提供 GitHub Actions 自动验证，见 `docs/ci-release.md`。建议自动化验证通过后再部署到 Vercel。
 
+如果暂时不能推送 GitHub，也可以生成并校验源码交付包：
+
+```bash
+pnpm run release:archive
+pnpm run release:verify-archive
+```
+
+校验通过后，`dist/daji-xingxiang-source-<提交号>.zip` 可作为干净源码包交给部署环境使用。
+
 部署完成后运行线上冒烟测试：
 
 ```bash

@@ -70,6 +70,7 @@ for (const script of [
   "check:deploy",
   "release:check",
   "release:archive",
+  "release:verify-archive",
   "publish:status",
   "smoke:admin-demo",
   "smoke:prod",
@@ -129,6 +130,20 @@ requireIncludes("scripts/create-release-archive.mjs", releaseArchive, [
   ".sha256",
   "dist",
   "只包含 Git 已提交文件",
+]);
+
+const verifyReleaseArchive = requireFile("scripts/verify-release-archive.mjs");
+requireIncludes("scripts/verify-release-archive.mjs", verifyReleaseArchive, [
+  "大吉形象源码交付包校验",
+  "RELEASE_MANIFEST",
+  "daji-xingxiang-release-",
+  "daji-xingxiang-source-",
+  "SHA256",
+  "node_modules",
+  ".next",
+  ".env.production",
+  "supabase/migrations/0001_initial_schema.sql",
+  "supabase/seed/0001_seed_demo_data.sql",
 ]);
 
 const vercelConfig = requireFile("vercel.json");
