@@ -58,21 +58,19 @@ SUPABASE_SERVICE_ROLE_KEY=
 
 ## 3. Vercel 部署
 
-1. 将项目推送到 GitHub。当前项目已初始化本地 Git 仓库，并使用 `main` 作为默认分支；还需要创建初始提交并关联 GitHub 远程仓库：
+1. 将项目推送到 GitHub。当前项目已初始化本地 Git 仓库，使用 `main` 作为默认分支，并已创建本地初始提交；还需要创建 GitHub 空仓库并关联远程仓库：
 
 ```bash
 git status --short
-git add .
-git commit -m "初始化大吉形象 MVP"
 git remote add origin https://github.com/你的账号/你的仓库.git
 git push -u origin main
 ```
 
-如果 Git 提示缺少作者信息，先配置你的姓名和邮箱：
+如果远程仓库地址填错，先移除后重加：
 
 ```bash
-git config --global user.name "你的名字"
-git config --global user.email "你的邮箱"
+git remote remove origin
+git remote add origin https://github.com/你的账号/你的仓库.git
 ```
 
 2. 在 Vercel 中导入该 GitHub 仓库。

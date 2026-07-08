@@ -313,6 +313,7 @@ for (const doc of [
   "docs/frontend-requirements.md",
   "docs/backend-requirements.md",
   "docs/deployment.md",
+  "docs/launch-handoff.md",
   "docs/supabase-setup.md",
   "docs/ci-release.md",
   "docs/env-vars.md",

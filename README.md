@@ -108,5 +108,6 @@ pnpm run preflight
 - 环境变量配置：`docs/env-vars.md`
 - 自动化发布验证：`docs/ci-release.md`
 - 发布前检查：`docs/release-checklist.md`
+- 上线交接单：`docs/launch-handoff.md`
 - 上线说明：`docs/deployment.md`
 - 素材来源：`docs/material-sources.md`

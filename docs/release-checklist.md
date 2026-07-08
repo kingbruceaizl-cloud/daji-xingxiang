@@ -86,17 +86,15 @@ pnpm run check:deploy
 
 该命令会检查项目是否已经是 Git 仓库、是否已有初始提交、是否配置了 `origin` 远程仓库、是否具备 Vercel 配置文件和正式环境变量模板。若选择 Vercel CLI 手动部署，可以使用 `ALLOW_MANUAL_VERCEL_DEPLOY=1 pnpm run check:deploy` 跳过 Git 远程仓库要求。
 
-当前本地项目已经初始化 Git 仓库，后续需要你创建 GitHub 仓库后执行：
+当前本地项目已经初始化 Git 仓库，并已创建本地初始提交。后续需要你创建 GitHub 仓库后执行：
 
 ```bash
 pnpm run verify:commit
-git config --global user.name "你的名字"
-git config --global user.email "你的邮箱"
-git add .
-git commit -m "初始化大吉形象 MVP"
 git remote add origin https://github.com/你的账号/你的仓库.git
 git push -u origin main
 ```
+
+更完整的交接步骤见 `docs/launch-handoff.md`。
 
 部署后，将线上域名填入 `NEXT_PUBLIC_APP_URL`，再重新运行上线体检。
 
