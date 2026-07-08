@@ -122,6 +122,8 @@ pnpm run release:check
 SMOKE_BASE_URL=https://你的域名 pnpm run smoke:url
 ```
 
+也可以在 GitHub Actions 页面手动运行“大吉形象线上冒烟验证”，输入线上域名后自动执行同样的线上检查。
+
 也可以打开：
 
 ```text

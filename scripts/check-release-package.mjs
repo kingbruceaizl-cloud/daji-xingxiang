@@ -132,6 +132,15 @@ requireIncludes(".github/workflows/verify.yml", githubWorkflow, [
   "pnpm install --frozen-lockfile",
 ]);
 
+const onlineSmokeWorkflow = requireFile(".github/workflows/online-smoke.yml");
+requireIncludes(".github/workflows/online-smoke.yml", onlineSmokeWorkflow, [
+  "大吉形象线上冒烟验证",
+  "workflow_dispatch",
+  "base_url",
+  "SMOKE_BASE_URL",
+  "pnpm run smoke:url",
+]);
+
 const materialCheck = requireFile("scripts/check-material-sources.mjs");
 requireIncludes("scripts/check-material-sources.mjs", materialCheck, [
   "大吉形象素材来源检查",
