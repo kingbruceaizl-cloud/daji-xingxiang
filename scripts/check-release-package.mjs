@@ -71,6 +71,7 @@ for (const script of [
   "release:check",
   "release:archive",
   "release:env-handoff",
+  "release:github-handoff",
   "release:launch-summary",
   "release:package",
   "release:supabase-sql",
@@ -136,6 +137,7 @@ requireIncludes("scripts/create-release-archive.mjs", releaseArchive, [
   "dist",
   "release:verify-archive",
   "release:env-handoff",
+  "release:github-handoff",
   "release:supabase-sql",
   "release:vercel-handoff",
   "release:launch-summary",
@@ -152,6 +154,17 @@ requireIncludes("scripts/create-env-handoff.mjs", envHandoff, [
   "KIE_API_KEY",
   "Supabase Auth 回调地址",
   "不输出任何真实密钥值",
+]);
+
+const githubHandoff = requireFile("scripts/create-github-handoff.mjs");
+requireIncludes("scripts/create-github-handoff.mjs", githubHandoff, [
+  "大吉形象 GitHub 仓库交接单生成",
+  "daji-xingxiang-github-handoff.md",
+  "git remote add origin",
+  "git push -u origin",
+  "大吉形象发布验证",
+  "大吉形象源码包交付",
+  "daji-xingxiang-source-package",
 ]);
 
 const verifyReleaseArchive = requireFile("scripts/verify-release-archive.mjs");
@@ -174,6 +187,7 @@ requireIncludes("scripts/create-launch-summary.mjs", launchSummary, [
   "大吉形象上线摘要生成",
   "daji-xingxiang-launch-summary.md",
   "daji-xingxiang-env-handoff.md",
+  "daji-xingxiang-github-handoff.md",
   "daji-xingxiang-supabase-init.sql",
   "daji-xingxiang-vercel-handoff.md",
   "daji-xingxiang-release-",
@@ -239,6 +253,7 @@ requireIncludes(".github/workflows/release-package.yml", releasePackageWorkflow,
   "dist/daji-xingxiang-source-*.zip.sha256",
   "dist/daji-xingxiang-release-*.json",
   "dist/daji-xingxiang-env-handoff.md",
+  "dist/daji-xingxiang-github-handoff.md",
   "dist/daji-xingxiang-launch-summary.md",
   "dist/daji-xingxiang-supabase-init.sql",
   "dist/daji-xingxiang-vercel-handoff.md",

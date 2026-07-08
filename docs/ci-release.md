@@ -76,6 +76,7 @@ pnpm run release:package
 - `daji-xingxiang-source-<提交号>.zip.sha256`
 - `daji-xingxiang-release-<提交号>.json`
 - `daji-xingxiang-env-handoff.md`
+- `daji-xingxiang-github-handoff.md`
 - `daji-xingxiang-launch-summary.md`
 - `daji-xingxiang-supabase-init.sql`
 - `daji-xingxiang-vercel-handoff.md`

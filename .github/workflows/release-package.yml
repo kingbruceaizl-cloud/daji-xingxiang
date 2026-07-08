@@ -41,6 +41,7 @@ jobs:
             dist/daji-xingxiang-source-*.zip.sha256
             dist/daji-xingxiang-release-*.json
             dist/daji-xingxiang-env-handoff.md
+            dist/daji-xingxiang-github-handoff.md
             dist/daji-xingxiang-launch-summary.md
             dist/daji-xingxiang-supabase-init.sql
             dist/daji-xingxiang-vercel-handoff.md

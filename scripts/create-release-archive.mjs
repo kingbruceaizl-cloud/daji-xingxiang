@@ -89,6 +89,7 @@ const manifest = {
     "pnpm run verify:ci",
     "pnpm run release:verify-archive",
     "pnpm run release:env-handoff",
+    "pnpm run release:github-handoff",
     "pnpm run release:supabase-sql",
     "pnpm run release:vercel-handoff",
     "pnpm run release:launch-summary",
