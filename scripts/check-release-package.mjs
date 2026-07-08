@@ -69,6 +69,7 @@ for (const script of [
   "check:release",
   "check:deploy",
   "release:check",
+  "publish:status",
   "smoke:admin-demo",
   "smoke:prod",
   "smoke:url",
@@ -225,6 +226,16 @@ requireIncludes("scripts/check-deploy-target.mjs", deployTargetCheck, [
   "engines.node",
   "latestDependencies",
   "ALLOW_MANUAL_VERCEL_DEPLOY",
+  "NEXT_PUBLIC_APP_URL",
+]);
+
+const publishStatus = requireFile("scripts/publish-status.mjs");
+requireIncludes("scripts/publish-status.mjs", publishStatus, [
+  "大吉形象发布通道状态",
+  "GitHub 远程 origin",
+  "Vercel Token",
+  "Supabase Access Token",
+  "AI 模型密钥",
   "NEXT_PUBLIC_APP_URL",
 ]);
 

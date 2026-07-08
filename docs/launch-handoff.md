@@ -98,6 +98,12 @@ https://你的域名/auth/update-password
 
 ## 发布前后检查
 
+查看当前发布通道状态：
+
+```bash
+pnpm run publish:status
+```
+
 推送前：
 
 ```bash
