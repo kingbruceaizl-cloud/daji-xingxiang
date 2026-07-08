@@ -41,10 +41,11 @@ cp .env.example .env.local
 
 ```bash
 pnpm run check:env
+pnpm run release:env-handoff
 pnpm run preflight
 ```
 
-`check:env` 检查模板是否齐全；`preflight` 检查当前环境是否满足正式上线条件。
+`check:env` 检查模板是否齐全；`release:env-handoff` 会生成 `dist/daji-xingxiang-env-handoff.md`，用于交接 Vercel、Supabase 和模型通道配置，不输出任何真实密钥值；`preflight` 检查当前环境是否满足正式上线条件。
 
 ## 5. 安全提醒
 

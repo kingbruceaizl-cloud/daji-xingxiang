@@ -70,6 +70,7 @@ for (const script of [
   "check:deploy",
   "release:check",
   "release:archive",
+  "release:env-handoff",
   "release:package",
   "release:verify-archive",
   "publish:status",
@@ -131,7 +132,20 @@ requireIncludes("scripts/create-release-archive.mjs", releaseArchive, [
   ".sha256",
   "dist",
   "release:verify-archive",
+  "release:env-handoff",
   "只包含 Git 已提交文件",
+]);
+
+const envHandoff = requireFile("scripts/create-env-handoff.mjs");
+requireIncludes("scripts/create-env-handoff.mjs", envHandoff, [
+  "大吉形象环境变量交接单生成",
+  "daji-xingxiang-env-handoff.md",
+  "NEXT_PUBLIC_SUPABASE_URL",
+  "SUPABASE_SERVICE_ROLE_KEY",
+  "NEXT_PUBLIC_APP_URL",
+  "KIE_API_KEY",
+  "Supabase Auth 回调地址",
+  "不输出任何真实密钥值",
 ]);
 
 const verifyReleaseArchive = requireFile("scripts/verify-release-archive.mjs");
@@ -183,6 +197,7 @@ requireIncludes(".github/workflows/release-package.yml", releasePackageWorkflow,
   "dist/daji-xingxiang-source-*.zip",
   "dist/daji-xingxiang-source-*.zip.sha256",
   "dist/daji-xingxiang-release-*.json",
+  "dist/daji-xingxiang-env-handoff.md",
 ]);
 
 const materialCheck = requireFile("scripts/check-material-sources.mjs");

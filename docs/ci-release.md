@@ -75,6 +75,7 @@ pnpm run release:package
 - `daji-xingxiang-source-<提交号>.zip`
 - `daji-xingxiang-source-<提交号>.zip.sha256`
 - `daji-xingxiang-release-<提交号>.json`
+- `daji-xingxiang-env-handoff.md`
 
 ## 和 Vercel 的关系
 
