@@ -133,6 +133,7 @@ const lines = [
   "- [ ] Install Command 填写 `pnpm install --frozen-lockfile`。",
   "- [ ] Build Command 填写 `pnpm run build`。",
   "- [ ] 按 `dist/daji-xingxiang-env-handoff.md` 填写 Supabase 和应用环境变量。",
+  "- [ ] 使用 `dist/daji-xingxiang-vercel-env-template.env` 逐项核对 Vercel 环境变量。",
   "- [ ] 按 `dist/daji-xingxiang-model-handoff.md` 填写至少一个模型通道密钥。",
   "- [ ] 部署完成后，将正式域名写入 `NEXT_PUBLIC_APP_URL` 并重新部署。",
   "",

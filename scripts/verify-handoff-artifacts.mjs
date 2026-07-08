@@ -95,6 +95,7 @@ if (!findings.length) {
     "daji-xingxiang-model-handoff.md",
     "daji-xingxiang-supabase-init.sql",
     "daji-xingxiang-supabase-verify.sql",
+    "daji-xingxiang-vercel-env-template.env",
     "daji-xingxiang-vercel-handoff.md",
   ];
 
@@ -122,6 +123,7 @@ if (!findings.length) {
     "release:github-handoff",
     "release:supabase-sql",
     "release:supabase-verify-sql",
+    "release:vercel-env-template",
     "release:vercel-handoff",
     "release:model-handoff",
     "release:launch-runbook",
@@ -156,6 +158,7 @@ if (!findings.length) {
     "上线执行核对单",
     "Supabase 初始化 SQL",
     "Supabase 验收 SQL",
+    "Vercel 环境变量模板",
   ]);
 
   const launchRunbook = readDistFile("daji-xingxiang-launch-runbook.md");
@@ -195,6 +198,15 @@ if (!findings.length) {
     "RLS",
     "KIE 文生图模型",
     "gpt-image-2-text-to-image",
+  ]);
+
+  const vercelEnvTemplate = readDistFile("daji-xingxiang-vercel-env-template.env");
+  requireIncludes("daji-xingxiang-vercel-env-template.env", vercelEnvTemplate, [
+    "大吉形象 Vercel 环境变量模板",
+    "NEXT_PUBLIC_SUPABASE_URL=https://<你的 Supabase 项目编号>.supabase.co",
+    "SUPABASE_SERVICE_ROLE_KEY=<填写 Supabase Service Role Key>",
+    "NEXT_PUBLIC_APP_ENV=production",
+    "KIE_API_KEY=<填写 KIE API Key>",
   ]);
 
   const vercelHandoff = readDistFile("daji-xingxiang-vercel-handoff.md");

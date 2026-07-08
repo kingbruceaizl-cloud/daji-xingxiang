@@ -79,6 +79,7 @@ for (const script of [
   "release:package",
   "release:supabase-sql",
   "release:supabase-verify-sql",
+  "release:vercel-env-template",
   "release:vercel-handoff",
   "release:verify-archive",
   "release:verify-handoff",
@@ -145,6 +146,7 @@ requireIncludes("scripts/create-release-archive.mjs", releaseArchive, [
   "release:github-handoff",
   "release:supabase-sql",
   "release:supabase-verify-sql",
+  "release:vercel-env-template",
   "release:vercel-handoff",
   "release:model-handoff",
   "release:launch-runbook",
@@ -257,6 +259,16 @@ requireIncludes("scripts/create-supabase-verify-sql.mjs", supabaseVerifySql, [
   "gpt-image-2-text-to-image",
 ]);
 
+const vercelEnvTemplate = requireFile("scripts/create-vercel-env-template.mjs");
+requireIncludes("scripts/create-vercel-env-template.mjs", vercelEnvTemplate, [
+  "大吉形象 Vercel 环境变量模板生成",
+  "daji-xingxiang-vercel-env-template.env",
+  "NEXT_PUBLIC_SUPABASE_URL",
+  "SUPABASE_SERVICE_ROLE_KEY",
+  "NEXT_PUBLIC_APP_ENV=production",
+  "KIE_CALLBACK_SECRET",
+]);
+
 const vercelHandoff = requireFile("scripts/create-vercel-handoff.mjs");
 requireIncludes("scripts/create-vercel-handoff.mjs", vercelHandoff, [
   "大吉形象 Vercel 部署交接单生成",
@@ -278,6 +290,7 @@ requireIncludes("scripts/verify-handoff-artifacts.mjs", verifyHandoff, [
   "daji-xingxiang-model-handoff.md",
   "daji-xingxiang-supabase-init.sql",
   "daji-xingxiang-supabase-verify.sql",
+  "daji-xingxiang-vercel-env-template.env",
   "daji-xingxiang-vercel-handoff.md",
   "shortCommit",
   "未发现明显密钥风险",
@@ -324,6 +337,7 @@ requireIncludes(".github/workflows/release-package.yml", releasePackageWorkflow,
   "dist/daji-xingxiang-model-handoff.md",
   "dist/daji-xingxiang-supabase-init.sql",
   "dist/daji-xingxiang-supabase-verify.sql",
+  "dist/daji-xingxiang-vercel-env-template.env",
   "dist/daji-xingxiang-vercel-handoff.md",
 ]);
 
