@@ -42,5 +42,6 @@ jobs:
             dist/daji-xingxiang-release-*.json
             dist/daji-xingxiang-env-handoff.md
             dist/daji-xingxiang-launch-summary.md
+            dist/daji-xingxiang-supabase-init.sql
           if-no-files-found: error
           retention-days: 30

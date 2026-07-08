@@ -73,6 +73,7 @@ for (const script of [
   "release:env-handoff",
   "release:launch-summary",
   "release:package",
+  "release:supabase-sql",
   "release:verify-archive",
   "publish:status",
   "smoke:admin-demo",
@@ -134,6 +135,7 @@ requireIncludes("scripts/create-release-archive.mjs", releaseArchive, [
   "dist",
   "release:verify-archive",
   "release:env-handoff",
+  "release:supabase-sql",
   "release:launch-summary",
   "只包含 Git 已提交文件",
 ]);
@@ -170,10 +172,21 @@ requireIncludes("scripts/create-launch-summary.mjs", launchSummary, [
   "大吉形象上线摘要生成",
   "daji-xingxiang-launch-summary.md",
   "daji-xingxiang-env-handoff.md",
+  "daji-xingxiang-supabase-init.sql",
   "daji-xingxiang-release-",
   "GitHub 远程仓库",
   "剩余上线动作",
   "不输出任何真实密钥值",
+]);
+
+const supabaseSqlBundle = requireFile("scripts/create-supabase-sql-bundle.mjs");
+requireIncludes("scripts/create-supabase-sql-bundle.mjs", supabaseSqlBundle, [
+  "大吉形象 Supabase SQL 交付文件生成",
+  "daji-xingxiang-supabase-init.sql",
+  "supabase/migrations/0001_initial_schema.sql",
+  "supabase/migrations/0002_auth_storage_and_indexes.sql",
+  "supabase/seed/0001_seed_demo_data.sql",
+  "Supabase SQL Editor",
 ]);
 
 const vercelConfig = requireFile("vercel.json");
@@ -212,6 +225,7 @@ requireIncludes(".github/workflows/release-package.yml", releasePackageWorkflow,
   "dist/daji-xingxiang-release-*.json",
   "dist/daji-xingxiang-env-handoff.md",
   "dist/daji-xingxiang-launch-summary.md",
+  "dist/daji-xingxiang-supabase-init.sql",
 ]);
 
 const materialCheck = requireFile("scripts/check-material-sources.mjs");

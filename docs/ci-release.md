@@ -77,6 +77,7 @@ pnpm run release:package
 - `daji-xingxiang-release-<提交号>.json`
 - `daji-xingxiang-env-handoff.md`
 - `daji-xingxiang-launch-summary.md`
+- `daji-xingxiang-supabase-init.sql`
 
 ## 和 Vercel 的关系
 

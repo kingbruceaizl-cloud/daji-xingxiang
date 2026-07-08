@@ -21,6 +21,14 @@
 pnpm run supabase:sql
 ```
 
+生成完整交付包时也会输出数据库初始化文件：
+
+```text
+dist/daji-xingxiang-supabase-init.sql
+```
+
+创建 Supabase 项目后，可直接复制该文件全部内容到 SQL Editor 执行。
+
 ## 3. 脚本会创建什么
 
 - 用户资料、项目、素材、商品、风格模板、视频模板、音乐、模型通道、生成任务等数据表。

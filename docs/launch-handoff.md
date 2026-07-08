@@ -43,9 +43,10 @@ dist/daji-xingxiang-source-<提交号>.zip.sha256
 dist/daji-xingxiang-release-<提交号>.json
 dist/daji-xingxiang-env-handoff.md
 dist/daji-xingxiang-launch-summary.md
+dist/daji-xingxiang-supabase-init.sql
 ```
 
-该压缩包只包含 Git 已提交文件，不包含 `node_modules`、`.next`、`.env` 或 `.vercel`。`.sha256` 文件用于校验压缩包完整性，JSON 清单记录提交号、生成时间、文件大小和校验摘要。环境变量交接单用于记录 Supabase、Vercel 和模型通道需要填写的变量，不输出真实密钥值。上线摘要用于汇总当前提交、交付物、外部配置缺口和下一步动作。`release:package` 会生成源码包后立即复核源码包、校验文件和清单是否一致，并确认压缩包内包含上线所需的关键源码、文档和 Supabase 初始化文件。需要排查时，可拆开运行 `release:archive`、`release:verify-archive`、`release:env-handoff` 和 `release:launch-summary`。
+该压缩包只包含 Git 已提交文件，不包含 `node_modules`、`.next`、`.env` 或 `.vercel`。`.sha256` 文件用于校验压缩包完整性，JSON 清单记录提交号、生成时间、文件大小和校验摘要。环境变量交接单用于记录 Supabase、Vercel 和模型通道需要填写的变量，不输出真实密钥值。上线摘要用于汇总当前提交、交付物、外部配置缺口和下一步动作。Supabase 初始化 SQL 可直接复制到 Supabase SQL Editor 执行。`release:package` 会生成源码包后立即复核源码包、校验文件和清单是否一致，并确认压缩包内包含上线所需的关键源码、文档和 Supabase 初始化文件。需要排查时，可拆开运行 `release:archive`、`release:verify-archive`、`release:env-handoff`、`release:supabase-sql` 和 `release:launch-summary`。
 
 推送到 GitHub 后，也可以在 Actions 页面手动运行“大吉形象源码包交付”，工作流会先执行完整 CI 验证，再生成并上传源码包附件。
 
@@ -101,7 +102,7 @@ TONGYI_API_KEY=
 pnpm run supabase:sql
 ```
 
-然后粘贴到 Supabase SQL Editor 中执行。
+也可以使用交付目录中的 `dist/daji-xingxiang-supabase-init.sql`。将完整 SQL 粘贴到 Supabase SQL Editor 中执行。
 
 需要确认的存储桶：
 

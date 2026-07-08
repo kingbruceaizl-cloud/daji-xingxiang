@@ -147,6 +147,7 @@ const manifestFile = manifest?.shortCommit
   : "待生成";
 const envHandoffFile = "daji-xingxiang-env-handoff.md";
 const launchSummaryFile = "daji-xingxiang-launch-summary.md";
+const supabaseSqlFile = "daji-xingxiang-supabase-init.sql";
 const appIsExternallyReady =
   origin.ok &&
   Boolean(origin.stdout) &&
@@ -181,12 +182,13 @@ const lines = [
   `- SHA256 校验文件：${checksumFile}（${fileStatus(checksumFile)}）`,
   `- 发布清单：${manifestFile}（${fileStatus(manifestFile)}）`,
   `- 环境变量交接单：${envHandoffFile}（${fileStatus(envHandoffFile)}）`,
+  `- Supabase 初始化 SQL：${supabaseSqlFile}（${fileStatus(supabaseSqlFile)}）`,
   `- 上线摘要：${launchSummaryFile}（已生成）`,
   "",
   "## 自动化能力",
   "",
   "- `.github/workflows/verify.yml`：推送或拉取请求时运行本地发布验证和生产冒烟。",
-  "- `.github/workflows/release-package.yml`：手动生成源码交付包、校验文件、发布清单、环境变量交接单和上线摘要。",
+  "- `.github/workflows/release-package.yml`：手动生成源码交付包、校验文件、发布清单、环境变量交接单、Supabase 初始化 SQL 和上线摘要。",
   "- `.github/workflows/online-smoke.yml`：部署后手动检查线上域名关键页面和接口。",
   "",
   "## 剩余上线动作",
@@ -208,7 +210,11 @@ if (!origin.ok || !origin.stdout) {
 }
 
 lines.push(
-  "2. 创建 Supabase 项目，执行初始化 SQL：",
+  "2. 创建 Supabase 项目，执行交付 SQL 文件或输出初始化 SQL：",
+  "",
+  "```text",
+  "dist/daji-xingxiang-supabase-init.sql",
+  "```",
   "",
   "```bash",
   "pnpm run supabase:sql",

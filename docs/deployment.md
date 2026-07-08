@@ -132,6 +132,8 @@ pnpm run release:package
 
 同一次执行还会生成 `dist/daji-xingxiang-env-handoff.md`，用于交接 Vercel、Supabase 和模型通道环境变量配置，不包含真实密钥值。
 
+还会生成 `dist/daji-xingxiang-supabase-init.sql`，创建 Supabase 项目后可将该文件完整复制到 Supabase SQL Editor 执行。
+
 交付目录还会生成 `dist/daji-xingxiang-launch-summary.md`，用于快速查看当前提交、交付物、剩余外部配置和下一步上线动作。
 
 部署完成后运行线上冒烟测试：
