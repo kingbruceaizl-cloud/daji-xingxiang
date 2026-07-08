@@ -4,12 +4,14 @@
 
 ```text
 .github/workflows/verify.yml
+.github/workflows/release-package.yml
 .github/workflows/online-smoke.yml
 ```
 
 ## 触发时机
 
 - `verify.yml`：推送到 `main` 或 `master` 分支，或创建/更新拉取请求。
+- `release-package.yml`：需要交付源码包时，在 GitHub Actions 页面手动触发。
 - `online-smoke.yml`：部署完成后，在 GitHub Actions 页面手动触发，并输入线上 `base_url`。
 
 ## 检查内容
@@ -51,6 +53,28 @@ pnpm run smoke:url
 ```
 
 它会检查线上首页、项目创建页、演示工作台、登录页、健康检查、商品目录、站点地图、应用清单和基础安全响应头。
+
+### 源码包交付
+
+需要从 GitHub 生成干净源码包时，在 GitHub Actions 中打开“大吉形象源码包交付”，点击“Run workflow”。
+
+工作流会先执行：
+
+```bash
+pnpm run verify:ci
+```
+
+验证通过后继续执行：
+
+```bash
+pnpm run release:package
+```
+
+完成后会上传一个名为 `daji-xingxiang-source-package` 的附件，包含：
+
+- `daji-xingxiang-source-<提交号>.zip`
+- `daji-xingxiang-source-<提交号>.zip.sha256`
+- `daji-xingxiang-release-<提交号>.json`
 
 ## 和 Vercel 的关系
 

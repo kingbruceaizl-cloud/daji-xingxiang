@@ -121,3 +121,5 @@ pnpm run verify:local
 ```
 
 建议自动化验证通过后再进入正式部署。
+
+需要从 GitHub 生成源码交付包时，可在 Actions 页面手动运行 `.github/workflows/release-package.yml`。该工作流会先执行 `pnpm run verify:ci`，再执行 `pnpm run release:package`，最后上传源码包、SHA256 校验文件和 JSON 发布清单。

@@ -173,6 +173,18 @@ requireIncludes(".github/workflows/online-smoke.yml", onlineSmokeWorkflow, [
   "pnpm run smoke:url",
 ]);
 
+const releasePackageWorkflow = requireFile(".github/workflows/release-package.yml");
+requireIncludes(".github/workflows/release-package.yml", releasePackageWorkflow, [
+  "大吉形象源码包交付",
+  "workflow_dispatch",
+  "pnpm run verify:ci",
+  "pnpm run release:package",
+  "actions/upload-artifact@v4",
+  "dist/daji-xingxiang-source-*.zip",
+  "dist/daji-xingxiang-source-*.zip.sha256",
+  "dist/daji-xingxiang-release-*.json",
+]);
+
 const materialCheck = requireFile("scripts/check-material-sources.mjs");
 requireIncludes("scripts/check-material-sources.mjs", materialCheck, [
   "大吉形象素材来源检查",

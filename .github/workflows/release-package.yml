@@ -1,0 +1,44 @@
+name: 大吉形象源码包交付
+
+on:
+  workflow_dispatch:
+
+jobs:
+  package:
+    name: 生成并校验源码交付包
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v4
+
+      - name: 启用 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 运行 CI 发布验证
+        run: pnpm run verify:ci
+
+      - name: 生成并校验源码交付包
+        run: pnpm run release:package
+
+      - name: 上传源码交付包
+        uses: actions/upload-artifact@v4
+        with:
+          name: daji-xingxiang-source-package
+          path: |
+            dist/daji-xingxiang-source-*.zip
+            dist/daji-xingxiang-source-*.zip.sha256
+            dist/daji-xingxiang-release-*.json
+          if-no-files-found: error
+          retention-days: 30
