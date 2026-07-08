@@ -4,6 +4,7 @@
 
 ```bash
 pnpm run release:check
+pnpm run release:clean
 pnpm run release:package
 pnpm run verify:commit
 pnpm run verify:local
@@ -24,6 +25,7 @@ SMOKE_BASE_URL=https://你的域名 pnpm run smoke:url
 - 线上素材来源记录。
 - Supabase 初始化文件。
 - 发布包基础文件。
+- 交付目录旧文件清理。
 - 源码交付包、SHA256 校验文件和 JSON 发布清单。
 - 环境变量交接单。
 - GitHub 仓库交接单。

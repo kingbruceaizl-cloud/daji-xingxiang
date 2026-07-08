@@ -70,6 +70,7 @@ for (const script of [
   "check:deploy",
   "release:check",
   "release:archive",
+  "release:clean",
   "release:env-handoff",
   "release:github-handoff",
   "release:launch-summary",
@@ -144,6 +145,15 @@ requireIncludes("scripts/create-release-archive.mjs", releaseArchive, [
   "release:launch-summary",
   "release:verify-handoff",
   "只包含 Git 已提交文件",
+]);
+
+const cleanReleaseArtifacts = requireFile("scripts/clean-release-artifacts.mjs");
+requireIncludes("scripts/clean-release-artifacts.mjs", cleanReleaseArtifacts, [
+  "大吉形象交付目录清理",
+  "daji-xingxiang-",
+  "releaseArtifactPattern",
+  "旧交付文件",
+  "rmSync",
 ]);
 
 const envHandoff = requireFile("scripts/create-env-handoff.mjs");
