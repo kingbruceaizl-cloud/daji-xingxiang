@@ -1,4 +1,5 @@
-import { mkdirSync, statSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 
@@ -38,6 +39,13 @@ if (!commit.ok || !commit.stdout) {
   fail("无法读取当前提交号。");
 }
 
+const fullCommit = run("git", ["rev-parse", "HEAD"]);
+if (!fullCommit.ok || !fullCommit.stdout) {
+  fail("无法读取当前完整提交号。");
+}
+
+const branch = run("git", ["branch", "--show-current"]);
+const committedAt = run("git", ["show", "-s", "--format=%cI", "HEAD"]);
 const distDir = resolve(process.cwd(), "dist");
 mkdirSync(distDir, { recursive: true });
 
@@ -54,10 +62,43 @@ if (!archive.ok) {
   fail(archive.stderr || "源码交付包生成失败。");
 }
 
-const sizeKb = Math.ceil(statSync(archivePath).size / 1024);
+const archiveBytes = readFileSync(archivePath);
+const sha256 = createHash("sha256").update(archiveBytes).digest("hex");
+const sizeBytes = statSync(archivePath).size;
+const sizeKb = Math.ceil(sizeBytes / 1024);
+const checksumName = `${archiveName}.sha256`;
+const checksumPath = resolve(distDir, checksumName);
+const manifestName = `daji-xingxiang-release-${commit.stdout}.json`;
+const manifestPath = resolve(distDir, manifestName);
+const manifest = {
+  app: "大吉形象",
+  packageType: "source",
+  branch: branch.stdout || null,
+  commit: fullCommit.stdout,
+  shortCommit: commit.stdout,
+  committedAt: committedAt.stdout || null,
+  generatedAt: new Date().toISOString(),
+  archive: {
+    file: archiveName,
+    sizeBytes,
+    sha256,
+  },
+  excludes: ["node_modules", ".next", ".env", ".env.local", ".env.production", ".vercel"],
+  verifyCommands: [
+    "pnpm install --frozen-lockfile",
+    "pnpm run verify:ci",
+    "pnpm run release:check",
+  ],
+};
+
+writeFileSync(checksumPath, `${sha256}  ${archiveName}\n`);
+writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 
 console.log(`检查通过：已生成源码交付包。`);
 console.log(`路径：dist/${archiveName}`);
+console.log(`校验：dist/${checksumName}`);
+console.log(`清单：dist/${manifestName}`);
 console.log(`提交：${commit.stdout}`);
 console.log(`大小：${sizeKb} KB`);
+console.log(`SHA256：${sha256}`);
 console.log("说明：该压缩包只包含 Git 已提交文件，不包含 node_modules、.next、.env 或 .vercel。");

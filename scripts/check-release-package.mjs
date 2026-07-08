@@ -124,6 +124,9 @@ requireIncludes("scripts/create-release-archive.mjs", releaseArchive, [
   "git",
   "archive",
   "daji-xingxiang-source-",
+  "daji-xingxiang-release-",
+  "sha256",
+  ".sha256",
   "dist",
   "只包含 Git 已提交文件",
 ]);

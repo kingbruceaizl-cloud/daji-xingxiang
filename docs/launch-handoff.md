@@ -39,9 +39,11 @@ pnpm run release:archive
 
 ```text
 dist/daji-xingxiang-source-<提交号>.zip
+dist/daji-xingxiang-source-<提交号>.zip.sha256
+dist/daji-xingxiang-release-<提交号>.json
 ```
 
-该压缩包只包含 Git 已提交文件，不包含 `node_modules`、`.next`、`.env` 或 `.vercel`。
+该压缩包只包含 Git 已提交文件，不包含 `node_modules`、`.next`、`.env` 或 `.vercel`。`.sha256` 文件用于校验压缩包完整性，JSON 清单记录提交号、生成时间、文件大小和校验摘要。
 
 ## Vercel 导入设置
 
