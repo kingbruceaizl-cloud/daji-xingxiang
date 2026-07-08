@@ -82,6 +82,7 @@ const lines = [
   "- `daji-xingxiang-release-<提交号>.json`",
   "- `daji-xingxiang-env-handoff.md`",
   "- `daji-xingxiang-github-handoff.md`",
+  "- `daji-xingxiang-launch-runbook.md`",
   "- `daji-xingxiang-launch-summary.md`",
   "- `daji-xingxiang-model-handoff.md`",
   "- `daji-xingxiang-supabase-init.sql`",
@@ -94,6 +95,7 @@ const lines = [
   "3. 按 `daji-xingxiang-env-handoff.md` 填写 Vercel 环境变量。",
   "4. 按 `daji-xingxiang-model-handoff.md` 配置 KIE 或其他模型通道。",
   "5. 按 `daji-xingxiang-vercel-handoff.md` 完成 Vercel 部署。",
+  "6. 按 `daji-xingxiang-launch-runbook.md` 逐项执行上线验收。",
   "",
 ];
 

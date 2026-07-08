@@ -140,6 +140,8 @@ pnpm run release:package
 
 还会生成 `dist/daji-xingxiang-model-handoff.md`，用于核对 KIE、OpenAI、即梦、可灵、通义等模型通道的密钥、回调地址和部署后验证步骤。
 
+还会生成 `dist/daji-xingxiang-launch-runbook.md`，用于正式发布当天逐项执行 GitHub、Supabase、Vercel、模型通道和验收动作。
+
 交付目录还会生成 `dist/daji-xingxiang-launch-summary.md`，用于快速查看当前提交、交付物、剩余外部配置和下一步上线动作。
 
 部署完成后运行线上冒烟测试：

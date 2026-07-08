@@ -73,6 +73,7 @@ for (const script of [
   "release:clean",
   "release:env-handoff",
   "release:github-handoff",
+  "release:launch-runbook",
   "release:launch-summary",
   "release:model-handoff",
   "release:package",
@@ -144,6 +145,7 @@ requireIncludes("scripts/create-release-archive.mjs", releaseArchive, [
   "release:supabase-sql",
   "release:vercel-handoff",
   "release:model-handoff",
+  "release:launch-runbook",
   "release:launch-summary",
   "release:verify-handoff",
   "只包含 Git 已提交文件",
@@ -189,6 +191,17 @@ requireIncludes("scripts/create-github-handoff.mjs", githubHandoff, [
   "大吉形象发布验证",
   "大吉形象源码包交付",
   "daji-xingxiang-source-package",
+]);
+
+const launchRunbook = requireFile("scripts/create-launch-runbook.mjs");
+requireIncludes("scripts/create-launch-runbook.mjs", launchRunbook, [
+  "大吉形象上线执行核对单生成",
+  "daji-xingxiang-launch-runbook.md",
+  "GitHub 仓库",
+  "Supabase 项目",
+  "Vercel 部署",
+  "KIE_CALLBACK_SECRET",
+  "SMOKE_BASE_URL=https://你的域名 pnpm run smoke:url",
 ]);
 
 const verifyReleaseArchive = requireFile("scripts/verify-release-archive.mjs");
@@ -247,6 +260,7 @@ const verifyHandoff = requireFile("scripts/verify-handoff-artifacts.mjs");
 requireIncludes("scripts/verify-handoff-artifacts.mjs", verifyHandoff, [
   "大吉形象交付物完整性校验",
   "daji-xingxiang-github-handoff.md",
+  "daji-xingxiang-launch-runbook.md",
   "daji-xingxiang-launch-summary.md",
   "daji-xingxiang-model-handoff.md",
   "daji-xingxiang-supabase-init.sql",
@@ -291,6 +305,7 @@ requireIncludes(".github/workflows/release-package.yml", releasePackageWorkflow,
   "dist/daji-xingxiang-release-*.json",
   "dist/daji-xingxiang-env-handoff.md",
   "dist/daji-xingxiang-github-handoff.md",
+  "dist/daji-xingxiang-launch-runbook.md",
   "dist/daji-xingxiang-launch-summary.md",
   "dist/daji-xingxiang-model-handoff.md",
   "dist/daji-xingxiang-supabase-init.sql",

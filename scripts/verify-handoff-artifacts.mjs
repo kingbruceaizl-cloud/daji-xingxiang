@@ -90,6 +90,7 @@ if (!findings.length) {
   const handoffFiles = [
     "daji-xingxiang-env-handoff.md",
     "daji-xingxiang-github-handoff.md",
+    "daji-xingxiang-launch-runbook.md",
     "daji-xingxiang-launch-summary.md",
     "daji-xingxiang-model-handoff.md",
     "daji-xingxiang-supabase-init.sql",
@@ -121,6 +122,7 @@ if (!findings.length) {
     "release:supabase-sql",
     "release:vercel-handoff",
     "release:model-handoff",
+    "release:launch-runbook",
     "release:launch-summary",
   ]);
 
@@ -149,7 +151,18 @@ if (!findings.length) {
     "GitHub 仓库交接单",
     "Vercel 部署交接单",
     "AI 模型通道交接单",
+    "上线执行核对单",
     "Supabase 初始化 SQL",
+  ]);
+
+  const launchRunbook = readDistFile("daji-xingxiang-launch-runbook.md");
+  requireIncludes("daji-xingxiang-launch-runbook.md", launchRunbook, [
+    "大吉形象上线执行核对单",
+    "GitHub 仓库",
+    "Supabase 项目",
+    "Vercel 部署",
+    "AI 模型通道",
+    "SMOKE_BASE_URL=https://你的域名 pnpm run smoke:url",
   ]);
 
   const modelHandoff = readDistFile("daji-xingxiang-model-handoff.md");

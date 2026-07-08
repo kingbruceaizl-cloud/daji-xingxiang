@@ -147,6 +147,7 @@ const manifestFile = manifest?.shortCommit
   : "待生成";
 const envHandoffFile = "daji-xingxiang-env-handoff.md";
 const githubHandoffFile = "daji-xingxiang-github-handoff.md";
+const launchRunbookFile = "daji-xingxiang-launch-runbook.md";
 const launchSummaryFile = "daji-xingxiang-launch-summary.md";
 const modelHandoffFile = "daji-xingxiang-model-handoff.md";
 const supabaseSqlFile = "daji-xingxiang-supabase-init.sql";
@@ -189,12 +190,13 @@ const lines = [
   `- Supabase 初始化 SQL：${supabaseSqlFile}（${fileStatus(supabaseSqlFile)}）`,
   `- Vercel 部署交接单：${vercelHandoffFile}（${fileStatus(vercelHandoffFile)}）`,
   `- AI 模型通道交接单：${modelHandoffFile}（${fileStatus(modelHandoffFile)}）`,
+  `- 上线执行核对单：${launchRunbookFile}（${fileStatus(launchRunbookFile)}）`,
   `- 上线摘要：${launchSummaryFile}（已生成）`,
   "",
   "## 自动化能力",
   "",
   "- `.github/workflows/verify.yml`：推送或拉取请求时运行本地发布验证和生产冒烟。",
-  "- `.github/workflows/release-package.yml`：手动生成源码交付包、校验文件、发布清单、环境变量交接单、GitHub 仓库交接单、Supabase 初始化 SQL、Vercel 部署交接单、AI 模型通道交接单和上线摘要。",
+  "- `.github/workflows/release-package.yml`：手动生成源码交付包、校验文件、发布清单、环境变量交接单、GitHub 仓库交接单、Supabase 初始化 SQL、Vercel 部署交接单、AI 模型通道交接单、上线执行核对单和上线摘要。",
   "- `.github/workflows/online-smoke.yml`：部署后手动检查线上域名关键页面和接口。",
   "",
   "## 剩余上线动作",
