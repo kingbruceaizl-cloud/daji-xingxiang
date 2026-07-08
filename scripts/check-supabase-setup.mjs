@@ -103,6 +103,14 @@ if (!seedData.includes("松弛低能量节拍")) {
   findings.push("缺少默认音乐库种子数据。");
 }
 
+if (!seedData.includes("gpt-image-2-text-to-image")) {
+  findings.push("缺少 KIE 文生图模型种子数据。");
+}
+
+if (!seedData.includes("gpt-image-2-image-to-image")) {
+  findings.push("缺少 KIE 图生图模型种子数据。");
+}
+
 if (!seedData.includes("柔雾底妆盘") || !seedData.includes("简约通勤手袋")) {
   findings.push("缺少扩展商品库种子数据。");
 }

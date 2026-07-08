@@ -107,6 +107,7 @@ const lines = [
   "",
   "- [ ] 创建 Supabase 项目。",
   "- [ ] 在 SQL Editor 中执行 `dist/daji-xingxiang-supabase-init.sql` 的完整内容。",
+  "- [ ] 在 SQL Editor 中执行 `dist/daji-xingxiang-supabase-verify.sql`，确认全部检查项通过。",
   "- [ ] 确认存储桶存在：`customer-assets`、`generated-assets`、`product-assets`、`music-assets`。",
   "- [ ] 在 Auth URL Configuration 中加入正式回调地址：",
   "",

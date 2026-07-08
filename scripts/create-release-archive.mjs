@@ -91,6 +91,7 @@ const manifest = {
     "pnpm run release:env-handoff",
     "pnpm run release:github-handoff",
     "pnpm run release:supabase-sql",
+    "pnpm run release:supabase-verify-sql",
     "pnpm run release:vercel-handoff",
     "pnpm run release:model-handoff",
     "pnpm run release:launch-runbook",

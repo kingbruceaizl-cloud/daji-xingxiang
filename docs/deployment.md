@@ -136,6 +136,8 @@ pnpm run release:package
 
 还会生成 `dist/daji-xingxiang-supabase-init.sql`，创建 Supabase 项目后可将该文件完整复制到 Supabase SQL Editor 执行。
 
+还会生成 `dist/daji-xingxiang-supabase-verify.sql`，用于执行初始化 SQL 后检查表、RLS、存储桶、模型通道和种子数据是否完整。
+
 还会生成 `dist/daji-xingxiang-vercel-handoff.md`，用于核对 Vercel 导入时的框架、Node、安装命令、构建命令、环境变量和部署后检查。
 
 还会生成 `dist/daji-xingxiang-model-handoff.md`，用于核对 KIE、OpenAI、即梦、可灵、通义等模型通道的密钥、回调地址和部署后验证步骤。

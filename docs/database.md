@@ -62,6 +62,8 @@ supabase db push
 pnpm run supabase:sql
 ```
 
+生成交付包后，还可以使用 `dist/daji-xingxiang-supabase-verify.sql` 在 Supabase SQL Editor 中验收真实项目，检查数据表、RLS、存储桶、模型通道和种子数据。
+
 本地文件完整性检查：
 
 ```bash

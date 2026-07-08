@@ -94,6 +94,7 @@ if (!findings.length) {
     "daji-xingxiang-launch-summary.md",
     "daji-xingxiang-model-handoff.md",
     "daji-xingxiang-supabase-init.sql",
+    "daji-xingxiang-supabase-verify.sql",
     "daji-xingxiang-vercel-handoff.md",
   ];
 
@@ -120,6 +121,7 @@ if (!findings.length) {
     "release:env-handoff",
     "release:github-handoff",
     "release:supabase-sql",
+    "release:supabase-verify-sql",
     "release:vercel-handoff",
     "release:model-handoff",
     "release:launch-runbook",
@@ -153,6 +155,7 @@ if (!findings.length) {
     "AI 模型通道交接单",
     "上线执行核对单",
     "Supabase 初始化 SQL",
+    "Supabase 验收 SQL",
   ]);
 
   const launchRunbook = readDistFile("daji-xingxiang-launch-runbook.md");
@@ -181,6 +184,17 @@ if (!findings.length) {
     "create table public.ai_jobs",
     "customer-assets",
     "低能量穿搭变装",
+    "gpt-image-2-text-to-image",
+  ]);
+
+  const supabaseVerifySql = readDistFile("daji-xingxiang-supabase-verify.sql");
+  requireIncludes("daji-xingxiang-supabase-verify.sql", supabaseVerifySql, [
+    "大吉形象 Supabase 初始化验收 SQL",
+    "数据表",
+    "存储桶",
+    "RLS",
+    "KIE 文生图模型",
+    "gpt-image-2-text-to-image",
   ]);
 
   const vercelHandoff = readDistFile("daji-xingxiang-vercel-handoff.md");

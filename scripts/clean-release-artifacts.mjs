@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 
 const distDir = resolve(process.cwd(), "dist");
 const releaseArtifactPattern =
-  /^daji-xingxiang-(?:source-[a-f0-9]+\.zip(?:\.sha256)?|release-[a-f0-9]+\.json|env-handoff\.md|github-handoff\.md|launch-runbook\.md|launch-summary\.md|model-handoff\.md|supabase-init\.sql|vercel-handoff\.md)$/;
+  /^daji-xingxiang-(?:source-[a-f0-9]+\.zip(?:\.sha256)?|release-[a-f0-9]+\.json|env-handoff\.md|github-handoff\.md|launch-runbook\.md|launch-summary\.md|model-handoff\.md|supabase-init\.sql|supabase-verify\.sql|vercel-handoff\.md)$/;
 
 console.log("大吉形象交付目录清理");
 console.log("--------------------");

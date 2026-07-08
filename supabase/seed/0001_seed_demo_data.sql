@@ -166,6 +166,16 @@ insert into public.ai_providers (name, display_name) values
 on conflict (name) do update set display_name = excluded.display_name;
 
 insert into public.ai_models (provider_id, name, display_name, capabilities, default_params)
+select id, 'gpt-image-2-text-to-image', 'GPT Image 2 文生图',
+  array['text_to_image']::public.model_capability[],
+  '{"aspectRatio":"3:4","quality":"high"}'::jsonb
+from public.ai_providers where name = 'kie'
+on conflict (provider_id, name) do update set
+  display_name = excluded.display_name,
+  capabilities = excluded.capabilities,
+  default_params = excluded.default_params;
+
+insert into public.ai_models (provider_id, name, display_name, capabilities, default_params)
 select id, 'gpt-image-2-image-to-image', 'GPT Image 2 图生图',
   array['image_to_image']::public.model_capability[],
   '{"aspectRatio":"3:4","quality":"high"}'::jsonb

@@ -78,6 +78,7 @@ for (const script of [
   "release:model-handoff",
   "release:package",
   "release:supabase-sql",
+  "release:supabase-verify-sql",
   "release:vercel-handoff",
   "release:verify-archive",
   "release:verify-handoff",
@@ -143,6 +144,7 @@ requireIncludes("scripts/create-release-archive.mjs", releaseArchive, [
   "release:env-handoff",
   "release:github-handoff",
   "release:supabase-sql",
+  "release:supabase-verify-sql",
   "release:vercel-handoff",
   "release:model-handoff",
   "release:launch-runbook",
@@ -227,6 +229,7 @@ requireIncludes("scripts/create-launch-summary.mjs", launchSummary, [
   "daji-xingxiang-github-handoff.md",
   "daji-xingxiang-model-handoff.md",
   "daji-xingxiang-supabase-init.sql",
+  "daji-xingxiang-supabase-verify.sql",
   "daji-xingxiang-vercel-handoff.md",
   "daji-xingxiang-release-",
   "GitHub 远程仓库",
@@ -242,6 +245,16 @@ requireIncludes("scripts/create-supabase-sql-bundle.mjs", supabaseSqlBundle, [
   "supabase/migrations/0002_auth_storage_and_indexes.sql",
   "supabase/seed/0001_seed_demo_data.sql",
   "Supabase SQL Editor",
+]);
+
+const supabaseVerifySql = requireFile("scripts/create-supabase-verify-sql.mjs");
+requireIncludes("scripts/create-supabase-verify-sql.mjs", supabaseVerifySql, [
+  "大吉形象 Supabase 验收 SQL 生成",
+  "daji-xingxiang-supabase-verify.sql",
+  "数据表",
+  "存储桶",
+  "KIE 文生图模型",
+  "gpt-image-2-text-to-image",
 ]);
 
 const vercelHandoff = requireFile("scripts/create-vercel-handoff.mjs");
@@ -264,6 +277,7 @@ requireIncludes("scripts/verify-handoff-artifacts.mjs", verifyHandoff, [
   "daji-xingxiang-launch-summary.md",
   "daji-xingxiang-model-handoff.md",
   "daji-xingxiang-supabase-init.sql",
+  "daji-xingxiang-supabase-verify.sql",
   "daji-xingxiang-vercel-handoff.md",
   "shortCommit",
   "未发现明显密钥风险",
@@ -309,6 +323,7 @@ requireIncludes(".github/workflows/release-package.yml", releasePackageWorkflow,
   "dist/daji-xingxiang-launch-summary.md",
   "dist/daji-xingxiang-model-handoff.md",
   "dist/daji-xingxiang-supabase-init.sql",
+  "dist/daji-xingxiang-supabase-verify.sql",
   "dist/daji-xingxiang-vercel-handoff.md",
 ]);
 
