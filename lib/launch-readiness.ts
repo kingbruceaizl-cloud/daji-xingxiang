@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getDeploymentInfo, type DeploymentInfo } from "@/lib/deployment-info";
 
 type CheckStatus = "ready" | "warning" | "missing";
 
@@ -15,6 +16,7 @@ export type LaunchReadiness = {
   mode: "demo" | "production-ready" | "needs-config";
   summary: string;
   generatedAt: string;
+  deployment: DeploymentInfo;
   checks: LaunchCheckItem[];
 };
 
@@ -197,6 +199,7 @@ export async function getLaunchReadiness(): Promise<LaunchReadiness> {
     mode: result.mode,
     summary: result.summary,
     generatedAt: new Date().toISOString(),
+    deployment: getDeploymentInfo(),
     checks,
   };
 }

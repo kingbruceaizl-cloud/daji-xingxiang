@@ -47,6 +47,14 @@ async function assertHealth() {
   if (!Array.isArray(data.checks) || data.checks.length < 5) {
     failures.push("/api/health 上线体检项不足。");
   }
+
+  if (!data.deployment?.platform) {
+    failures.push("/api/health 未返回部署平台信息。");
+  }
+
+  if (!data.deployment?.appEnv) {
+    failures.push("/api/health 未返回应用环境信息。");
+  }
 }
 
 async function assertCatalog() {

@@ -48,6 +48,10 @@ function statusClassName(status: LaunchCheckItem["status"]) {
   return "bg-stone-100 text-stone-600";
 }
 
+function displayValue(value: string | null) {
+  return value || "未提供";
+}
+
 async function AdminLaunchContent() {
   await connection();
 
@@ -123,6 +127,34 @@ async function AdminLaunchContent() {
               <div className="mt-1 text-sm text-stone-500">{item.label}</div>
             </div>
           ))}
+        </section>
+
+        <section className="mb-8 rounded-md border border-stone-200 bg-white p-5">
+          <div className="mb-4">
+            <h2 className="font-semibold">部署版本</h2>
+            <p className="mt-1 text-sm text-stone-500">
+              部署后可用这里核对线上环境、域名、分支和提交号。
+            </p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {[
+              ["运行平台", readiness.deployment.platform],
+              ["应用环境", readiness.deployment.appEnv],
+              ["Vercel 环境", displayValue(readiness.deployment.vercelEnv)],
+              ["应用域名", displayValue(readiness.deployment.publicUrl)],
+              ["部署域名", displayValue(readiness.deployment.deploymentUrl)],
+              ["Git 仓库", displayValue(readiness.deployment.gitRepository)],
+              ["Git 分支", displayValue(readiness.deployment.gitBranch)],
+              ["提交号", displayValue(readiness.deployment.gitCommitShort)],
+            ].map(([label, value]) => (
+              <div key={label} className="rounded-md bg-stone-50 p-3">
+                <div className="text-xs text-stone-400">{label}</div>
+                <div className="mt-1 break-all text-sm font-medium text-stone-700">
+                  {value}
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
 
         <section className="grid gap-3">

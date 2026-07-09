@@ -354,6 +354,8 @@ requireIncludes("scripts/smoke-prod.mjs", smokeProd, [
   "assertSecurityHeaders",
   "assertKieCallback",
   "assertDemoJobLookup",
+  "data.deployment.platform",
+  "data.deployment?.appEnv",
   "/admin/launch",
   "/api/catalog",
 ]);
@@ -373,6 +375,31 @@ requireIncludes("scripts/smoke-url.mjs", smokeUrl, [
   "assertSecurityHeaders",
   "SMOKE_BASE_URL",
   "/api/health",
+  "data.deployment?.platform",
+  "data.deployment?.appEnv",
+]);
+
+const launchReadiness = requireFile("lib/launch-readiness.ts");
+requireIncludes("lib/launch-readiness.ts", launchReadiness, [
+  "getDeploymentInfo",
+  "deployment: DeploymentInfo",
+  "deployment: getDeploymentInfo()",
+]);
+
+const deploymentInfo = requireFile("lib/deployment-info.ts");
+requireIncludes("lib/deployment-info.ts", deploymentInfo, [
+  "getDeploymentInfo",
+  "VERCEL_GIT_COMMIT_SHA",
+  "VERCEL_GIT_COMMIT_REF",
+  "VERCEL_URL",
+  "gitCommitShort",
+]);
+
+const launchPage = requireFile("app/admin/launch/page.tsx");
+requireIncludes("app/admin/launch/page.tsx", launchPage, [
+  "部署版本",
+  "提交号",
+  "readiness.deployment",
 ]);
 
 const kieCallback = requireFile("app/api/provider-callback/kie/route.ts");
@@ -523,6 +550,7 @@ for (const routeFile of [
   "app/api/generate/image/route.ts",
   "app/api/provider-callback/kie/route.ts",
   "lib/ai/result-assets.ts",
+  "lib/deployment-info.ts",
   "app/api/admin/video-templates/route.ts",
   "app/api/admin/music/route.ts",
 ]) {

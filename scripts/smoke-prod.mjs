@@ -58,6 +58,14 @@ async function assertHealth() {
   if (!Array.isArray(data.checks) || data.checks.length < 5) {
     failures.push("/api/health 上线体检项不足。");
   }
+
+  if (!data.deployment || data.deployment.platform !== "本地或自托管") {
+    failures.push("/api/health 未返回本地生产模式部署信息。");
+  }
+
+  if (!data.deployment?.appEnv) {
+    failures.push("/api/health 未返回应用环境信息。");
+  }
 }
 
 async function assertCatalog() {
