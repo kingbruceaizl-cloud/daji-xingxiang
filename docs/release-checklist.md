@@ -129,6 +129,8 @@ SMOKE_BASE_URL=https://你的域名 pnpm run smoke:url
 
 线上冒烟测试还会验证匿名请求不能写入后台商品接口，防止后台配置接口被公开误用。
 
+线上冒烟测试还会验证匿名用户不能调用 `kie` 真实模型通道，但仍可使用 `mock` 演示通道。
+
 如果 Vercel 域名已经写入 `NEXT_PUBLIC_APP_URL`，也可以直接重新运行：
 
 ```bash

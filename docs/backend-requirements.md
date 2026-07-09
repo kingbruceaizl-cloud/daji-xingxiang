@@ -174,6 +174,7 @@
 - `POST /api/projects` 返回 `local-...` 项目 ID，不写入数据库。
 - `POST /api/upload` 对图片返回本地 `data:` 预览地址，不写入云端存储。
 - `POST /api/generate/image` 和 `POST /api/generate/video` 可使用 `mock` 演示模型通道返回演示任务。
+- `kie` 等真实模型通道必须要求登录后调用，避免公开部署后被匿名请求消耗模型额度。
 - `persistAiJob` 在无 Service Role Key 时跳过数据库写入，并返回清晰中文说明。
 
 ## 8. 安全与权限

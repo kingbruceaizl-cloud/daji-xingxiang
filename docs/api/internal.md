@@ -36,6 +36,8 @@ POST /api/generate/image
 
 如果已配置 `SUPABASE_SERVICE_ROLE_KEY`，接口会同时把任务写入 `ai_jobs` 表；未配置时返回演示结果，不阻塞前端体验。
 
+匿名用户只能使用 `mock` 演示通道。`kie` 等真实模型通道需要先登录后再创建任务，避免公开部署后被匿名请求消耗模型额度。
+
 ## 视频任务
 
 ```http

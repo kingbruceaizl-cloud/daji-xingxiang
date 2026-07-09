@@ -121,6 +121,53 @@ async function assertCatalog() {
   }
 }
 
+async function assertMockGenerationAllowed() {
+  const response = await fetch(`${baseUrl}/api/generate/image`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      provider: "mock",
+      prompt: "大吉形象线上冒烟演示图",
+    }),
+  });
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok || !payload.ok || !payload.job) {
+    failures.push("/api/generate/image 演示生成未正常返回。");
+    return;
+  }
+
+  if (payload.job.provider !== "mock") {
+    failures.push("/api/generate/image 演示生成未使用 mock 通道。");
+  }
+}
+
+async function assertRealProviderGenerationGuard() {
+  const response = await fetch(`${baseUrl}/api/generate/image`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      provider: "kie",
+      prompt: "大吉形象线上冒烟真实模型保护",
+    }),
+  });
+  const payload = await response.json().catch(() => ({}));
+  const message = typeof payload.message === "string" ? payload.message : "";
+
+  if (response.status !== 401 || payload.ok) {
+    failures.push("/api/generate/image 匿名真实模型请求应被拒绝。");
+    return;
+  }
+
+  if (!message.includes("真实模型通道 kie 需要先登录后再生成")) {
+    failures.push("/api/generate/image 匿名真实模型请求未返回中文登录提示。");
+  }
+}
+
 async function assertAdminWriteGuard() {
   const response = await fetch(`${baseUrl}/api/admin/products`, {
     method: "POST",
@@ -246,6 +293,8 @@ async function main() {
   await assertPage("/auth/login", "登录");
   await assertHealth();
   await assertCatalog();
+  await assertMockGenerationAllowed();
+  await assertRealProviderGenerationGuard();
   await assertAdminWriteGuard();
   await assertTextEndpoint("/robots.txt", `${baseUrl}/sitemap.xml`);
   await assertTextEndpoint("/sitemap.xml", `${baseUrl}/projects/new`);

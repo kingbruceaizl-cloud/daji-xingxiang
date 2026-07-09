@@ -1,4 +1,9 @@
 import { createAiJob, buildImagePrompt } from "@/lib/ai";
+import {
+  createRealAiProviderLoginMessage,
+  normalizeAiProvider,
+  realAiProviderRequiresLogin,
+} from "@/lib/ai/access";
 import { persistAiJob } from "@/lib/ai/persistence";
 import { getCurrentUserId } from "@/lib/supabase/current-user";
 import { NextResponse } from "next/server";
@@ -15,6 +20,14 @@ export async function POST(request: Request) {
       });
 
     const ownerId = await getCurrentUserId();
+    const provider = normalizeAiProvider(body.provider);
+    if (realAiProviderRequiresLogin(provider) && !ownerId) {
+      return NextResponse.json(
+        { ok: false, message: createRealAiProviderLoginMessage(provider) },
+        { status: 401 },
+      );
+    }
+
     const callbackUrl = new URL(
       `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/provider-callback/kie`,
     );
@@ -24,7 +37,7 @@ export async function POST(request: Request) {
     }
 
     const input = {
-      provider: body.provider || "mock",
+      provider,
       model: body.model,
       jobType: body.inputImageUrls?.length ? "image_to_image" : "text_to_image",
       prompt,

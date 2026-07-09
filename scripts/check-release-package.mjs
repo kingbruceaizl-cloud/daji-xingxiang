@@ -391,6 +391,10 @@ requireIncludes("scripts/smoke-prod.mjs", smokeProd, [
   "assertPrivateCacheHeaders",
   "assertKieCallback",
   "assertDemoJobLookup",
+  "assertMockGenerationAllowed",
+  "assertRealProviderGenerationGuard",
+  "/api/generate/image 匿名真实模型请求应被拒绝。",
+  "真实模型通道 kie 需要先登录后再生成",
   "assertAdminWriteGuard",
   "/api/admin/products 匿名写入不应成功。",
   "请先登录后再操作后台",
@@ -418,6 +422,8 @@ requireIncludes("scripts/smoke-url.mjs", smokeUrl, [
   "assertPrivateIndexingHeaders",
   "assertPrivateCacheHeaders",
   "assertAdminWriteGuard",
+  "assertMockGenerationAllowed",
+  "assertRealProviderGenerationGuard",
   "SMOKE_BASE_URL",
   "assertOnlineBaseUrl",
   "线上冒烟测试必须使用 https 域名",
@@ -427,6 +433,8 @@ requireIncludes("scripts/smoke-url.mjs", smokeUrl, [
   "data.deployment?.appEnv",
   "data.deployment?.publicUrl",
   "应用公开访问地址与当前线上测试域名不一致",
+  "/api/generate/image 匿名真实模型请求应被拒绝。",
+  "真实模型通道 kie 需要先登录后再生成",
   "/api/admin/products 匿名写入不应成功。",
   "请先登录后再操作后台",
   "x-robots-tag",
@@ -444,6 +452,15 @@ requireIncludes("lib/launch-readiness.ts", launchReadiness, [
   "长度过短，请确认已填写真实密钥。",
   "KIE_CALLBACK_SECRET",
   "已配置 KIE 模型密钥，但缺少 KIE 回调密钥",
+]);
+
+const aiAccess = requireFile("lib/ai/access.ts");
+requireIncludes("lib/ai/access.ts", aiAccess, [
+  "normalizeAiProvider",
+  "realAiProviderRequiresLogin",
+  "createRealAiProviderLoginMessage",
+  "真实模型通道",
+  "需要先登录后再生成",
 ]);
 
 const deploymentInfo = requireFile("lib/deployment-info.ts");
@@ -498,6 +515,22 @@ requireIncludes("components/studio/generate-panel.tsx", generatePanel, [
   "pollingJobKey",
   "正在自动查询",
   "outputAssets",
+]);
+
+const imageGenerateRoute = requireFile("app/api/generate/image/route.ts");
+requireIncludes("app/api/generate/image/route.ts", imageGenerateRoute, [
+  "normalizeAiProvider",
+  "realAiProviderRequiresLogin",
+  "createRealAiProviderLoginMessage",
+  "{ status: 401 }",
+]);
+
+const videoGenerateRoute = requireFile("app/api/generate/video/route.ts");
+requireIncludes("app/api/generate/video/route.ts", videoGenerateRoute, [
+  "normalizeAiProvider",
+  "realAiProviderRequiresLogin",
+  "createRealAiProviderLoginMessage",
+  "{ status: 401 }",
 ]);
 
 const releaseCheck = requireFile("scripts/release-check.mjs");
@@ -608,7 +641,9 @@ for (const routeFile of [
   "app/api/jobs/[id]/route.ts",
   "app/api/upload/route.ts",
   "app/api/generate/image/route.ts",
+  "app/api/generate/video/route.ts",
   "app/api/provider-callback/kie/route.ts",
+  "lib/ai/access.ts",
   "lib/ai/result-assets.ts",
   "lib/deployment-info.ts",
   "app/api/admin/video-templates/route.ts",
