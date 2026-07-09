@@ -123,6 +123,8 @@ SMOKE_BASE_URL=https://你的域名 pnpm run smoke:url
 
 线上冒烟测试必须使用 `https` 公网域名，并会确认 `/api/health` 中的应用公开访问地址与测试域名一致。
 
+线上冒烟测试也会检查 API 防索引响应头；后台、登录后页面和 API 应返回 `X-Robots-Tag: noindex, nofollow, noarchive`。
+
 如果 Vercel 域名已经写入 `NEXT_PUBLIC_APP_URL`，也可以直接重新运行：
 
 ```bash

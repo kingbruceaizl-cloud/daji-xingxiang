@@ -319,6 +319,16 @@ requireIncludes("vercel.json", vercelConfig, [
   '"buildCommand": "pnpm run build"',
 ]);
 
+const nextPrivateIndexingConfig = requireFile("next.config.ts");
+requireIncludes("next.config.ts", nextPrivateIndexingConfig, [
+  "privateIndexingHeaders",
+  "X-Robots-Tag",
+  "noindex, nofollow, noarchive",
+  "/admin/:path*",
+  "/protected/:path*",
+  "/api/:path*",
+]);
+
 const githubWorkflow = requireFile(".github/workflows/verify.yml");
 requireIncludes(".github/workflows/verify.yml", githubWorkflow, [
   "大吉形象发布验证",
@@ -368,12 +378,14 @@ const smokeProd = requireFile("scripts/smoke-prod.mjs");
 requireIncludes("scripts/smoke-prod.mjs", smokeProd, [
   "大吉形象生产模式冒烟测试",
   "assertSecurityHeaders",
+  "assertPrivateIndexingHeaders",
   "assertKieCallback",
   "assertDemoJobLookup",
   "data.deployment.platform",
   "data.deployment?.appEnv",
   "/admin/launch",
   "/api/catalog",
+  "x-robots-tag",
 ]);
 
 const smokeAdminDemo = requireFile("scripts/smoke-admin-demo.mjs");
@@ -389,6 +401,7 @@ const smokeUrl = requireFile("scripts/smoke-url.mjs");
 requireIncludes("scripts/smoke-url.mjs", smokeUrl, [
   "大吉形象线上地址冒烟测试",
   "assertSecurityHeaders",
+  "assertPrivateIndexingHeaders",
   "SMOKE_BASE_URL",
   "assertOnlineBaseUrl",
   "线上冒烟测试必须使用 https 域名",
@@ -398,6 +411,7 @@ requireIncludes("scripts/smoke-url.mjs", smokeUrl, [
   "data.deployment?.appEnv",
   "data.deployment?.publicUrl",
   "应用公开访问地址与当前线上测试域名不一致",
+  "x-robots-tag",
 ]);
 
 const launchReadiness = requireFile("lib/launch-readiness.ts");

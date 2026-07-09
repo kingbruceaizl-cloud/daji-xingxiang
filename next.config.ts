@@ -19,11 +19,30 @@ const securityHeaders = [
   },
 ];
 
+const privateIndexingHeaders = [
+  {
+    key: "X-Robots-Tag",
+    value: "noindex, nofollow, noarchive",
+  },
+];
+
 const nextConfig: NextConfig = {
   cacheComponents: true,
   poweredByHeader: false,
   async headers() {
     return [
+      {
+        source: "/admin/:path*",
+        headers: privateIndexingHeaders,
+      },
+      {
+        source: "/protected/:path*",
+        headers: privateIndexingHeaders,
+      },
+      {
+        source: "/api/:path*",
+        headers: privateIndexingHeaders,
+      },
       {
         source: "/(.*)",
         headers: securityHeaders,

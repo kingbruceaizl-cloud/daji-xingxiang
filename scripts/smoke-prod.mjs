@@ -172,6 +172,20 @@ async function assertSecurityHeaders() {
   }
 }
 
+async function assertPrivateIndexingHeaders(paths) {
+  for (const path of paths) {
+    const response = await fetch(`${baseUrl}${path}`);
+    const robotsHeader = response.headers.get("x-robots-tag") || "";
+    const normalized = robotsHeader.toLowerCase();
+
+    for (const expectedValue of ["noindex", "nofollow", "noarchive"]) {
+      if (!normalized.includes(expectedValue)) {
+        failures.push(`${path} 缺少防索引响应头：${expectedValue}`);
+      }
+    }
+  }
+}
+
 async function runSmokeChecks() {
   await assertPage("/", "大吉形象");
   await assertPage("/projects/new", "创建客户形象设计项目");
@@ -186,6 +200,7 @@ async function runSmokeChecks() {
   await assertTextEndpoint("/sitemap.xml", "/projects/new");
   await assertTextEndpoint("/manifest.webmanifest", "大吉形象");
   await assertSecurityHeaders();
+  await assertPrivateIndexingHeaders(["/api/health", "/admin/launch"]);
 }
 
 log("大吉形象生产模式冒烟测试");
