@@ -119,6 +119,11 @@ const envTemplateCheck = requireFile("scripts/check-env-templates.mjs");
 requireIncludes("scripts/check-env-templates.mjs", envTemplateCheck, [
   "大吉形象环境变量模板检查",
   ".env.production.example",
+  "envContractFiles",
+  "assertContentIncludesKeys",
+  "scripts/create-vercel-env-template.mjs",
+  "docs/env-vars.md",
+  "KIE_BASE_URL",
   "NEXT_PUBLIC_APP_ENV=production",
 ]);
 

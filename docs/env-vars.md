@@ -33,6 +33,7 @@ cp .env.example .env.local
 | `SUPABASE_SERVICE_ROLE_KEY` | 服务端写入数据库和管理数据 | 不可以 |
 | `NEXT_PUBLIC_APP_URL` | 线上域名、回调和元信息地址 | 可以 |
 | `NEXT_PUBLIC_APP_ENV` | 应用运行环境，正式上线必须为 `production` | 可以 |
+| `KIE_BASE_URL` | KIE 接口基础地址，默认可使用 `https://api.kie.ai` | 不可以 |
 | `KIE_API_KEY` | KIE 模型通道密钥 | 不可以 |
 | `KIE_CALLBACK_SECRET` | KIE 回调校验密钥；启用 KIE 时正式上线必填，建议 16 位以上随机强字符串 | 不可以 |
 | `OPENAI_API_KEY` | OpenAI 模型通道密钥 | 不可以 |

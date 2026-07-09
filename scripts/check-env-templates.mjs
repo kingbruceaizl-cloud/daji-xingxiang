@@ -17,6 +17,37 @@ const requiredKeys = [
 ];
 
 const templateFiles = [".env.example", ".env.production.example"];
+const envContractFiles = [
+  {
+    path: "scripts/create-env-handoff.mjs",
+    keys: requiredKeys,
+  },
+  {
+    path: "scripts/create-vercel-env-template.mjs",
+    keys: requiredKeys,
+  },
+  {
+    path: "scripts/create-vercel-handoff.mjs",
+    keys: requiredKeys,
+  },
+  {
+    path: "docs/env-vars.md",
+    keys: requiredKeys,
+  },
+];
+const preflightKeys = [
+  "NEXT_PUBLIC_SUPABASE_URL",
+  "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+  "SUPABASE_SERVICE_ROLE_KEY",
+  "NEXT_PUBLIC_APP_URL",
+  "NEXT_PUBLIC_APP_ENV",
+  "KIE_API_KEY",
+  "KIE_CALLBACK_SECRET",
+  "OPENAI_API_KEY",
+  "JIMENG_API_KEY",
+  "KLING_API_KEY",
+  "TONGYI_API_KEY",
+];
 const findings = [];
 
 function read(path) {
@@ -38,6 +69,14 @@ function parseKeys(content) {
       .filter((line) => line && !line.startsWith("#") && line.includes("="))
       .map((line) => line.split("=")[0]),
   );
+}
+
+function assertContentIncludesKeys(path, content, keys) {
+  for (const key of keys) {
+    if (!content.includes(key)) {
+      findings.push(`${path} 缺少环境变量约定：${key}`);
+    }
+  }
 }
 
 console.log("大吉形象环境变量模板检查");
@@ -83,6 +122,12 @@ if (productionContent.includes("localhost")) {
 if (!productionContent.includes("NEXT_PUBLIC_APP_ENV=production")) {
   findings.push(".env.production.example 需要设置 NEXT_PUBLIC_APP_ENV=production。");
 }
+
+for (const item of envContractFiles) {
+  assertContentIncludesKeys(item.path, read(item.path), item.keys);
+}
+
+assertContentIncludesKeys("scripts/preflight.mjs", read("scripts/preflight.mjs"), preflightKeys);
 
 const gitignore = read(".gitignore");
 if (!gitignore.includes(".env.production")) {
