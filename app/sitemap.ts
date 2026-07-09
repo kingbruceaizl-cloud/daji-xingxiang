@@ -19,6 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "",
     "/projects",
     "/projects/new",
+    "/projects/demo-xinzhongshi",
     "/studio/demo",
     "/auth/login",
     "/auth/sign-up",

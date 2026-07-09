@@ -215,18 +215,21 @@ export const demoProducts = [
 
 export const projects = [
   {
+    id: "demo-xinzhongshi",
     name: "张女士｜新中式宴会形象",
     status: "图片已生成",
     updatedAt: "今天 21:10",
     cover: publicImages.portrait,
   },
   {
+    id: "demo-tongqin",
     name: "直播间｜通勤套装试穿",
     status: "等待视频",
     updatedAt: "今天 18:42",
     cover: publicImages.rack,
   },
   {
+    id: "demo-dinengliang",
     name: "短视频｜低能量变装模板",
     status: "脚本配置中",
     updatedAt: "昨天 23:08",

@@ -114,6 +114,20 @@ async function assertCatalog() {
   }
 }
 
+async function assertProjectDetail() {
+  const response = await fetch(`${baseUrl}/api/projects/demo-xinzhongshi`);
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok || !payload.ok || !payload.project) {
+    failures.push("/api/projects/demo-xinzhongshi 返回异常。");
+    return;
+  }
+
+  if (!Array.isArray(payload.assets) || !Array.isArray(payload.jobs)) {
+    failures.push("/api/projects/demo-xinzhongshi 未返回素材和生成任务摘要。");
+  }
+}
+
 async function assertKieCallback() {
   const headers = {
     "Content-Type": "application/json",
@@ -391,6 +405,8 @@ async function runSmokeChecks() {
   await assertPage("/", "大吉形象");
   await assertHomeMetadata();
   await assertPage("/projects/new", "创建客户形象设计项目");
+  await assertPage("/projects/demo-xinzhongshi", "项目详情");
+  await assertPage("/projects/demo-xinzhongshi", "进入形象大师");
   await assertPage("/studio/demo", "生成形象图片");
   await assertPage("/studio/demo", "移除素材");
   await assertPage("/studio/demo", "下载结果");
@@ -398,6 +414,7 @@ async function runSmokeChecks() {
   await assertPage("/admin/launch", "上线体检");
   await assertHealth();
   await assertCatalog();
+  await assertProjectDetail();
   await assertKieCallback();
   await assertDemoJobLookup();
   await assertMockGenerationAllowed();

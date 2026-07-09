@@ -90,6 +90,7 @@ GET /api/catalog
 ```http
 GET /api/projects
 POST /api/projects
+GET /api/projects/:id
 ```
 
 创建项目请求示例：
@@ -101,6 +102,14 @@ POST /api/projects
   "notes": "用于宴会形象设计"
 }
 ```
+
+项目详情接口会返回：
+
+- `project`: 项目基础信息。
+- `assets`: 项目素材摘要，包含客户素材和生成结果。
+- `jobs`: 生成任务摘要，包含模型、状态、提示词和更新时间。
+
+未配置 Supabase 或未登录时，详情接口会返回演示项目数据，保证项目详情页可预览。
 
 ## 素材上传
 

@@ -42,7 +42,7 @@ export default async function ProjectsPage() {
           {projects.map((project) => (
             <Link
               key={project.name}
-              href={project.id ? `/studio/${project.id}` : "/studio/demo"}
+              href={project.id ? `/projects/${project.id}` : "/projects/demo-xinzhongshi"}
               className="overflow-hidden rounded-md border border-stone-200 bg-white"
             >
               <Image

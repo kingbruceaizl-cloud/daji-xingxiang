@@ -469,6 +469,9 @@ requireIncludes("scripts/smoke-prod.mjs", smokeProd, [
   "data.deployment?.appEnv",
   "/admin/launch",
   "/api/catalog",
+  "assertProjectDetail",
+  "/projects/demo-xinzhongshi",
+  "/api/projects/demo-xinzhongshi",
   "移除素材",
   "下载结果",
   "x-robots-tag",
@@ -510,6 +513,9 @@ requireIncludes("scripts/smoke-url.mjs", smokeUrl, [
   "线上冒烟测试不能使用本地地址",
   "/api/health",
   "/admin/launch",
+  "assertProjectDetail",
+  "/projects/demo-xinzhongshi",
+  "/api/projects/demo-xinzhongshi",
   "上线体检",
   "移除素材",
   "下载结果",
@@ -564,6 +570,15 @@ requireIncludes("lib/deployment-info.ts", deploymentInfo, [
   "gitCommitShort",
 ]);
 
+const projectsLib = requireFile("lib/projects.ts");
+requireIncludes("lib/projects.ts", projectsLib, [
+  "getProjectDetailById",
+  "ProjectDetail",
+  "demoAssets",
+  "assets",
+  "jobs",
+]);
+
 const launchPage = requireFile("app/admin/launch/page.tsx");
 requireIncludes("app/admin/launch/page.tsx", launchPage, [
   "部署版本",
@@ -597,6 +612,20 @@ requireIncludes("app/api/jobs/[id]/route.ts", jobApi, [
   "output_asset_ids",
   "outputAssets",
   "previewUrl",
+]);
+
+const projectDetailApi = requireFile("app/api/projects/[id]/route.ts");
+requireIncludes("app/api/projects/[id]/route.ts", projectDetailApi, [
+  "getProjectDetailById",
+  "NextResponse.json",
+]);
+
+const projectDetailPage = requireFile("app/projects/[id]/page.tsx");
+requireIncludes("app/projects/[id]/page.tsx", projectDetailPage, [
+  "项目详情",
+  "项目素材",
+  "生成任务",
+  "进入形象大师",
 ]);
 
 const uploadApi = requireFile("app/api/upload/route.ts");
@@ -751,6 +780,7 @@ requireIncludes("app/layout.tsx", layout, [
 const sitemap = requireFile("app/sitemap.ts");
 requireIncludes("app/sitemap.ts", sitemap, [
   "NEXT_PUBLIC_APP_URL",
+  "/projects/demo-xinzhongshi",
   "/projects/new",
   "/studio/demo",
 ]);
@@ -782,6 +812,9 @@ requireIncludes("next.config.ts", nextConfig, [
 
 const internalApiDocs = requireFile("docs/api/internal.md");
 requireIncludes("docs/api/internal.md", internalApiDocs, [
+  "GET /api/projects/:id",
+  "`assets`: 项目素材摘要",
+  "`jobs`: 生成任务摘要",
   "普通登录用户只能上传 `customer-assets` 客户素材",
   "`product-assets`、`music-assets` 和 `generated-assets` 属于后台素材目录",
   "AI 回调产生的结果通常由服务端直接转存到 `generated-assets`",
@@ -803,6 +836,7 @@ requireIncludes("docs/frontend-requirements.md", frontendRequirements, [
 
 for (const routeFile of [
   "app/page.tsx",
+  "app/projects/[id]/page.tsx",
   "app/projects/new/page.tsx",
   "app/studio/[projectId]/page.tsx",
   "app/admin/launch/page.tsx",
@@ -811,6 +845,7 @@ for (const routeFile of [
   "app/admin/jobs/page.tsx",
   "app/api/health/route.ts",
   "app/api/jobs/[id]/route.ts",
+  "app/api/projects/[id]/route.ts",
   "app/api/upload/route.ts",
   "app/api/generate/image/route.ts",
   "app/api/generate/video/route.ts",
