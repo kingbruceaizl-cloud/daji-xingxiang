@@ -178,6 +178,7 @@ export function StudioGeneratePanel({
   const [isVideoLoading, setIsVideoLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [extraPrompt, setExtraPrompt] = useState("");
   const [imageProviderId, setImageProviderId] = useState<(typeof imageProviders)[number]["id"]>("mock");
   const [videoProviderId, setVideoProviderId] = useState<(typeof videoProviders)[number]["id"]>("mock");
   const [isPolling, setIsPolling] = useState(false);
@@ -283,6 +284,10 @@ export function StudioGeneratePanel({
   const imageProvider = imageProviders.find((item) => item.id === imageProviderId) || imageProviders[0];
   const videoProvider = videoProviders.find((item) => item.id === videoProviderId) || videoProviders[0];
   const resultUrl = bestPreviewUrl(job || {});
+  const cleanedExtraPrompt = extraPrompt.trim();
+  const finalPrompt = cleanedExtraPrompt
+    ? `${prompt}补充要求：${cleanedExtraPrompt}。`
+    : prompt;
   const payload = {
     provider: imageProvider.provider,
     model: imageProvider.model,
@@ -290,7 +295,8 @@ export function StudioGeneratePanel({
     styleName,
     inputImageUrls: inputImageUrl ? [inputImageUrl] : [],
     selectedProducts,
-    prompt,
+    prompt: finalPrompt,
+    extraPrompt: cleanedExtraPrompt,
   };
 
   async function handleImageGenerate() {
@@ -326,7 +332,8 @@ export function StudioGeneratePanel({
         projectId,
         styleName,
         selectedProducts,
-        prompt,
+        prompt: finalPrompt,
+        extraPrompt: cleanedExtraPrompt,
         inputImageUrls: videoInputUrl ? [videoInputUrl] : [],
       });
       setJob(result);
@@ -345,7 +352,17 @@ export function StudioGeneratePanel({
           <Sparkles className="h-4 w-4" />
           生成提示词
         </div>
-        <p className="mt-4 text-sm leading-7 text-stone-600">{prompt}</p>
+        <p className="mt-4 text-sm leading-7 text-stone-600">{finalPrompt}</p>
+        <label className="mt-4 block text-xs font-medium text-stone-500">
+          手动补充提示词
+          <textarea
+            value={extraPrompt}
+            onChange={(event) => setExtraPrompt(event.target.value)}
+            rows={3}
+            placeholder="例如：保留原发色，减少配饰，整体更适合通勤。"
+            className="mt-2 w-full resize-none rounded-md border border-stone-200 bg-stone-50 px-3 py-2 text-sm leading-6 text-stone-700 outline-none focus:border-red-300 focus:bg-white"
+          />
+        </label>
         <p className="mt-3 text-xs leading-5 text-stone-400">
           当前客户素材：{inputImageUrl ? "已载入，可用于图生图演示" : "未上传，将使用纯提示词生成"}
         </p>
