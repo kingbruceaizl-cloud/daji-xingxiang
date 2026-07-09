@@ -452,6 +452,9 @@ requireIncludes("scripts/smoke-prod.mjs", smokeProd, [
   "twitter:title",
   "assertKieCallback",
   "assertDemoJobLookup",
+  "/protected",
+  "登录摘要",
+  "当前为本地演示模式",
   "assertMockGenerationAllowed",
   "assertRealProviderGenerationGuard",
   "/api/generate/image 匿名真实模型请求应被拒绝。",
@@ -596,6 +599,14 @@ requireIncludes("lib/ai/display.ts", aiDisplay, [
   "演示视频模型",
 ]);
 
+const authError = requireFile("lib/auth-error.ts");
+requireIncludes("lib/auth-error.ts", authError, [
+  "formatAuthErrorMessage",
+  "邮箱或密码不正确，请重新输入。",
+  "请先完成邮箱验证，再登录大吉形象。",
+  "操作过于频繁，请稍后再试。",
+]);
+
 const deploymentInfo = requireFile("lib/deployment-info.ts");
 requireIncludes("lib/deployment-info.ts", deploymentInfo, [
   "getDeploymentInfo",
@@ -686,6 +697,18 @@ requireIncludes("app/admin/jobs/page.tsx", adminJobsPage, [
   "formatJobStatusLabel",
 ]);
 
+const protectedPage = requireFile("app/protected/page.tsx");
+requireIncludes("app/protected/page.tsx", protectedPage, [
+  "登录摘要",
+  "当前为本地演示模式",
+  "账号邮箱",
+  "账号编号",
+  "当前权限",
+]);
+requireExcludes("app/protected/page.tsx", protectedPage, [
+  "JSON.stringify(data.claims",
+]);
+
 const uploadApi = requireFile("app/api/upload/route.ts");
 requireIncludes("app/api/upload/route.ts", uploadApi, [
   "isUploadBucket",
@@ -729,6 +752,16 @@ requireIncludes("components/admin/json-create-form.tsx", jsonCreateForm, [
   "结构化配置模板",
   "配置格式不正确，请检查引号、逗号和括号。",
 ]);
+
+for (const formFile of [
+  "components/login-form.tsx",
+  "components/sign-up-form.tsx",
+  "components/forgot-password-form.tsx",
+  "components/update-password-form.tsx",
+]) {
+  const formContent = requireFile(formFile);
+  requireIncludes(formFile, formContent, ["formatAuthErrorMessage"]);
+}
 
 const generatePanel = requireFile("components/studio/generate-panel.tsx");
 requireIncludes("components/studio/generate-panel.tsx", generatePanel, [
@@ -931,6 +964,7 @@ requireIncludes("docs/backend-requirements.md", backendRequirements, [
 const frontendRequirements = requireFile("docs/frontend-requirements.md");
 requireIncludes("docs/frontend-requirements.md", frontendRequirements, [
   "上传控件需要在选择文件后先校验文件类型和大小",
+  "登录后工作台只展示中文账号摘要",
   "已选商品固定展示在底部确认栏",
   "同步更新生成提示词和生成任务参数",
   "支持手动补充提示词",
@@ -943,6 +977,7 @@ requireIncludes("docs/frontend-requirements.md", frontendRequirements, [
 
 for (const routeFile of [
   "app/page.tsx",
+  "app/protected/page.tsx",
   "app/projects/[id]/page.tsx",
   "app/projects/new/page.tsx",
   "app/studio/[projectId]/page.tsx",
@@ -957,12 +992,17 @@ for (const routeFile of [
   "app/api/generate/image/route.ts",
   "app/api/generate/video/route.ts",
   "app/api/provider-callback/kie/route.ts",
+  "lib/auth-error.ts",
   "lib/ai/access.ts",
   "lib/ai/display.ts",
   "lib/ai/result-assets.ts",
   "lib/deployment-info.ts",
   "lib/upload-rules.ts",
   "components/studio/studio-creation-flow.tsx",
+  "components/login-form.tsx",
+  "components/sign-up-form.tsx",
+  "components/forgot-password-form.tsx",
+  "components/update-password-form.tsx",
   "app/api/admin/video-templates/route.ts",
   "app/api/admin/music/route.ts",
 ]) {

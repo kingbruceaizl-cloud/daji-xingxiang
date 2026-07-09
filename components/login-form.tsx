@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { formatAuthErrorMessage } from "@/lib/auth-error";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,7 +41,7 @@ export function LoginForm({
       if (error) throw error;
       router.push("/protected");
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "登录失败，请检查邮箱和密码");
+      setError(formatAuthErrorMessage(error, "登录失败，请检查邮箱和密码。"));
     } finally {
       setIsLoading(false);
     }

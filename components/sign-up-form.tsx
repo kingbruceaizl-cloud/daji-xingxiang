@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { formatAuthErrorMessage } from "@/lib/auth-error";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -50,7 +51,7 @@ export function SignUpForm({
       if (error) throw error;
       router.push("/auth/sign-up-success");
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "注册失败，请稍后重试");
+      setError(formatAuthErrorMessage(error, "注册失败，请稍后重试。"));
     } finally {
       setIsLoading(false);
     }

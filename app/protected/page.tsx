@@ -22,7 +22,11 @@ const generationQueue = [
 
 async function UserDetails() {
   if (!hasEnvVars) {
-    return "本地演示模式：请配置 Supabase 环境变量后启用真实登录。";
+    return (
+      <div className="mt-4 rounded-md bg-stone-50 p-4 text-sm leading-6 text-stone-600">
+        当前为本地演示模式。配置 Supabase 环境变量后，这里会显示真实账号摘要。
+      </div>
+    );
   }
 
   const supabase = await createClient();
@@ -32,7 +36,31 @@ async function UserDetails() {
     redirect("/auth/login");
   }
 
-  return JSON.stringify(data.claims, null, 2);
+  const claims = data.claims as {
+    email?: string;
+    role?: string;
+    sub?: string;
+  };
+  const accountId = claims.sub ? `${claims.sub.slice(0, 8)}...` : "已登录";
+
+  return (
+    <div className="mt-4 grid gap-3 rounded-md bg-stone-50 p-4 text-sm text-stone-600">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-stone-400">账号邮箱</span>
+        <span className="font-medium text-stone-900">
+          {claims.email || "已登录账号"}
+        </span>
+      </div>
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-stone-400">账号编号</span>
+        <span>{accountId}</span>
+      </div>
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-stone-400">当前权限</span>
+        <span>{claims.role || "普通登录用户"}</span>
+      </div>
+    </div>
+  );
 }
 
 export default async function ProtectedPage() {
@@ -145,12 +173,10 @@ export default async function ProtectedPage() {
 
       <section className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
         <div className="rounded-md border border-stone-200 bg-white p-6">
-          <h2 className="text-xl font-semibold">登录状态</h2>
-          <pre className="mt-4 max-h-32 overflow-auto rounded-md bg-stone-100 p-3 text-xs text-stone-600">
+          <h2 className="text-xl font-semibold">登录摘要</h2>
           <Suspense>
             <UserDetails />
           </Suspense>
-        </pre>
         </div>
         <div className="rounded-md border border-stone-200 bg-white p-6">
           <h2 className="text-xl font-semibold">下一步开发重点</h2>

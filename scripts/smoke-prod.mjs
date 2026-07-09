@@ -404,6 +404,8 @@ async function assertPrivateCacheHeaders(paths) {
 async function runSmokeChecks() {
   await assertPage("/", "大吉形象");
   await assertHomeMetadata();
+  await assertPage("/protected", "登录摘要");
+  await assertPage("/protected", "当前为本地演示模式");
   await assertPage("/projects/new", "创建客户形象设计项目");
   await assertPage("/projects/demo-xinzhongshi", "项目详情");
   await assertPage("/projects/demo-xinzhongshi", "进入形象大师");

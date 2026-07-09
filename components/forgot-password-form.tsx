@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { formatAuthErrorMessage } from "@/lib/auth-error";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,7 +38,7 @@ export function ForgotPasswordForm({
       if (error) throw error;
       setSuccess(true);
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "发送失败，请稍后重试");
+      setError(formatAuthErrorMessage(error, "发送失败，请稍后重试。"));
     } finally {
       setIsLoading(false);
     }
