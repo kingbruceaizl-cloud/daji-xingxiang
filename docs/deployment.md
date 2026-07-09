@@ -116,6 +116,8 @@ pnpm run preflight
 
 `check:deploy` 默认按 GitHub 导入 Vercel 的方式检查 Git 仓库和远程地址。如果你后续选择 Vercel CLI 手动部署，可以运行：
 
+发布前还会要求工作区没有未提交修改，避免 GitHub/Vercel 只部署已提交代码而遗漏本地改动。
+
 ```bash
 ALLOW_MANUAL_VERCEL_DEPLOY=1 pnpm run check:deploy
 ```

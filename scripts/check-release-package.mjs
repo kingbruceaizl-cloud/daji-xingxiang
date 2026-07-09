@@ -617,6 +617,8 @@ requireIncludes("scripts/check-deploy-target.mjs", deployTargetCheck, [
   "git",
   "origin",
   "初始提交",
+  "当前存在未提交修改",
+  "避免线上部署遗漏本地修改",
   "user.name",
   "user.email",
   "vercel.json",

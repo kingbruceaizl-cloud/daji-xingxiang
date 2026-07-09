@@ -72,6 +72,11 @@ function checkGitTarget() {
     }
   }
 
+  const workingTree = runGit(["status", "--short"]);
+  if (workingTree.ok && workingTree.stdout) {
+    findings.push("当前存在未提交修改。按 GitHub 导入 Vercel 的发布方式，必须先提交代码，避免线上部署遗漏本地修改。");
+  }
+
   const remote = runGit(["remote", "get-url", "origin"]);
   if (!remote.ok || !remote.stdout) {
     const message =
