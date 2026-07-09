@@ -109,11 +109,30 @@ function validateSecretEnv(key, label, minLength = 20) {
   return [];
 }
 
+function validateExactEnv(key, expectedValue, label) {
+  const value = envValue(key);
+
+  if (!value) {
+    return [`${key} 未配置`];
+  }
+
+  if (isPlaceholderValue(value)) {
+    return [`${key} 仍是占位值`];
+  }
+
+  if (value !== expectedValue) {
+    return [`${label}必须设置为 ${expectedValue}`];
+  }
+
+  return [];
+}
+
 const envIssues = [
   ...validateUrlEnv("NEXT_PUBLIC_SUPABASE_URL", "Supabase 项目地址"),
   ...validateSecretEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "Supabase 公开访问密钥"),
   ...validateSecretEnv("SUPABASE_SERVICE_ROLE_KEY", "Supabase 服务端密钥"),
   ...validateUrlEnv("NEXT_PUBLIC_APP_URL", "应用公开访问地址"),
+  ...validateExactEnv("NEXT_PUBLIC_APP_ENV", "production", "应用运行环境"),
 ];
 const configuredProviders = aiProviders.filter(
   (key) => validateSecretEnv(key, key, 8).length === 0,

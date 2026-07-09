@@ -73,6 +73,7 @@ pnpm run preflight
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `NEXT_PUBLIC_APP_URL`
+- `NEXT_PUBLIC_APP_ENV=production`
 - 至少一个 AI 模型通道密钥，例如 `KIE_API_KEY`
 - 如果使用 KIE，必须配置 `KIE_CALLBACK_SECRET`
 

@@ -37,6 +37,10 @@ const requiredEnv = [
     key: "NEXT_PUBLIC_APP_URL",
     label: "应用公开访问地址",
   },
+  {
+    key: "NEXT_PUBLIC_APP_ENV",
+    label: "应用运行环境",
+  },
 ];
 
 const modelChannels = [
@@ -116,6 +120,22 @@ function validateSecretValue(value: string, minLength = 20) {
   return "";
 }
 
+function validateProductionEnvValue(value: string) {
+  if (!value) {
+    return "未配置，正式上线前必填。";
+  }
+
+  if (isPlaceholderValue(value)) {
+    return "仍是占位值，正式上线前需要替换为正式环境标识。";
+  }
+
+  if (value !== "production") {
+    return "正式上线必须使用正式环境标识。";
+  }
+
+  return "";
+}
+
 function createEnvChecks(): LaunchCheckItem[] {
   return requiredEnv.map((item) => {
     const value = envValue(item.key);
@@ -124,7 +144,9 @@ function createEnvChecks(): LaunchCheckItem[] {
         ? validateUrlValue(value)
         : item.key === "NEXT_PUBLIC_APP_URL"
           ? validateUrlValue(value)
-          : validateSecretValue(value);
+          : item.key === "NEXT_PUBLIC_APP_ENV"
+            ? validateProductionEnvValue(value)
+            : validateSecretValue(value);
 
     return {
       key: item.key,

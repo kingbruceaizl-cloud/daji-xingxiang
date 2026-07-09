@@ -160,6 +160,10 @@ function mergeEnv() {
 }
 
 function statusFor(key, env) {
+  if (key === "NEXT_PUBLIC_APP_ENV") {
+    return String(env[key] || "").trim() === "production" ? "已配置" : "待配置";
+  }
+
   return isPlaceholder(env[key]) ? "待配置" : "已配置";
 }
 
