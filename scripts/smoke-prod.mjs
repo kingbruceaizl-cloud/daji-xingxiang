@@ -408,6 +408,9 @@ async function runSmokeChecks() {
   await assertPage("/projects/demo-xinzhongshi", "项目详情");
   await assertPage("/projects/demo-xinzhongshi", "进入形象大师");
   await assertPage("/studio/demo", "生成形象图片");
+  await assertPage("/studio/demo", "全部商品");
+  await assertPage("/studio/demo", "已选商品");
+  await assertPage("/studio/demo", "清空选择");
   await assertPage("/studio/demo", "移除素材");
   await assertPage("/studio/demo", "下载结果");
   await assertPage("/studio/demo", "KIE 图像");

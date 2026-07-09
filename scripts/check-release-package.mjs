@@ -472,6 +472,9 @@ requireIncludes("scripts/smoke-prod.mjs", smokeProd, [
   "assertProjectDetail",
   "/projects/demo-xinzhongshi",
   "/api/projects/demo-xinzhongshi",
+  "全部商品",
+  "已选商品",
+  "清空选择",
   "移除素材",
   "下载结果",
   "x-robots-tag",
@@ -517,6 +520,9 @@ requireIncludes("scripts/smoke-url.mjs", smokeUrl, [
   "/projects/demo-xinzhongshi",
   "/api/projects/demo-xinzhongshi",
   "上线体检",
+  "全部商品",
+  "已选商品",
+  "清空选择",
   "移除素材",
   "下载结果",
   "data.deployment?.platform",
@@ -680,6 +686,18 @@ requireIncludes("components/studio/generate-panel.tsx", generatePanel, [
   "outputAssets",
 ]);
 
+const studioCreationFlow = requireFile("components/studio/studio-creation-flow.tsx");
+requireIncludes("components/studio/studio-creation-flow.tsx", studioCreationFlow, [
+  "StudioCreationFlow",
+  "toggleProduct",
+  "全部商品",
+  "已选商品",
+  "清空选择",
+  "setSelectedStyleName",
+  "selectedProductNames",
+  "StudioGeneratePanel",
+]);
+
 const customerAssetsPanel = requireFile("components/studio/customer-assets-panel.tsx");
 requireIncludes("components/studio/customer-assets-panel.tsx", customerAssetsPanel, [
   "移除素材",
@@ -831,6 +849,8 @@ requireIncludes("docs/backend-requirements.md", backendRequirements, [
 const frontendRequirements = requireFile("docs/frontend-requirements.md");
 requireIncludes("docs/frontend-requirements.md", frontendRequirements, [
   "上传控件需要在选择文件后先校验文件类型和大小",
+  "已选商品固定展示在底部确认栏",
+  "同步更新生成提示词和生成任务参数",
   "支持保存到项目和下载结果",
 ]);
 
@@ -854,6 +874,7 @@ for (const routeFile of [
   "lib/ai/result-assets.ts",
   "lib/deployment-info.ts",
   "lib/upload-rules.ts",
+  "components/studio/studio-creation-flow.tsx",
   "app/api/admin/video-templates/route.ts",
   "app/api/admin/music/route.ts",
 ]) {
