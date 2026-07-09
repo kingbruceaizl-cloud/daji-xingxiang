@@ -14,6 +14,13 @@ const sampleMusic = `{
   "usage": "适合低能量穿搭、白底变装和生活方式短片。"
 }`;
 
+const musicFieldHints = [
+  "音乐名称：展示在工作台短视频配置里的曲目名称。",
+  "音乐地址：已有公开音频地址时填写；使用存储桶时填写存储路径。",
+  "情绪标签：多个标签用中文逗号分隔。",
+  "使用场景：说明适合哪类变装视频、客户气质或商品展示。",
+];
+
 export default async function AdminMusicPage() {
   const adminState = await getAdminPageState();
   if (!adminState.allowed) {
@@ -70,6 +77,7 @@ export default async function AdminMusicPage() {
         <JsonCreateForm
           endpoint="/api/admin/music"
           initialValue={sampleMusic}
+          fieldHints={musicFieldHints}
           submitText="保存音乐"
         />
       </div>

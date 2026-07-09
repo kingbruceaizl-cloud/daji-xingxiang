@@ -494,6 +494,8 @@ requireIncludes("scripts/smoke-admin-demo.mjs", smokeAdminDemo, [
   "/admin/video-templates",
   "/admin/music",
   "/admin/jobs",
+  "字段说明",
+  "配置模板",
   "演示生图模型",
   "演示视频模型",
   "NEXT_PUBLIC_SUPABASE_URL",
@@ -719,6 +721,15 @@ requireIncludes("components/upload/upload-button.tsx", uploadButton, [
   "aria-live=\"polite\"",
 ]);
 
+const jsonCreateForm = requireFile("components/admin/json-create-form.tsx");
+requireIncludes("components/admin/json-create-form.tsx", jsonCreateForm, [
+  "fieldHints",
+  "字段说明",
+  "配置模板",
+  "结构化配置模板",
+  "配置格式不正确，请检查引号、逗号和括号。",
+]);
+
 const generatePanel = requireFile("components/studio/generate-panel.tsx");
 requireIncludes("components/studio/generate-panel.tsx", generatePanel, [
   "KIE 图像",
@@ -926,6 +937,7 @@ requireIncludes("docs/frontend-requirements.md", frontendRequirements, [
   "不直接暴露内部英文标识",
   "在工作台中选择视频模板、脚本文案和音乐",
   "同步到视频生成任务参数",
+  "需要先展示中文字段说明",
   "支持保存到项目和下载结果",
 ]);
 

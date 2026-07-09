@@ -18,6 +18,15 @@ const sampleProduct = `{
   "tags": "新中式,宴会,真实商品"
 }`;
 
+const productFieldHints = [
+  "商品名称：展示给形象顾问和客户看的商品或素材名称。",
+  "商品类型：真实商品和搭配素材二选一，模板里已给出真实商品写法。",
+  "分类名称：可填写发型、妆造、服装、裤子、鞋子、包袋、饰品或视频道具。",
+  "价格：真实商品填写数字金额，搭配素材可以留空或填写 0。",
+  "提示词描述：用于生成形象图时拼接商品材质、风格和搭配重点。",
+  "标签：多个标签用中文逗号分隔，方便后续筛选。",
+];
+
 export default async function AdminProductsPage() {
   const adminState = await getAdminPageState();
   if (!adminState.allowed) {
@@ -71,6 +80,7 @@ export default async function AdminProductsPage() {
         <JsonCreateForm
           endpoint="/api/admin/products"
           initialValue={sampleProduct}
+          fieldHints={productFieldHints}
           submitText="保存商品"
         />
       </div>

@@ -17,6 +17,15 @@ const sampleTemplate = `{
   "scriptTags": "变装,商品卡片,白底棚拍"
 }`;
 
+const videoTemplateFieldHints = [
+  "模板名称：展示在工作台短视频配置里的模板名。",
+  "视频比例和时长：用于约束竖屏短视频的画幅和秒数。",
+  "运镜说明：描述机位、构图、推进或拉远方式。",
+  "转场方式：描述旋转、闪切、遮挡或其他变装方式。",
+  "默认提示词：用于创建视频任务时补充画面要求。",
+  "脚本文案：用于字幕、商品卡片和短视频故事节奏。",
+];
+
 export default async function AdminVideoTemplatesPage() {
   const adminState = await getAdminPageState();
   if (!adminState.allowed) {
@@ -97,6 +106,7 @@ export default async function AdminVideoTemplatesPage() {
         <JsonCreateForm
           endpoint="/api/admin/video-templates"
           initialValue={sampleTemplate}
+          fieldHints={videoTemplateFieldHints}
           submitText="保存视频脚本"
         />
       </div>

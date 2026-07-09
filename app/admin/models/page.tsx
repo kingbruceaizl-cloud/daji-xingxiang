@@ -17,6 +17,15 @@ const sampleModel = `{
   }
 }`;
 
+const modelFieldHints = [
+  "通道标识：用于服务端识别模型供应商，例如 kie。",
+  "通道显示名：后台和工作台展示给操作者看的名称。",
+  "模型名称：供应商接口要求的模型标识。",
+  "模型显示名：后台展示用的中文模型名称。",
+  "能力类型：文生图、图生图、图生视频等能力的内部标记。",
+  "默认参数：模型调用时默认使用的画幅、质量等参数。",
+];
+
 export default async function AdminModelsPage() {
   const adminState = await getAdminPageState();
   if (!adminState.allowed) {
@@ -58,6 +67,7 @@ export default async function AdminModelsPage() {
         <JsonCreateForm
           endpoint="/api/admin/models"
           initialValue={sampleModel}
+          fieldHints={modelFieldHints}
           submitText="保存模型"
         />
       </div>

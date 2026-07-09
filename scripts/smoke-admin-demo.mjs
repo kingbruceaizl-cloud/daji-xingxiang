@@ -70,10 +70,16 @@ async function assertPage(path, expectedText) {
 async function runAdminChecks() {
   await assertPage("/admin", "后台控制台");
   await assertPage("/admin/products", "新增真实商品或搭配素材");
+  await assertPage("/admin/products", "字段说明");
+  await assertPage("/admin/products", "配置模板");
   await assertPage("/admin/styles", "维护提示词风格模板");
+  await assertPage("/admin/styles", "字段说明");
   await assertPage("/admin/video-templates", "维护变装短视频模板和脚本文案");
+  await assertPage("/admin/video-templates", "字段说明");
   await assertPage("/admin/music", "管理短视频音乐和情绪标签");
+  await assertPage("/admin/music", "字段说明");
   await assertPage("/admin/models", "维护 AI 模型通道与模型能力");
+  await assertPage("/admin/models", "字段说明");
   await assertPage("/admin/jobs", "查看图片、视频和文案生成记录");
   await assertPage("/admin/jobs", "演示生图模型");
   await assertPage("/admin/jobs", "演示视频模型");

@@ -13,6 +13,14 @@ const sampleStyle = `{
   "tags": "国风,宴会,婚礼"
 }`;
 
+const styleFieldHints = [
+  "风格名称：展示在形象大师里的风格按钮名称。",
+  "风格说明：给运营人员看的适用场景说明。",
+  "正向提示词：希望模型强化的画面、材质、妆造和气质。",
+  "反向提示词：希望模型避免的错误效果。",
+  "标签：多个标签用中文逗号分隔。",
+];
+
 export default async function AdminStylesPage() {
   const adminState = await getAdminPageState();
   if (!adminState.allowed) {
@@ -56,6 +64,7 @@ export default async function AdminStylesPage() {
         <JsonCreateForm
           endpoint="/api/admin/styles"
           initialValue={sampleStyle}
+          fieldHints={styleFieldHints}
           submitText="保存风格"
         />
       </div>
