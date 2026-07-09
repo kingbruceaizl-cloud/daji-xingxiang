@@ -302,8 +302,24 @@ requireIncludes("scripts/create-supabase-verify-sql.mjs", supabaseVerifySql, [
   "daji-xingxiang-supabase-verify.sql",
   "数据表",
   "存储桶",
+  "RLS 策略",
+  "存储策略",
+  "expected_file_size_limit",
+  "expected_mime_types",
+  "私有桶归属校验使用 owner_id 与用户路径",
   "KIE 文生图模型",
   "gpt-image-2-text-to-image",
+]);
+
+const supabaseSetupCheck = requireFile("scripts/check-supabase-setup.mjs");
+requireIncludes("scripts/check-supabase-setup.mjs", supabaseSetupCheck, [
+  "大吉形象 Supabase 初始化检查",
+  "requiredBucketSettings",
+  "requiredTablePolicies",
+  "requiredStoragePolicies",
+  "owner_id = (select auth.uid()::text)",
+  "(storage.foldername(name))[1] = (select auth.uid()::text)",
+  "发现旧存储归属字段 owner",
 ]);
 
 const vercelEnvTemplate = requireFile("scripts/create-vercel-env-template.mjs");

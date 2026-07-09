@@ -136,7 +136,7 @@ pnpm run release:package
 
 还会生成 `dist/daji-xingxiang-supabase-init.sql`，创建 Supabase 项目后可将该文件完整复制到 Supabase SQL Editor 执行。
 
-还会生成 `dist/daji-xingxiang-supabase-verify.sql`，用于执行初始化 SQL 后检查表、RLS、存储桶、模型通道和种子数据是否完整。
+还会生成 `dist/daji-xingxiang-supabase-verify.sql`，用于执行初始化 SQL 后检查表、RLS、RLS 策略、存储桶配置、存储对象策略、模型通道和种子数据是否完整。
 
 还会生成 `dist/daji-xingxiang-vercel-env-template.env`，用于在 Vercel 环境变量面板逐项填写生产变量。
 

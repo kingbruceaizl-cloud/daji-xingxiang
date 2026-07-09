@@ -52,7 +52,7 @@ dist/daji-xingxiang-vercel-env-template.env
 dist/daji-xingxiang-vercel-handoff.md
 ```
 
-该压缩包只包含 Git 已提交文件，不包含 `node_modules`、`.next`、`.env` 或 `.vercel`。`.sha256` 文件用于校验压缩包完整性，JSON 清单记录提交号、生成时间、文件大小、校验摘要和复验命令。环境变量交接单用于记录 Supabase、Vercel 和模型通道需要填写的变量，不输出真实密钥值。GitHub 仓库交接单用于创建仓库、绑定远程、推送、检查 Actions 和下载交付附件。AI 模型通道交接单用于配置 KIE 回调、KIE 图像模型和后续 OpenAI、即梦、可灵、通义预留密钥。上线执行核对单用于正式发布当天逐项执行 GitHub、Supabase、Vercel、模型和验收动作。上线摘要用于汇总当前提交、交付物、外部配置缺口和下一步动作。Supabase 初始化 SQL 可直接复制到 Supabase SQL Editor 执行；Supabase 验收 SQL 用于执行初始化后检查表、RLS、存储桶、模型通道和种子数据。Vercel 环境变量模板用于在 Vercel 面板逐项填写生产变量。Vercel 部署交接单用于导入项目时核对框架、Node、安装命令、构建命令和部署后检查。`release:package` 会生成源码包后立即复核源码包、校验文件和清单是否一致，并确认压缩包内包含上线所需的关键源码、文档、Supabase 初始化文件、GitHub Actions 工作流、Vercel 配置、Node 版本锁定、pnpm 配置和线上素材连通性检查脚本。需要排查时，可拆开运行 `release:archive`、`release:verify-archive`、`release:env-handoff`、`release:github-handoff`、`release:supabase-sql`、`release:supabase-verify-sql`、`release:vercel-env-template`、`release:vercel-handoff`、`release:model-handoff`、`release:launch-runbook` 和 `release:launch-summary`。
+该压缩包只包含 Git 已提交文件，不包含 `node_modules`、`.next`、`.env` 或 `.vercel`。`.sha256` 文件用于校验压缩包完整性，JSON 清单记录提交号、生成时间、文件大小、校验摘要和复验命令。环境变量交接单用于记录 Supabase、Vercel 和模型通道需要填写的变量，不输出真实密钥值。GitHub 仓库交接单用于创建仓库、绑定远程、推送、检查 Actions 和下载交付附件。AI 模型通道交接单用于配置 KIE 回调、KIE 图像模型和后续 OpenAI、即梦、可灵、通义预留密钥。上线执行核对单用于正式发布当天逐项执行 GitHub、Supabase、Vercel、模型和验收动作。上线摘要用于汇总当前提交、交付物、外部配置缺口和下一步动作。Supabase 初始化 SQL 可直接复制到 Supabase SQL Editor 执行；Supabase 验收 SQL 用于执行初始化后检查表、RLS、RLS 策略、存储桶配置、存储对象策略、模型通道和种子数据。Vercel 环境变量模板用于在 Vercel 面板逐项填写生产变量。Vercel 部署交接单用于导入项目时核对框架、Node、安装命令、构建命令和部署后检查。`release:package` 会生成源码包后立即复核源码包、校验文件和清单是否一致，并确认压缩包内包含上线所需的关键源码、文档、Supabase 初始化文件、GitHub Actions 工作流、Vercel 配置、Node 版本锁定、pnpm 配置和线上素材连通性检查脚本。需要排查时，可拆开运行 `release:archive`、`release:verify-archive`、`release:env-handoff`、`release:github-handoff`、`release:supabase-sql`、`release:supabase-verify-sql`、`release:vercel-env-template`、`release:vercel-handoff`、`release:model-handoff`、`release:launch-runbook` 和 `release:launch-summary`。
 
 推送到 GitHub 后，也可以在 Actions 页面手动运行“大吉形象源码包交付”，工作流会先执行完整 CI 验证和线上素材连通性检查，再生成并上传源码包附件。
 
@@ -110,7 +110,7 @@ pnpm run supabase:sql
 
 也可以使用交付目录中的 `dist/daji-xingxiang-supabase-init.sql`。将完整 SQL 粘贴到 Supabase SQL Editor 中执行。
 
-执行完成后，再运行交付目录中的 `dist/daji-xingxiang-supabase-verify.sql`，确认表、RLS、存储桶、模型通道和种子数据均显示通过。
+执行完成后，再运行交付目录中的 `dist/daji-xingxiang-supabase-verify.sql`，确认表、RLS、RLS 策略、存储桶配置、存储对象策略、模型通道和种子数据均显示通过。
 
 需要确认的存储桶：
 

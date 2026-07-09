@@ -27,6 +27,8 @@
 - 注册后自动创建用户资料
 - 存储桶
 - 存储对象访问策略
+- 存储桶公开属性、文件大小限制和 MIME 类型白名单
+- 私有素材桶 `owner_id` 与用户路径归属校验
 - 常用索引
 
 音乐库包含 `usage_note` 使用场景说明，便于运营在生成短视频时选择合适的情绪和节奏。
@@ -62,7 +64,7 @@ supabase db push
 pnpm run supabase:sql
 ```
 
-生成交付包后，还可以使用 `dist/daji-xingxiang-supabase-verify.sql` 在 Supabase SQL Editor 中验收真实项目，检查数据表、RLS、存储桶、模型通道和种子数据。
+生成交付包后，还可以使用 `dist/daji-xingxiang-supabase-verify.sql` 在 Supabase SQL Editor 中验收真实项目，检查数据表、RLS、RLS 策略、存储桶配置、存储对象策略、模型通道和种子数据。
 
 本地文件完整性检查：
 

@@ -65,7 +65,10 @@ on storage.objects for select
 to authenticated
 using (
   bucket_id in ('customer-assets', 'generated-assets', 'music-assets')
-  and owner = auth.uid()
+  and (
+    owner_id = (select auth.uid()::text)
+    or (storage.foldername(name))[1] = (select auth.uid()::text)
+  )
 );
 
 create policy "用户可上传自己的客户素材"
@@ -73,7 +76,10 @@ on storage.objects for insert
 to authenticated
 with check (
   bucket_id in ('customer-assets', 'generated-assets', 'music-assets')
-  and owner = auth.uid()
+  and (
+    owner_id = (select auth.uid()::text)
+    or (storage.foldername(name))[1] = (select auth.uid()::text)
+  )
 );
 
 create policy "用户可更新自己的客户素材"
@@ -81,11 +87,17 @@ on storage.objects for update
 to authenticated
 using (
   bucket_id in ('customer-assets', 'generated-assets', 'music-assets')
-  and owner = auth.uid()
+  and (
+    owner_id = (select auth.uid()::text)
+    or (storage.foldername(name))[1] = (select auth.uid()::text)
+  )
 )
 with check (
   bucket_id in ('customer-assets', 'generated-assets', 'music-assets')
-  and owner = auth.uid()
+  and (
+    owner_id = (select auth.uid()::text)
+    or (storage.foldername(name))[1] = (select auth.uid()::text)
+  )
 );
 
 create policy "用户可删除自己的客户素材"
@@ -93,7 +105,10 @@ on storage.objects for delete
 to authenticated
 using (
   bucket_id in ('customer-assets', 'generated-assets', 'music-assets')
-  and owner = auth.uid()
+  and (
+    owner_id = (select auth.uid()::text)
+    or (storage.foldername(name))[1] = (select auth.uid()::text)
+  )
 );
 
 create policy "公开读取商品素材"

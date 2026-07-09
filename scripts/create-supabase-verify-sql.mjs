@@ -23,17 +23,58 @@ const requiredTables = [
   "job_events",
 ];
 
-const requiredBuckets = [
-  "customer-assets",
-  "generated-assets",
-  "product-assets",
-  "music-assets",
+const requiredBucketSettings = [
+  {
+    name: "customer-assets",
+    public: false,
+    fileSizeLimit: 104857600,
+    mimeTypes: ["image/jpeg", "image/png", "image/webp", "video/mp4", "video/quicktime"],
+  },
+  {
+    name: "generated-assets",
+    public: false,
+    fileSizeLimit: 524288000,
+    mimeTypes: ["image/jpeg", "image/png", "image/webp", "video/mp4"],
+  },
+  {
+    name: "product-assets",
+    public: true,
+    fileSizeLimit: 52428800,
+    mimeTypes: ["image/jpeg", "image/png", "image/webp"],
+  },
+  {
+    name: "music-assets",
+    public: false,
+    fileSizeLimit: 52428800,
+    mimeTypes: ["audio/mpeg", "audio/mp4", "audio/wav", "audio/x-wav"],
+  },
 ];
 
 const requiredProviders = ["kie", "openai", "jimeng", "kling", "tongyi"];
 
+const requiredStoragePolicies = [
+  "用户可读取自己的客户素材",
+  "用户可上传自己的客户素材",
+  "用户可更新自己的客户素材",
+  "用户可删除自己的客户素材",
+  "公开读取商品素材",
+];
+
 function valuesList(values) {
   return values.map((value) => `    ('${value}')`).join(",\n");
+}
+
+function sqlArray(values) {
+  return `array[${values.map((value) => `'${value}'`).join(", ")}]::text[]`;
+}
+
+function bucketValuesList(values) {
+  return values
+    .map(
+      (value) =>
+        `    ('${value.name}', ${value.public}, ${value.fileSizeLimit}, ${sqlArray(value.mimeTypes)})`,
+    )
+    .join(",\n");
 }
 
 const sql = `-- 大吉形象 Supabase 初始化验收 SQL
@@ -44,13 +85,17 @@ with expected_tables(name) as (
   values
 ${valuesList(requiredTables)}
 ),
-expected_buckets(name) as (
+expected_buckets(name, expected_public, expected_file_size_limit, expected_mime_types) as (
   values
-${valuesList(requiredBuckets)}
+${bucketValuesList(requiredBucketSettings)}
 ),
 expected_providers(name) as (
   values
 ${valuesList(requiredProviders)}
+),
+expected_storage_policies(name) as (
+  values
+${valuesList(requiredStoragePolicies)}
 ),
 table_checks as (
   select
@@ -71,15 +116,82 @@ rls_checks as (
   from expected_tables
   left join pg_class on pg_class.oid = to_regclass('public.' || expected_tables.name)
 ),
+table_policy_checks as (
+  select
+    'RLS 策略'::text as check_group,
+    expected_tables.name as check_item,
+    case when count(pg_policies.policyname) > 0 then '通过' else '未通过' end as result,
+    count(pg_policies.policyname)::text as current_value,
+    '确认初始化 SQL 中的 create policy 已执行。'::text as suggestion
+  from expected_tables
+  left join pg_policies
+    on pg_policies.schemaname = 'public'
+    and pg_policies.tablename = expected_tables.name
+  group by expected_tables.name
+),
 bucket_checks as (
   select
     '存储桶'::text as check_group,
     expected_buckets.name as check_item,
-    case when storage.buckets.id is not null then '通过' else '未通过' end as result,
-    coalesce(storage.buckets.id, '缺失') as current_value,
-    '重新执行存储桶初始化 SQL，或在 Supabase Storage 中手动创建。'::text as suggestion
+    case when storage.buckets.id is not null
+      and storage.buckets.public = expected_buckets.expected_public
+      and storage.buckets.file_size_limit = expected_buckets.expected_file_size_limit
+      and expected_buckets.expected_mime_types <@ coalesce(storage.buckets.allowed_mime_types, array[]::text[])
+    then '通过' else '未通过' end as result,
+    concat_ws(
+      '；',
+      '存在=' || case when storage.buckets.id is null then '否' else '是' end,
+      '公开=' || coalesce(storage.buckets.public::text, '缺失'),
+      '大小=' || coalesce(storage.buckets.file_size_limit::text, '缺失'),
+      'MIME=' || coalesce(array_to_string(storage.buckets.allowed_mime_types, ','), '缺失')
+    ) as current_value,
+    '重新执行存储桶初始化 SQL，确认公开属性、大小限制和 MIME 白名单正确。'::text as suggestion
   from expected_buckets
   left join storage.buckets on storage.buckets.id = expected_buckets.name
+),
+storage_policy_checks as (
+  select
+    '存储策略'::text as check_group,
+    expected_storage_policies.name as check_item,
+    case when pg_policies.policyname is not null then '通过' else '未通过' end as result,
+    coalesce(pg_policies.cmd || ' / ' || pg_policies.roles::text, '缺失') as current_value,
+    '重新执行存储对象 RLS 策略，确认 storage.objects 访问规则存在。'::text as suggestion
+  from expected_storage_policies
+  left join pg_policies
+    on pg_policies.schemaname = 'storage'
+    and pg_policies.tablename = 'objects'
+    and pg_policies.policyname = expected_storage_policies.name
+),
+storage_owner_policy_checks as (
+  select
+    '存储策略'::text as check_group,
+    '私有桶归属校验使用 owner_id 与用户路径'::text as check_item,
+    case when count(*) filter (
+      where (
+        coalesce(pg_policies.qual, '') || coalesce(pg_policies.with_check, '')
+      ) like '%owner_id%'
+      and (
+        coalesce(pg_policies.qual, '') || coalesce(pg_policies.with_check, '')
+      ) like '%storage.foldername%'
+    ) >= 4 then '通过' else '未通过' end as result,
+    count(*) filter (
+      where (
+        coalesce(pg_policies.qual, '') || coalesce(pg_policies.with_check, '')
+      ) like '%owner_id%'
+      and (
+        coalesce(pg_policies.qual, '') || coalesce(pg_policies.with_check, '')
+      ) like '%storage.foldername%'
+    )::text as current_value,
+    '私有素材桶的 select、insert、update、delete 策略都应校验 owner_id 或路径第一段用户 ID。'::text as suggestion
+  from pg_policies
+  where pg_policies.schemaname = 'storage'
+    and pg_policies.tablename = 'objects'
+    and pg_policies.policyname in (
+      '用户可读取自己的客户素材',
+      '用户可上传自己的客户素材',
+      '用户可更新自己的客户素材',
+      '用户可删除自己的客户素材'
+    )
 ),
 provider_checks as (
   select
@@ -157,6 +269,14 @@ model_checks as (
     'gpt-image-2-image-to-image',
     '重新执行种子数据 SQL。'
 ),
+function_checks as (
+  select
+    '认证触发器'::text as check_group,
+    'handle_new_user 函数'::text as check_item,
+    case when to_regprocedure('public.handle_new_user()') is not null then '通过' else '未通过' end as result,
+    case when to_regprocedure('public.handle_new_user()') is not null then '已创建' else '缺失' end as current_value,
+    '重新执行 Supabase 初始化 SQL 中的认证触发器函数。'::text as suggestion
+),
 trigger_checks as (
   select
     '认证触发器'::text as check_group,
@@ -181,10 +301,14 @@ select check_group as "检查分组",
 from (
   select * from table_checks
   union all select * from rls_checks
+  union all select * from table_policy_checks
   union all select * from bucket_checks
+  union all select * from storage_policy_checks
+  union all select * from storage_owner_policy_checks
   union all select * from provider_checks
   union all select * from seed_checks
   union all select * from model_checks
+  union all select * from function_checks
   union all select * from trigger_checks
 ) checks
 order by "检查分组", "检查项";

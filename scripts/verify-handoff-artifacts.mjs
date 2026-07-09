@@ -196,6 +196,11 @@ if (!findings.length) {
     "数据表",
     "存储桶",
     "RLS",
+    "RLS 策略",
+    "存储策略",
+    "expected_file_size_limit",
+    "expected_mime_types",
+    "私有桶归属校验使用 owner_id 与用户路径",
     "KIE 文生图模型",
     "gpt-image-2-text-to-image",
   ]);

@@ -29,7 +29,7 @@ dist/daji-xingxiang-supabase-init.sql
 
 创建 Supabase 项目后，可直接复制该文件全部内容到 SQL Editor 执行。
 
-执行完成后，复制验收 SQL 到 SQL Editor，检查表、RLS、存储桶、模型通道和种子数据：
+执行完成后，复制验收 SQL 到 SQL Editor，检查表、RLS、RLS 策略、存储桶配置、存储对象策略、模型通道和种子数据：
 
 ```text
 dist/daji-xingxiang-supabase-verify.sql
@@ -40,7 +40,9 @@ dist/daji-xingxiang-supabase-verify.sql
 - 用户资料、项目、素材、商品、风格模板、视频模板、音乐、模型通道、生成任务等数据表。
 - 注册后自动创建用户资料的触发器。
 - 客户素材、生成结果、商品素材、音乐素材四个存储桶。
+- 存储桶公开属性、文件大小限制和 MIME 类型白名单。
 - 基础行级权限策略。
+- 存储对象访问策略，私有素材桶会校验 `owner_id` 或路径第一段用户 ID。
 - 默认商品分类、演示商品、风格模板、视频模板、模型通道和 KIE 图像模型。
 
 ## 4. 本地检查
