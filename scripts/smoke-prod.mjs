@@ -244,6 +244,37 @@ async function assertAdminWriteGuard() {
   }
 }
 
+async function assertAdminAssetUploadGuard() {
+  const formData = new FormData();
+  formData.set("bucket", "product-assets");
+  formData.set("file", new Blob(["smoke"], { type: "image/png" }), "smoke.png");
+
+  const response = await fetch(`${baseUrl}/api/upload`, {
+    method: "POST",
+    body: formData,
+  });
+  const payload = await response.json().catch(() => ({}));
+  const message = typeof payload.message === "string" ? payload.message : "";
+  const allowedMessages = [
+    "请先配置 Supabase Service Role Key",
+    "请先登录后再上传后台素材",
+    "当前账号没有后台素材上传权限",
+  ];
+
+  if (response.ok || payload.ok) {
+    failures.push("/api/upload 匿名上传后台素材不应成功。");
+    return;
+  }
+
+  if (![400, 401, 403].includes(response.status)) {
+    failures.push(`/api/upload 匿名上传后台素材返回状态异常：${response.status}`);
+  }
+
+  if (!allowedMessages.some((item) => message.includes(item))) {
+    failures.push("/api/upload 匿名上传后台素材未返回中文权限提示。");
+  }
+}
+
 async function assertTextEndpoint(path, expectedText) {
   const response = await fetch(`${baseUrl}${path}`);
   const text = await response.text();
@@ -348,6 +379,7 @@ async function runSmokeChecks() {
   await assertMockGenerationAllowed();
   await assertRealProviderGenerationGuard();
   await assertAdminWriteGuard();
+  await assertAdminAssetUploadGuard();
   await assertTextEndpoint("/robots.txt", "sitemap.xml");
   await assertTextEndpoint("/sitemap.xml", "/projects/new");
   await assertManifest();

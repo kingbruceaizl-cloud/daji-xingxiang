@@ -114,6 +114,12 @@ POST /api/upload
 - `bucket`: `customer-assets`、`generated-assets`、`product-assets` 或 `music-assets`
 - `projectId`: 可选项目 ID
 
+权限规则：
+
+- 普通登录用户只能上传 `customer-assets` 客户素材。
+- `product-assets`、`music-assets` 和 `generated-assets` 属于后台素材目录，只允许 `owner` 或 `admin` 上传。
+- AI 回调产生的结果通常由服务端直接转存到 `generated-assets`，不建议前端直接写入。
+
 未配置 Supabase 或未登录时，接口会返回中文提示，不会写入真实存储。
 
 ## 后台管理

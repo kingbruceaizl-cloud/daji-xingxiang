@@ -457,6 +457,9 @@ requireIncludes("scripts/smoke-prod.mjs", smokeProd, [
   "/api/generate/image 匿名真实模型请求应被拒绝。",
   "真实模型通道 kie 需要先登录后再生成",
   "assertAdminWriteGuard",
+  "assertAdminAssetUploadGuard",
+  "/api/upload 匿名上传后台素材不应成功。",
+  "当前账号没有后台素材上传权限",
   "/api/admin/products 匿名写入不应成功。",
   "请先登录后再操作后台",
   "data.deployment.platform",
@@ -488,6 +491,9 @@ requireIncludes("scripts/smoke-url.mjs", smokeUrl, [
   "og:site_name",
   "twitter:title",
   "assertAdminWriteGuard",
+  "assertAdminAssetUploadGuard",
+  "/api/upload 匿名上传后台素材不应成功。",
+  "当前账号没有后台素材上传权限",
   "assertMockGenerationAllowed",
   "assertRealProviderGenerationGuard",
   "SMOKE_BASE_URL",
@@ -581,6 +587,17 @@ requireIncludes("app/api/jobs/[id]/route.ts", jobApi, [
   "output_asset_ids",
   "outputAssets",
   "previewUrl",
+]);
+
+const uploadApi = requireFile("app/api/upload/route.ts");
+requireIncludes("app/api/upload/route.ts", uploadApi, [
+  "adminOnlyBuckets",
+  "validateBucketAccess",
+  "请先登录后再上传后台素材",
+  "当前账号没有后台素材上传权限",
+  "generated-assets",
+  "product-assets",
+  "music-assets",
 ]);
 
 const generatePanel = requireFile("components/studio/generate-panel.tsx");
@@ -711,6 +728,19 @@ requireIncludes("next.config.ts", nextConfig, [
   "Referrer-Policy",
   "X-Frame-Options",
   "Permissions-Policy",
+]);
+
+const internalApiDocs = requireFile("docs/api/internal.md");
+requireIncludes("docs/api/internal.md", internalApiDocs, [
+  "普通登录用户只能上传 `customer-assets` 客户素材",
+  "`product-assets`、`music-assets` 和 `generated-assets` 属于后台素材目录",
+  "AI 回调产生的结果通常由服务端直接转存到 `generated-assets`",
+]);
+
+const backendRequirements = requireFile("docs/backend-requirements.md");
+requireIncludes("docs/backend-requirements.md", backendRequirements, [
+  "商品、音乐和生成结果素材桶仅允许 `owner` 或 `admin` 写入",
+  "不能写入商品、音乐或生成结果等后台素材桶",
 ]);
 
 for (const routeFile of [

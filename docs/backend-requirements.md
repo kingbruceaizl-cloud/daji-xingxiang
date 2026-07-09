@@ -130,7 +130,7 @@
 
 ## 4. 服务端 API 草案
 
-- `POST /api/upload`: 上传客户、商品或音乐素材。
+- `POST /api/upload`: 上传客户素材；商品、音乐和生成结果素材桶仅允许 `owner` 或 `admin` 写入。
 - `POST /api/projects`: 创建项目。
 - `GET /api/projects`: 获取项目列表。
 - `GET /api/projects/[id]`: 获取项目详情。
@@ -173,6 +173,7 @@
 
 - `POST /api/projects` 返回 `local-...` 项目 ID，不写入数据库。
 - `POST /api/upload` 对图片返回本地 `data:` 预览地址，不写入云端存储。
+- 未登录或未配置 Supabase 时，`POST /api/upload` 不能写入商品、音乐或生成结果等后台素材桶。
 - `POST /api/generate/image` 和 `POST /api/generate/video` 可使用 `mock` 演示模型通道返回演示任务。
 - `kie` 等真实模型通道必须要求登录后调用，避免公开部署后被匿名请求消耗模型额度。
 - `persistAiJob` 在无 Service Role Key 时跳过数据库写入，并返回清晰中文说明。

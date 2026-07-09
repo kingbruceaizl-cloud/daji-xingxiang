@@ -8,6 +8,11 @@ const allowedBuckets = new Set([
   "product-assets",
   "music-assets",
 ]);
+const adminOnlyBuckets = new Set([
+  "generated-assets",
+  "product-assets",
+  "music-assets",
+]);
 
 function inferAssetKind(bucket: string, mimeType: string) {
   if (bucket === "music-assets") {
@@ -20,6 +25,55 @@ function inferAssetKind(bucket: string, mimeType: string) {
     return mimeType.startsWith("video/") ? "generated_video" : "generated_image";
   }
   return mimeType.startsWith("video/") ? "customer_video" : "customer_image";
+}
+
+async function validateBucketAccess(
+  supabase: NonNullable<ReturnType<typeof createAdminClient>> | null,
+  ownerId: string | null,
+  bucket: string,
+) {
+  if (!adminOnlyBuckets.has(bucket)) {
+    return null;
+  }
+
+  if (!supabase) {
+    return NextResponse.json(
+      {
+        ok: false,
+        message: "请先配置 Supabase Service Role Key 后再上传后台素材。",
+      },
+      { status: 400 },
+    );
+  }
+
+  if (!ownerId) {
+    return NextResponse.json(
+      { ok: false, message: "请先登录后再上传后台素材。" },
+      { status: 401 },
+    );
+  }
+
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", ownerId)
+    .maybeSingle();
+
+  if (error) {
+    return NextResponse.json(
+      { ok: false, message: `素材权限校验失败：${error.message}` },
+      { status: 403 },
+    );
+  }
+
+  if (!profile || !["owner", "admin"].includes(profile.role)) {
+    return NextResponse.json(
+      { ok: false, message: "当前账号没有后台素材上传权限。" },
+      { status: 403 },
+    );
+  }
+
+  return null;
 }
 
 export async function POST(request: Request) {
@@ -44,6 +98,11 @@ export async function POST(request: Request) {
 
   const supabase = createAdminClient();
   const ownerId = await getCurrentUserId();
+  const accessResponse = await validateBucketAccess(supabase, ownerId, bucket);
+  if (accessResponse) {
+    return accessResponse;
+  }
+
   const bytes = await file.arrayBuffer();
 
   if (!supabase || !ownerId) {
