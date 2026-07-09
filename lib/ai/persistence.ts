@@ -41,6 +41,6 @@ export async function persistAiJob(
 
   return {
     status: "saved",
-    message: "任务已写入 Supabase ai_jobs 表。",
+    message: "任务已写入 Supabase 任务表。",
   };
 }

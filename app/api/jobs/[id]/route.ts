@@ -103,7 +103,7 @@ export async function GET(
     job: {
       id,
       status: "succeeded",
-      message: "演示任务已完成。配置 Supabase 或 provider 参数后可查询真实任务。",
+      message: "演示任务已完成。配置 Supabase 或模型通道参数后可查询真实任务。",
       updatedAt: new Date().toISOString(),
     },
   });

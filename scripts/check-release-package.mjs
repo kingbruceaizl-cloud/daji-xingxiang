@@ -132,6 +132,17 @@ requireIncludes("scripts/check-secret-safety.mjs", secretSafetyCheck, [
   "PRIVATE KEY",
 ]);
 
+const chineseUiCheck = requireFile("scripts/check-chinese-ui.mjs");
+requireIncludes("scripts/check-chinese-ui.mjs", chineseUiCheck, [
+  "大吉形象中文界面检查",
+  "allowedTechnicalTerms",
+  "技术名词白名单",
+  "纯英文界面词",
+  "hasUnapprovedLatin",
+  "isLikelyUserFacingString",
+  "router\\.push",
+]);
+
 const releaseArchive = requireFile("scripts/create-release-archive.mjs");
 requireIncludes("scripts/create-release-archive.mjs", releaseArchive, [
   "大吉形象源码交付包生成",

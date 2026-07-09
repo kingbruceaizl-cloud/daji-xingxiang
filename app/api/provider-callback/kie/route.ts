@@ -115,7 +115,7 @@ export async function POST(request: Request) {
 
   if (!taskId) {
     return NextResponse.json(
-      { ok: false, message: "KIE 回调缺少 taskId。", payload },
+      { ok: false, message: "KIE 回调缺少任务编号。", payload },
       { status: 400 },
     );
   }
