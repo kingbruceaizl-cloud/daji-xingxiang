@@ -115,6 +115,23 @@ function assertForbiddenEntries(entries) {
   }
 }
 
+function assertManifestVerifyCommands(manifest) {
+  const commands = Array.isArray(manifest.verifyCommands)
+    ? manifest.verifyCommands
+    : [];
+
+  for (const command of [
+    "pnpm install --frozen-lockfile",
+    "pnpm run verify:ci",
+    "pnpm run check:materials:urls",
+    "pnpm run release:check",
+  ]) {
+    if (!commands.includes(command)) {
+      fail(`发布清单缺少复验命令：${command}`);
+    }
+  }
+}
+
 console.log("大吉形象源码交付包校验");
 console.log("----------------------");
 
@@ -126,6 +143,8 @@ if (!manifestName) {
   const manifest = readJson(manifestPath);
 
   if (manifest) {
+    assertManifestVerifyCommands(manifest);
+
     const archiveName = manifest.archive?.file;
     const expectedSha256 = manifest.archive?.sha256;
     const expectedSizeBytes = manifest.archive?.sizeBytes;
@@ -177,6 +196,7 @@ if (!manifestName) {
           "app/api/health/route.ts",
           "app/api/generate/image/route.ts",
           "app/api/generate/video/route.ts",
+          "scripts/check-material-urls.mjs",
           "docs/prd.md",
           "docs/deployment.md",
           "docs/launch-handoff.md",

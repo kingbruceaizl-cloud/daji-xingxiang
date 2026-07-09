@@ -111,6 +111,7 @@ lines.push(
   "",
   "```bash",
   "pnpm run verify:ci",
+  "pnpm run check:materials:urls",
   "pnpm run release:package",
   "pnpm run publish:status",
   "```",
@@ -136,8 +137,8 @@ lines.push(
   "",
   "## GitHub Actions",
   "",
-  "- 推送到 `main` 后，`大吉形象发布验证` 会自动运行。",
-  "- 需要交付源码包时，手动运行 `大吉形象源码包交付`。",
+  "- 推送到 `main` 后，`大吉形象发布验证` 会自动运行，并检查线上素材连通性。",
+  "- 需要交付源码包时，手动运行 `大吉形象源码包交付`，确认它先完成素材连通性检查。",
   "- 部署完成后，手动运行 `大吉形象线上冒烟验证` 并输入线上域名。",
   "",
 );

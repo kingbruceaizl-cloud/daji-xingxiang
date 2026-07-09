@@ -155,6 +155,7 @@ requireIncludes("scripts/create-release-archive.mjs", releaseArchive, [
   ".sha256",
   "dist",
   "release:verify-archive",
+  "check:materials:urls",
   "release:env-handoff",
   "release:github-handoff",
   "release:supabase-sql",
@@ -228,6 +229,8 @@ requireIncludes("scripts/verify-release-archive.mjs", verifyReleaseArchive, [
   "daji-xingxiang-release-",
   "daji-xingxiang-source-",
   "release:package",
+  "assertManifestVerifyCommands",
+  "pnpm run check:materials:urls",
   ".github/workflows/verify.yml",
   ".github/workflows/release-package.yml",
   ".github/workflows/online-smoke.yml",
@@ -239,6 +242,7 @@ requireIncludes("scripts/verify-release-archive.mjs", verifyReleaseArchive, [
   ".next",
   ".env.production",
   "supabase/migrations/0001_initial_schema.sql",
+  "scripts/check-material-urls.mjs",
   "supabase/seed/0001_seed_demo_data.sql",
 ]);
 

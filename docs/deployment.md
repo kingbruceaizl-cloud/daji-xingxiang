@@ -128,7 +128,7 @@ ALLOW_MANUAL_VERCEL_DEPLOY=1 pnpm run check:deploy
 pnpm run release:package
 ```
 
-校验通过后，`dist/daji-xingxiang-source-<提交号>.zip` 可作为干净源码包交给部署环境使用。需要排查时，可拆开运行 `release:archive` 和 `release:verify-archive`。
+校验通过后，`dist/daji-xingxiang-source-<提交号>.zip` 可作为干净源码包交给部署环境使用。发布清单会列出复验命令，包括 `pnpm run verify:ci`、`pnpm run check:materials:urls` 和 `pnpm run release:check`。需要排查时，可拆开运行 `release:archive` 和 `release:verify-archive`。
 
 同一次执行还会生成 `dist/daji-xingxiang-env-handoff.md`，用于交接 Vercel、Supabase 和模型通道环境变量配置，不包含真实密钥值。
 

@@ -87,6 +87,7 @@ const manifest = {
   verifyCommands: [
     "pnpm install --frozen-lockfile",
     "pnpm run verify:ci",
+    "pnpm run check:materials:urls",
     "pnpm run release:verify-archive",
     "pnpm run release:env-handoff",
     "pnpm run release:github-handoff",
