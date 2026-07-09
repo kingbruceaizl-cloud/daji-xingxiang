@@ -144,11 +144,12 @@ pnpm run release:check
 代码推送到 GitHub 后，会通过 `.github/workflows/verify.yml` 自动运行：
 
 ```bash
-pnpm run verify:local
+pnpm run verify:ci
+pnpm run check:materials:urls
 ```
 
 建议自动化验证通过后再进入正式部署。
 
-需要从 GitHub 生成源码交付包时，可在 Actions 页面手动运行 `.github/workflows/release-package.yml`。该工作流会先执行 `pnpm run verify:ci`，再执行 `pnpm run release:package`，最后上传源码包、SHA256 校验文件、JSON 发布清单、环境变量交接单、GitHub 仓库交接单、Supabase 初始化 SQL、Supabase 验收 SQL、Vercel 环境变量模板、Vercel 部署交接单、AI 模型通道交接单、上线执行核对单和上线摘要。
+需要从 GitHub 生成源码交付包时，可在 Actions 页面手动运行 `.github/workflows/release-package.yml`。该工作流会先执行 `pnpm run verify:ci` 和 `pnpm run check:materials:urls`，再执行 `pnpm run release:package`，最后上传源码包、SHA256 校验文件、JSON 发布清单、环境变量交接单、GitHub 仓库交接单、Supabase 初始化 SQL、Supabase 验收 SQL、Vercel 环境变量模板、Vercel 部署交接单、AI 模型通道交接单、上线执行核对单和上线摘要。
 
 `release:package` 最后会执行 `pnpm run release:verify-handoff`，确认这些交付物都指向当前提交，并且没有发现明显密钥风险。

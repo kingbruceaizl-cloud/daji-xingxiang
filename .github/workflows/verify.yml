@@ -9,7 +9,7 @@ on:
 
 jobs:
   verify:
-    name: 中文、初始化、发布包、构建和生产冒烟检查
+    name: 中文、素材、初始化、发布包、构建和生产冒烟检查
     runs-on: ubuntu-latest
 
     steps:
@@ -32,3 +32,6 @@ jobs:
 
       - name: 运行 CI 发布验证
         run: pnpm run verify:ci
+
+      - name: 检查线上素材连通性
+        run: pnpm run check:materials:urls

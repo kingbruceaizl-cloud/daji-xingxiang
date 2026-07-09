@@ -354,6 +354,7 @@ const githubWorkflow = requireFile(".github/workflows/verify.yml");
 requireIncludes(".github/workflows/verify.yml", githubWorkflow, [
   "大吉形象发布验证",
   "pnpm run verify:ci",
+  "pnpm run check:materials:urls",
   "node-version-file: .node-version",
   "pnpm install --frozen-lockfile",
 ]);
@@ -372,6 +373,7 @@ requireIncludes(".github/workflows/release-package.yml", releasePackageWorkflow,
   "大吉形象源码包交付",
   "workflow_dispatch",
   "pnpm run verify:ci",
+  "pnpm run check:materials:urls",
   "pnpm run release:package",
   "actions/upload-artifact@v4",
   "dist/daji-xingxiang-source-*.zip",
