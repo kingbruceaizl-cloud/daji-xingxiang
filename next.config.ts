@@ -26,6 +26,18 @@ const privateIndexingHeaders = [
   },
 ];
 
+const privateCacheHeaders = [
+  {
+    key: "Cache-Control",
+    value: "no-store, max-age=0",
+  },
+];
+
+const privateResponseHeaders = [
+  ...privateIndexingHeaders,
+  ...privateCacheHeaders,
+];
+
 const nextConfig: NextConfig = {
   cacheComponents: true,
   poweredByHeader: false,
@@ -33,15 +45,15 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/admin/:path*",
-        headers: privateIndexingHeaders,
+        headers: privateResponseHeaders,
       },
       {
         source: "/protected/:path*",
-        headers: privateIndexingHeaders,
+        headers: privateResponseHeaders,
       },
       {
         source: "/api/:path*",
-        headers: privateIndexingHeaders,
+        headers: privateResponseHeaders,
       },
       {
         source: "/(.*)",

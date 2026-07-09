@@ -322,8 +322,12 @@ requireIncludes("vercel.json", vercelConfig, [
 const nextPrivateIndexingConfig = requireFile("next.config.ts");
 requireIncludes("next.config.ts", nextPrivateIndexingConfig, [
   "privateIndexingHeaders",
+  "privateCacheHeaders",
+  "privateResponseHeaders",
   "X-Robots-Tag",
+  "Cache-Control",
   "noindex, nofollow, noarchive",
+  "no-store, max-age=0",
   "/admin/:path*",
   "/protected/:path*",
   "/api/:path*",
@@ -379,6 +383,7 @@ requireIncludes("scripts/smoke-prod.mjs", smokeProd, [
   "大吉形象生产模式冒烟测试",
   "assertSecurityHeaders",
   "assertPrivateIndexingHeaders",
+  "assertPrivateCacheHeaders",
   "assertKieCallback",
   "assertDemoJobLookup",
   "data.deployment.platform",
@@ -386,6 +391,7 @@ requireIncludes("scripts/smoke-prod.mjs", smokeProd, [
   "/admin/launch",
   "/api/catalog",
   "x-robots-tag",
+  "cache-control",
 ]);
 
 const smokeAdminDemo = requireFile("scripts/smoke-admin-demo.mjs");
@@ -402,6 +408,7 @@ requireIncludes("scripts/smoke-url.mjs", smokeUrl, [
   "大吉形象线上地址冒烟测试",
   "assertSecurityHeaders",
   "assertPrivateIndexingHeaders",
+  "assertPrivateCacheHeaders",
   "SMOKE_BASE_URL",
   "assertOnlineBaseUrl",
   "线上冒烟测试必须使用 https 域名",
@@ -412,6 +419,7 @@ requireIncludes("scripts/smoke-url.mjs", smokeUrl, [
   "data.deployment?.publicUrl",
   "应用公开访问地址与当前线上测试域名不一致",
   "x-robots-tag",
+  "cache-control",
 ]);
 
 const launchReadiness = requireFile("lib/launch-readiness.ts");

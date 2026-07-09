@@ -170,6 +170,22 @@ async function assertPrivateIndexingHeaders(paths) {
   }
 }
 
+async function assertPrivateCacheHeaders(paths) {
+  for (const path of paths) {
+    const response = await fetch(`${baseUrl}${path}`);
+    const cacheControl = response.headers.get("cache-control") || "";
+    const normalized = cacheControl.toLowerCase();
+
+    if (!normalized.includes("no-store")) {
+      failures.push(`${path} 缺少私有内容缓存控制：no-store`);
+    }
+
+    if (!normalized.includes("max-age=0")) {
+      failures.push(`${path} 缺少私有内容缓存控制：max-age=0`);
+    }
+  }
+}
+
 async function main() {
   log("大吉形象线上地址冒烟测试");
   log("------------------------");
@@ -202,6 +218,7 @@ async function main() {
   await assertTextEndpoint("/manifest.webmanifest", "大吉形象");
   await assertSecurityHeaders();
   await assertPrivateIndexingHeaders(["/api/health"]);
+  await assertPrivateCacheHeaders(["/api/health"]);
 
   if (failures.length) {
     log("发现需要处理的问题：");

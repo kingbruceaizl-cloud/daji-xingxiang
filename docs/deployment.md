@@ -247,7 +247,7 @@ GET /api/health
 - `Referrer-Policy`
 - `X-Frame-Options`
 - `Permissions-Policy`
-- 后台、登录后页面和 API 额外返回 `X-Robots-Tag: noindex, nofollow, noarchive`，避免被搜索引擎索引。
+- 后台、登录后页面和 API 额外返回 `X-Robots-Tag: noindex, nofollow, noarchive` 和 `Cache-Control: no-store, max-age=0`，避免被搜索引擎索引或被浏览器缓存。
 
 ## 8. 后台权限
 

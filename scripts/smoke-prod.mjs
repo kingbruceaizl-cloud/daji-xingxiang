@@ -186,6 +186,22 @@ async function assertPrivateIndexingHeaders(paths) {
   }
 }
 
+async function assertPrivateCacheHeaders(paths) {
+  for (const path of paths) {
+    const response = await fetch(`${baseUrl}${path}`);
+    const cacheControl = response.headers.get("cache-control") || "";
+    const normalized = cacheControl.toLowerCase();
+
+    if (!normalized.includes("no-store")) {
+      failures.push(`${path} 缺少私有内容缓存控制：no-store`);
+    }
+
+    if (!normalized.includes("max-age=0")) {
+      failures.push(`${path} 缺少私有内容缓存控制：max-age=0`);
+    }
+  }
+}
+
 async function runSmokeChecks() {
   await assertPage("/", "大吉形象");
   await assertPage("/projects/new", "创建客户形象设计项目");
@@ -201,6 +217,7 @@ async function runSmokeChecks() {
   await assertTextEndpoint("/manifest.webmanifest", "大吉形象");
   await assertSecurityHeaders();
   await assertPrivateIndexingHeaders(["/api/health", "/admin/launch"]);
+  await assertPrivateCacheHeaders(["/api/health", "/admin/launch"]);
 }
 
 log("大吉形象生产模式冒烟测试");
