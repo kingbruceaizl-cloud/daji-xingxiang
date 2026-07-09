@@ -127,6 +127,8 @@ SMOKE_BASE_URL=https://你的域名 pnpm run smoke:url
 
 线上冒烟测试也会检查 API 防索引和私有缓存响应头；后台、登录后页面和 API 应返回 `X-Robots-Tag: noindex, nofollow, noarchive` 与 `Cache-Control: no-store, max-age=0`。
 
+线上冒烟测试还会验证匿名请求不能写入后台商品接口，防止后台配置接口被公开误用。
+
 如果 Vercel 域名已经写入 `NEXT_PUBLIC_APP_URL`，也可以直接重新运行：
 
 ```bash

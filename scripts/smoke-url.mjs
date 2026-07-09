@@ -121,6 +121,39 @@ async function assertCatalog() {
   }
 }
 
+async function assertAdminWriteGuard() {
+  const response = await fetch(`${baseUrl}/api/admin/products`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: "冒烟测试匿名商品",
+      type: "asset",
+    }),
+  });
+  const payload = await response.json().catch(() => ({}));
+  const message = typeof payload.message === "string" ? payload.message : "";
+  const allowedMessages = [
+    "请先配置 Supabase Service Role Key",
+    "请先登录后再操作后台",
+    "当前账号没有后台管理权限",
+  ];
+
+  if (response.ok || payload.ok) {
+    failures.push("/api/admin/products 匿名写入不应成功。");
+    return;
+  }
+
+  if (![400, 401, 403].includes(response.status)) {
+    failures.push(`/api/admin/products 匿名写入返回状态异常：${response.status}`);
+  }
+
+  if (!allowedMessages.some((item) => message.includes(item))) {
+    failures.push("/api/admin/products 匿名写入未返回中文权限提示。");
+  }
+}
+
 async function assertTextEndpoint(path, expectedText) {
   const response = await fetch(`${baseUrl}${path}`);
   const text = await response.text();
@@ -213,6 +246,7 @@ async function main() {
   await assertPage("/auth/login", "登录");
   await assertHealth();
   await assertCatalog();
+  await assertAdminWriteGuard();
   await assertTextEndpoint("/robots.txt", `${baseUrl}/sitemap.xml`);
   await assertTextEndpoint("/sitemap.xml", `${baseUrl}/projects/new`);
   await assertTextEndpoint("/manifest.webmanifest", "大吉形象");

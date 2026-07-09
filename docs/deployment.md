@@ -257,3 +257,4 @@ GET /api/health
 - 配置 Supabase 后，访问后台需要先登录。
 - 只有 `profiles.role` 为 `owner` 或 `admin` 的账号可以写入商品、风格和模型配置。
 - 后台写入接口依赖 `SUPABASE_SERVICE_ROLE_KEY`，但不会仅凭 Service Role Key 开放写入。
+- 生产和线上冒烟测试会验证匿名请求不能写入 `/api/admin/products`。
