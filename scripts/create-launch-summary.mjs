@@ -21,6 +21,7 @@ const requiredEnvKeys = [
 ];
 const aiEnvKeys = [
   "KIE_API_KEY",
+  "KIE_CALLBACK_SECRET",
   "OPENAI_API_KEY",
   "JIMENG_API_KEY",
   "KLING_API_KEY",
@@ -137,6 +138,11 @@ const manifest = readLatestManifest();
 const env = getMergedEnv();
 const missingRequiredEnv = requiredEnvKeys.filter((key) => isPlaceholder(env[key]));
 const configuredAiKeys = aiEnvKeys.filter((key) => !isPlaceholder(env[key]));
+const enabledAiKeys = configuredAiKeys.filter((key) => key !== "KIE_CALLBACK_SECRET");
+const kieCallbackReady =
+  isPlaceholder(env.KIE_API_KEY) ||
+  (!isPlaceholder(env.KIE_CALLBACK_SECRET) &&
+    String(env.KIE_CALLBACK_SECRET).trim().length >= 16);
 
 const archiveFile = manifest?.archive?.file || "待生成";
 const checksumFile = manifest?.archive?.file
@@ -158,7 +164,8 @@ const appIsExternallyReady =
   origin.ok &&
   Boolean(origin.stdout) &&
   !missingRequiredEnv.length &&
-  Boolean(configuredAiKeys.length);
+  Boolean(enabledAiKeys.length) &&
+  kieCallbackReady;
 
 const lines = [
   "# 大吉形象上线摘要",
@@ -172,7 +179,8 @@ const lines = [
   `- 本地代码与交付包：${manifest ? "已生成" : "待生成"}`,
   `- GitHub 远程仓库：${mark(origin.ok && Boolean(origin.stdout))}`,
   `- 正式环境变量：${missingRequiredEnv.length ? "待配置" : "已配置"}`,
-  `- AI 模型通道：${configuredAiKeys.length ? "已配置" : "待配置至少一个"}`,
+  `- AI 模型通道：${enabledAiKeys.length ? "已配置" : "待配置至少一个"}`,
+  `- KIE 回调密钥：${kieCallbackReady ? "无需处理或已配置" : "待配置"}`,
   `- 公网上线状态：${appIsExternallyReady ? "可进入部署验证" : "仍需外部配置"}`,
   "",
   "## 代码状态",
@@ -266,11 +274,20 @@ lines.push(
   "",
   "## 当前 AI 模型密钥状态",
   "",
-  configuredAiKeys.length
-    ? `- 已配置：${configuredAiKeys.join("、")}`
+  enabledAiKeys.length
+    ? `- 已配置：${enabledAiKeys.join("、")}`
     : "- 待配置至少一个：KIE_API_KEY、OPENAI_API_KEY、JIMENG_API_KEY、KLING_API_KEY、TONGYI_API_KEY",
   "",
 );
+
+if (!kieCallbackReady) {
+  lines.push(
+    "## 当前 KIE 回调密钥状态",
+    "",
+    "- 已配置 `KIE_API_KEY`，但缺少有效的 `KIE_CALLBACK_SECRET`。正式上线前需要配置 16 位以上随机强字符串。",
+    "",
+  );
+}
 
 writeFileSync(outputPath, `${lines.join("\n")}\n`);
 

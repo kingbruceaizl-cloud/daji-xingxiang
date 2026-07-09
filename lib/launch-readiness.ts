@@ -93,6 +93,49 @@ function createModelCheck(): LaunchCheckItem {
   };
 }
 
+function createKieCallbackSecretCheck(): LaunchCheckItem {
+  const kieEnabled = envConfigured("KIE_API_KEY");
+  const callbackSecret = process.env.KIE_CALLBACK_SECRET?.trim();
+
+  if (!kieEnabled) {
+    return {
+      key: "KIE_CALLBACK_SECRET",
+      label: "KIE 回调密钥",
+      required: false,
+      status: "ready",
+      detail: "未启用 KIE 模型通道，暂不需要校验 KIE 回调密钥。",
+    };
+  }
+
+  if (!callbackSecret) {
+    return {
+      key: "KIE_CALLBACK_SECRET",
+      label: "KIE 回调密钥",
+      required: true,
+      status: "missing",
+      detail: "已配置 KIE 模型密钥，但缺少 KIE 回调密钥，正式上线前必须配置。",
+    };
+  }
+
+  if (callbackSecret.length < 16) {
+    return {
+      key: "KIE_CALLBACK_SECRET",
+      label: "KIE 回调密钥",
+      required: true,
+      status: "warning",
+      detail: "KIE 回调密钥过短，建议使用 16 位以上随机强字符串。",
+    };
+  }
+
+  return {
+    key: "KIE_CALLBACK_SECRET",
+    label: "KIE 回调密钥",
+    required: true,
+    status: "ready",
+    detail: "已配置 KIE 回调密钥，回调入口具备基础可信校验。",
+  };
+}
+
 async function createDatabaseCheck(): Promise<LaunchCheckItem> {
   const supabase = createAdminClient();
 
@@ -189,6 +232,7 @@ export async function getLaunchReadiness(): Promise<LaunchReadiness> {
   const checks = [
     ...createEnvChecks(),
     createModelCheck(),
+    createKieCallbackSecretCheck(),
     await createDatabaseCheck(),
     await createStorageCheck(),
   ];

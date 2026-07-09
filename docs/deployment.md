@@ -185,6 +185,8 @@ KIE_API_KEY=
 KIE_CALLBACK_SECRET=
 ```
 
+启用 KIE 时，`KIE_CALLBACK_SECRET` 是正式上线必填项，建议使用 16 位以上随机强字符串，并和 KIE 回调配置保持一致。
+
 配置模型前可先生成模型通道交接单：
 
 ```bash

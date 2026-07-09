@@ -70,6 +70,9 @@ pnpm run preflight
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `NEXT_PUBLIC_APP_URL`
 - 至少一个 AI 模型通道密钥，例如 `KIE_API_KEY`
+- 如果使用 KIE，必须配置 `KIE_CALLBACK_SECRET`
+
+启用 KIE 时，`preflight` 会要求 `KIE_CALLBACK_SECRET` 为 16 位以上随机强字符串，避免第三方回调入口缺少可信校验。
 
 ## 4. 系统内体检
 

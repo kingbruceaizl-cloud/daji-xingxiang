@@ -111,6 +111,7 @@ requireIncludes(".env.production.example", envProductionExample, [
   "NEXT_PUBLIC_APP_URL=https://你的域名",
   "NEXT_PUBLIC_APP_ENV=production",
   "SUPABASE_SERVICE_ROLE_KEY=",
+  "KIE_CALLBACK_SECRET=",
 ]);
 
 const envTemplateCheck = requireFile("scripts/check-env-templates.mjs");
@@ -241,8 +242,17 @@ requireIncludes("scripts/create-launch-summary.mjs", launchSummary, [
   "daji-xingxiang-vercel-handoff.md",
   "daji-xingxiang-release-",
   "GitHub 远程仓库",
+  "KIE 回调密钥",
   "剩余上线动作",
   "不输出任何真实密钥值",
+]);
+
+const preflight = requireFile("scripts/preflight.mjs");
+requireIncludes("scripts/preflight.mjs", preflight, [
+  "大吉形象上线前检查",
+  "KIE_CALLBACK_SECRET",
+  "启用 KIE 时必须配置 KIE_CALLBACK_SECRET",
+  "16 位以上随机强字符串",
 ]);
 
 const supabaseSqlBundle = requireFile("scripts/create-supabase-sql-bundle.mjs");
@@ -395,6 +405,9 @@ requireIncludes("lib/launch-readiness.ts", launchReadiness, [
   "getDeploymentInfo",
   "deployment: DeploymentInfo",
   "deployment: getDeploymentInfo()",
+  "createKieCallbackSecretCheck",
+  "KIE_CALLBACK_SECRET",
+  "已配置 KIE 模型密钥，但缺少 KIE 回调密钥",
 ]);
 
 const deploymentInfo = requireFile("lib/deployment-info.ts");

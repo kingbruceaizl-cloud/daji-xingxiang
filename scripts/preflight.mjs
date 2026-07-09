@@ -43,6 +43,7 @@ const missing = requiredForProduction.filter((key) => !process.env[key]);
 const configuredProviders = aiProviders.filter((key) => Boolean(process.env[key]));
 const failures = [...missing];
 const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+const kieCallbackSecret = process.env.KIE_CALLBACK_SECRET?.trim();
 
 console.log("大吉形象上线前检查");
 console.log("------------------");
@@ -61,6 +62,18 @@ if (configuredProviders.length) {
 } else {
   console.log("AI 模型通道：未配置，将只能使用演示模型通道");
   failures.push("至少一个 AI 模型通道密钥");
+}
+
+if (process.env.KIE_API_KEY) {
+  if (!kieCallbackSecret) {
+    console.log("KIE 回调密钥：未配置");
+    failures.push("启用 KIE 时必须配置 KIE_CALLBACK_SECRET");
+  } else if (kieCallbackSecret.length < 16) {
+    console.log("KIE 回调密钥：长度过短");
+    failures.push("KIE_CALLBACK_SECRET 建议使用 16 位以上随机强字符串");
+  } else {
+    console.log("KIE 回调密钥：已配置");
+  }
 }
 
 if (appUrl) {
