@@ -118,6 +118,8 @@ git push -u origin main
 SMOKE_BASE_URL=https://你的域名 pnpm run smoke:url
 ```
 
+线上冒烟测试必须使用 `https` 公网域名，并会确认 `/api/health` 中的应用公开访问地址与测试域名一致。
+
 如果 Vercel 域名已经写入 `NEXT_PUBLIC_APP_URL`，也可以直接重新运行：
 
 ```bash

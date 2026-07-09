@@ -380,9 +380,14 @@ requireIncludes("scripts/smoke-url.mjs", smokeUrl, [
   "大吉形象线上地址冒烟测试",
   "assertSecurityHeaders",
   "SMOKE_BASE_URL",
+  "assertOnlineBaseUrl",
+  "线上冒烟测试必须使用 https 域名",
+  "线上冒烟测试不能使用本地地址",
   "/api/health",
   "data.deployment?.platform",
   "data.deployment?.appEnv",
+  "data.deployment?.publicUrl",
+  "应用公开访问地址与当前线上测试域名不一致",
 ]);
 
 const launchReadiness = requireFile("lib/launch-readiness.ts");

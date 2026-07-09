@@ -10,10 +10,48 @@ function normalizeBaseUrl(value) {
     return "";
   }
 
-  return value.replace(/\/+$/, "");
+  return value.trim().replace(/\/+$/, "");
 }
 
 const baseUrl = normalizeBaseUrl(rawBaseUrl);
+
+function isLocalHostname(hostname) {
+  return ["localhost", "127.0.0.1", "0.0.0.0", "::1"].includes(hostname);
+}
+
+function parseBaseUrl() {
+  try {
+    return new URL(baseUrl);
+  } catch {
+    failures.push("线上地址格式无效，请使用完整 https 域名。");
+    return null;
+  }
+}
+
+function assertOnlineBaseUrl() {
+  const parsed = parseBaseUrl();
+  if (!parsed) {
+    return null;
+  }
+
+  if (parsed.protocol !== "https:") {
+    failures.push("线上冒烟测试必须使用 https 域名。");
+  }
+
+  if (isLocalHostname(parsed.hostname)) {
+    failures.push("线上冒烟测试不能使用本地地址。");
+  }
+
+  return parsed;
+}
+
+function normalizeHealthUrl(value) {
+  if (!value) {
+    return "";
+  }
+
+  return String(value).trim().replace(/\/+$/, "");
+}
 
 async function assertPage(path, expectedText) {
   const response = await fetch(`${baseUrl}${path}`, {
@@ -54,6 +92,13 @@ async function assertHealth() {
 
   if (!data.deployment?.appEnv) {
     failures.push("/api/health 未返回应用环境信息。");
+  }
+
+  const publicUrl = normalizeHealthUrl(data.deployment?.publicUrl);
+  if (!publicUrl) {
+    failures.push("/api/health 未返回应用公开访问地址。");
+  } else if (publicUrl !== baseUrl) {
+    failures.push("/api/health 中的应用公开访问地址与当前线上测试域名不一致。");
   }
 }
 
@@ -121,14 +166,25 @@ async function main() {
     );
   }
 
+  assertOnlineBaseUrl();
+
+  if (failures.length) {
+    log("发现需要处理的问题：");
+    for (const item of failures) {
+      log(`- ${item}`);
+    }
+    process.exitCode = 1;
+    return;
+  }
+
   await assertPage("/", "大吉形象");
   await assertPage("/projects/new", "创建客户形象设计项目");
   await assertPage("/studio/demo", "生成形象图片");
   await assertPage("/auth/login", "登录");
   await assertHealth();
   await assertCatalog();
-  await assertTextEndpoint("/robots.txt", "sitemap.xml");
-  await assertTextEndpoint("/sitemap.xml", "/projects/new");
+  await assertTextEndpoint("/robots.txt", `${baseUrl}/sitemap.xml`);
+  await assertTextEndpoint("/sitemap.xml", `${baseUrl}/projects/new`);
   await assertTextEndpoint("/manifest.webmanifest", "大吉形象");
   await assertSecurityHeaders();
 
