@@ -85,6 +85,8 @@ pnpm run release:package
 - `daji-xingxiang-vercel-env-template.env`
 - `daji-xingxiang-vercel-handoff.md`
 
+源码压缩包内部会额外校验上线关键文件是否齐全，包括 GitHub Actions 工作流、`vercel.json`、`.node-version` 和 `.npmrc`。如果这些文件缺失，交付包校验会失败。
+
 ## 和 Vercel 的关系
 
 建议先让 GitHub Actions 通过，再合并或部署到 Vercel。

@@ -162,8 +162,14 @@ if (!manifestName) {
 
         const entries = listArchiveEntries(archivePath);
         assertRequiredEntries(entries, [
+          ".github/workflows/online-smoke.yml",
+          ".github/workflows/release-package.yml",
+          ".github/workflows/verify.yml",
+          ".node-version",
+          ".npmrc",
           "package.json",
           "pnpm-lock.yaml",
+          "vercel.json",
           "README.md",
           ".env.example",
           ".env.production.example",
