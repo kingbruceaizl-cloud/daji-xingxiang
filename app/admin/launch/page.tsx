@@ -98,7 +98,7 @@ async function AdminLaunchContent() {
                 检查大吉形象是否具备正式发布条件。
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-stone-500">
-                这里会检查应用地址、Supabase、数据库、存储桶和 AI 模型通道。
+                这里会检查应用地址、Supabase、数据库、存储桶配置和 AI 模型通道。
                 本地演示可以缺少这些配置，正式上线前需要全部处理。
               </p>
             </div>

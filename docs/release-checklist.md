@@ -89,7 +89,7 @@ pnpm run preflight
 /admin/launch
 ```
 
-确认环境、数据库、存储桶和模型通道都已就绪。
+确认环境、数据库、存储桶配置和模型通道都已就绪。
 
 ## 5. Vercel 发布
 

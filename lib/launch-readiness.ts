@@ -51,11 +51,35 @@ const modelChannels = [
   { key: "TONGYI_API_KEY", label: "通义模型通道" },
 ];
 
-const requiredBuckets = [
-  "customer-assets",
-  "generated-assets",
-  "product-assets",
-  "music-assets",
+const requiredBucketSettings = [
+  {
+    name: "customer-assets",
+    label: "客户素材",
+    public: false,
+    fileSizeLimit: 104857600,
+    mimeTypes: ["image/jpeg", "image/png", "image/webp", "video/mp4", "video/quicktime"],
+  },
+  {
+    name: "generated-assets",
+    label: "生成结果",
+    public: false,
+    fileSizeLimit: 524288000,
+    mimeTypes: ["image/jpeg", "image/png", "image/webp", "video/mp4"],
+  },
+  {
+    name: "product-assets",
+    label: "商品素材",
+    public: true,
+    fileSizeLimit: 52428800,
+    mimeTypes: ["image/jpeg", "image/png", "image/webp"],
+  },
+  {
+    name: "music-assets",
+    label: "音乐素材",
+    public: false,
+    fileSizeLimit: 52428800,
+    mimeTypes: ["audio/mpeg", "audio/mp4", "audio/wav", "audio/x-wav"],
+  },
 ];
 
 function envConfigured(key: string) {
@@ -134,6 +158,18 @@ function validateProductionEnvValue(value: string) {
   }
 
   return "";
+}
+
+function formatBucketPrivacy(isPublic: boolean) {
+  return isPublic ? "公开" : "私有";
+}
+
+function formatFileSize(bytes: number) {
+  if (bytes >= 1024 * 1024) {
+    return `${Math.round(bytes / 1024 / 1024)}MB`;
+  }
+
+  return `${bytes}B`;
 }
 
 function createEnvChecks(): LaunchCheckItem[] {
@@ -268,17 +304,59 @@ async function createStorageCheck(): Promise<LaunchCheckItem> {
     };
   }
 
-  const existing = new Set(data.map((bucket) => bucket.name));
-  const missing = requiredBuckets.filter((bucket) => !existing.has(bucket));
+  const buckets = data || [];
+  const bucketByName = new Map(buckets.map((bucket) => [bucket.name, bucket]));
+  const missing = requiredBucketSettings
+    .filter((bucket) => !bucketByName.has(bucket.name))
+    .map((bucket) => `${bucket.label}(${bucket.name})`);
+  const configIssues = requiredBucketSettings.flatMap((expected) => {
+    const bucket = bucketByName.get(expected.name);
+
+    if (!bucket) {
+      return [];
+    }
+
+    const issues: string[] = [];
+    const actualMimeTypes = bucket.allowed_mime_types || [];
+    const missingMimeTypes = expected.mimeTypes.filter(
+      (mimeType) => !actualMimeTypes.includes(mimeType),
+    );
+
+    if (bucket.public !== expected.public) {
+      issues.push(
+        `${expected.label}应为${formatBucketPrivacy(expected.public)}，当前为${formatBucketPrivacy(bucket.public)}`,
+      );
+    }
+
+    if (bucket.file_size_limit !== expected.fileSizeLimit) {
+      issues.push(
+        `${expected.label}大小上限应为${formatFileSize(expected.fileSizeLimit)}，当前为${
+          bucket.file_size_limit ? formatFileSize(bucket.file_size_limit) : "未设置"
+        }`,
+      );
+    }
+
+    if (missingMimeTypes.length) {
+      issues.push(`${expected.label}缺少文件类型：${missingMimeTypes.join("、")}`);
+    }
+
+    return issues;
+  });
+  const visibleIssues = configIssues.slice(0, 4);
+  const hiddenIssueCount = configIssues.length - visibleIssues.length;
 
   return {
     key: "STORAGE_BUCKETS",
     label: "素材存储桶",
     required: true,
-    status: missing.length ? "missing" : "ready",
+    status: missing.length ? "missing" : configIssues.length ? "warning" : "ready",
     detail: missing.length
       ? `缺少：${missing.join("、")}。`
-      : "客户素材、生成结果、商品素材和音乐存储桶均已创建。",
+      : configIssues.length
+        ? `发现配置需确认：${visibleIssues.join("；")}${
+            hiddenIssueCount > 0 ? `；另有 ${hiddenIssueCount} 项` : ""
+          }。请执行 Supabase 验收 SQL 复核。`
+        : "客户素材、生成结果、商品素材和音乐存储桶均已创建，公开属性、大小限制和文件类型白名单符合上线要求。",
   };
 }
 

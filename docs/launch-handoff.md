@@ -161,7 +161,7 @@ SMOKE_BASE_URL=https://你的域名 pnpm run smoke:url
 /admin/launch
 ```
 
-确认 Supabase、数据库、存储桶和模型通道都已就绪。
+确认 Supabase、数据库、存储桶配置和模型通道都已就绪。
 
 ## 当前剩余外部事项
 

@@ -176,7 +176,7 @@ const lines = [
   "- [ ] `/` 首页可以访问。",
   "- [ ] `/projects/new` 可以创建项目。",
   "- [ ] `/studio/demo` 可以走通无画布形象大师演示流程。",
-  "- [ ] `/admin/launch` 显示 Supabase、存储桶和模型通道状态。",
+  "- [ ] `/admin/launch` 显示 Supabase、存储桶配置和模型通道状态。",
   "- [ ] `/admin/models` 可以查看模型配置。",
   "- [ ] `/admin/jobs` 可以查看生成任务。",
   "",

@@ -133,7 +133,7 @@ lines.push(
   "SMOKE_BASE_URL=https://你的域名 pnpm run smoke:url",
   "```",
   "",
-  "4. 打开 `/admin/launch` 查看 Supabase、数据库、存储桶和模型通道状态。",
+  "4. 打开 `/admin/launch` 查看 Supabase、数据库、存储桶配置和模型通道状态。",
   "",
   "## GitHub Actions",
   "",
