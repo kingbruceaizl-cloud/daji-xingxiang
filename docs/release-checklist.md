@@ -9,6 +9,7 @@ pnpm run release:package
 pnpm run verify:commit
 pnpm run verify:local
 pnpm run check:secrets
+pnpm run check:materials:urls
 pnpm run check:deploy
 pnpm run smoke:admin-demo
 pnpm run smoke:prod
@@ -23,6 +24,7 @@ SMOKE_BASE_URL=https://你的域名 pnpm run smoke:url
 - 环境变量模板。
 - 待提交文件是否疑似包含真实密钥、JWT 或私钥。
 - 线上素材来源记录。
+- 线上素材地址是否可访问并返回图片。
 - Supabase 初始化文件。
 - 发布包基础文件。
 - 交付目录旧文件清理。

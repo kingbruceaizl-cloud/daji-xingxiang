@@ -14,6 +14,7 @@
     "check:secrets": "node scripts/check-secret-safety.mjs",
     "check:zh": "node scripts/check-chinese-ui.mjs",
     "check:materials": "node scripts/check-material-sources.mjs",
+    "check:materials:urls": "node scripts/check-material-urls.mjs",
     "check:supabase": "node scripts/check-supabase-setup.mjs",
     "check:release": "node scripts/check-release-package.mjs",
     "check:deploy": "node scripts/check-deploy-target.mjs",

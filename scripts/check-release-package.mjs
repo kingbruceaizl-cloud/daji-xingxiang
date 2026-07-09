@@ -65,6 +65,7 @@ for (const script of [
   "check:secrets",
   "check:zh",
   "check:materials",
+  "check:materials:urls",
   "check:supabase",
   "check:release",
   "check:deploy",
@@ -394,6 +395,18 @@ requireIncludes("scripts/check-material-sources.mjs", materialCheck, [
   "Pexels",
 ]);
 
+const materialUrlCheck = requireFile("scripts/check-material-urls.mjs");
+requireIncludes("scripts/check-material-urls.mjs", materialUrlCheck, [
+  "大吉形象线上素材连通性检查",
+  "lib/demo-data.ts",
+  "supabase/seed/0001_seed_demo_data.sql",
+  "docs/material-sources.md",
+  "images\\.pexels\\.com",
+  "AbortSignal.timeout",
+  "Range",
+  "content-type",
+]);
+
 const smokeProd = requireFile("scripts/smoke-prod.mjs");
 requireIncludes("scripts/smoke-prod.mjs", smokeProd, [
   "大吉形象生产模式冒烟测试",
@@ -549,6 +562,7 @@ requireIncludes("scripts/release-check.mjs", releaseCheck, [
   "大吉形象正式发布总检查",
   "smoke:admin-demo",
   "verify:local",
+  "check:materials:urls",
   "smoke:prod",
   "check:deploy",
   "preflight",

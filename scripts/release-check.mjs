@@ -87,11 +87,12 @@ async function main() {
 
   log("大吉形象正式发布总检查");
   log("----------------------");
-  log("该命令会依次检查本地发布包、生产模式、部署目标、正式环境变量，并在配置线上域名后检查公网地址。");
+  log("该命令会依次检查本地发布包、线上素材、生产模式、部署目标、正式环境变量，并在配置线上域名后检查公网地址。");
 
   const steps = [
     ["后台演示模式冒烟测试", "pnpm", ["run", "smoke:admin-demo"]],
     ["本地发布包验证", "pnpm", ["run", "verify:local"]],
+    ["线上素材连通性检查", "pnpm", ["run", "check:materials:urls"]],
     ["生产模式冒烟测试", "pnpm", ["run", "smoke:prod"]],
     ["部署目标审计", "pnpm", ["run", "check:deploy"]],
     ["正式环境变量预检", "pnpm", ["run", "preflight"]],
