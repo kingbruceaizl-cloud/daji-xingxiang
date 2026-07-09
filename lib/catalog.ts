@@ -8,6 +8,7 @@ import {
   stylePresets,
   videoTemplates,
 } from "@/lib/demo-data";
+import { formatJobStatusLabel, formatJobTypeLabel } from "@/lib/ai/display";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export type CatalogData = {
@@ -235,8 +236,8 @@ export async function getCatalogData(): Promise<CatalogData> {
       id: job.id,
       provider: job.provider,
       model: job.model,
-      type: job.job_type,
-      status: job.status,
+      type: formatJobTypeLabel(job.job_type),
+      status: formatJobStatusLabel(job.status),
       prompt: job.prompt,
       updatedAt: job.updated_at || job.created_at,
       errorMessage: job.error_message,

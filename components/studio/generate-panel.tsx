@@ -1,6 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import {
+  formatModelLabel,
+  formatProviderLabel,
+} from "@/lib/ai/display";
 import type { CatalogData } from "@/lib/catalog";
 import { Clapperboard, Download, Loader2, Save, Send, Sparkles } from "lucide-react";
 import Image from "next/image";
@@ -560,7 +564,10 @@ export function StudioGeneratePanel({
           <div className="mt-4 rounded-md bg-white/10 p-3 text-sm leading-6 text-stone-100">
             <div>任务：{job.jobId}</div>
             <div>状态：{statusText(job.status)}{isPolling ? "，正在自动查询" : ""}</div>
-            <div>模型：{job.provider} / {job.model}</div>
+            <div>
+              模型：{formatProviderLabel(job.provider)} /{" "}
+              {formatModelLabel(job.model, job.provider)}
+            </div>
             <div>{job.message}</div>
             {job.outputAssets?.length ? (
               <div>结果素材：{job.outputAssets.length} 个</div>

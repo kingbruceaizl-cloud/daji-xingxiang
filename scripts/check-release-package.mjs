@@ -472,6 +472,8 @@ requireIncludes("scripts/smoke-prod.mjs", smokeProd, [
   "assertProjectDetail",
   "/projects/demo-xinzhongshi",
   "/api/projects/demo-xinzhongshi",
+  "演示生图模型",
+  "演示视频模型",
   "全部商品",
   "已选商品",
   "清空选择",
@@ -492,6 +494,8 @@ requireIncludes("scripts/smoke-admin-demo.mjs", smokeAdminDemo, [
   "/admin/video-templates",
   "/admin/music",
   "/admin/jobs",
+  "演示生图模型",
+  "演示视频模型",
   "NEXT_PUBLIC_SUPABASE_URL",
 ]);
 
@@ -525,6 +529,8 @@ requireIncludes("scripts/smoke-url.mjs", smokeUrl, [
   "/projects/demo-xinzhongshi",
   "/api/projects/demo-xinzhongshi",
   "上线体检",
+  "演示生图模型",
+  "演示视频模型",
   "全部商品",
   "已选商品",
   "清空选择",
@@ -577,6 +583,17 @@ requireIncludes("lib/ai/access.ts", aiAccess, [
   "需要先登录后再生成",
 ]);
 
+const aiDisplay = requireFile("lib/ai/display.ts");
+requireIncludes("lib/ai/display.ts", aiDisplay, [
+  "formatProviderLabel",
+  "formatModelLabel",
+  "formatJobTypeLabel",
+  "formatJobStatusLabel",
+  "演示通道",
+  "演示生图模型",
+  "演示视频模型",
+]);
+
 const deploymentInfo = requireFile("lib/deployment-info.ts");
 requireIncludes("lib/deployment-info.ts", deploymentInfo, [
   "getDeploymentInfo",
@@ -590,9 +607,19 @@ const projectsLib = requireFile("lib/projects.ts");
 requireIncludes("lib/projects.ts", projectsLib, [
   "getProjectDetailById",
   "ProjectDetail",
+  "formatJobTypeLabel",
+  "formatJobStatusLabel",
   "demoAssets",
   "assets",
   "jobs",
+]);
+
+const catalogLib = requireFile("lib/catalog.ts");
+requireIncludes("lib/catalog.ts", catalogLib, [
+  "getCatalogData",
+  "formatJobTypeLabel",
+  "formatJobStatusLabel",
+  "jobsResult",
 ]);
 
 const launchPage = requireFile("app/admin/launch/page.tsx");
@@ -642,6 +669,19 @@ requireIncludes("app/projects/[id]/page.tsx", projectDetailPage, [
   "项目素材",
   "生成任务",
   "进入形象大师",
+  "formatProviderLabel",
+  "formatModelLabel",
+  "formatJobTypeLabel",
+  "formatJobStatusLabel",
+]);
+
+const adminJobsPage = requireFile("app/admin/jobs/page.tsx");
+requireIncludes("app/admin/jobs/page.tsx", adminJobsPage, [
+  "生成任务",
+  "formatProviderLabel",
+  "formatModelLabel",
+  "formatJobTypeLabel",
+  "formatJobStatusLabel",
 ]);
 
 const uploadApi = requireFile("app/api/upload/route.ts");
@@ -688,6 +728,8 @@ requireIncludes("components/studio/generate-panel.tsx", generatePanel, [
   "resultDownloadName",
   "extraPrompt",
   "finalPrompt",
+  "formatProviderLabel",
+  "formatModelLabel",
   "selectedVideoTemplateName",
   "selectedScriptName",
   "selectedMusicName",
@@ -881,6 +923,7 @@ requireIncludes("docs/frontend-requirements.md", frontendRequirements, [
   "已选商品固定展示在底部确认栏",
   "同步更新生成提示词和生成任务参数",
   "支持手动补充提示词",
+  "不直接暴露内部英文标识",
   "在工作台中选择视频模板、脚本文案和音乐",
   "同步到视频生成任务参数",
   "支持保存到项目和下载结果",
@@ -903,6 +946,7 @@ for (const routeFile of [
   "app/api/generate/video/route.ts",
   "app/api/provider-callback/kie/route.ts",
   "lib/ai/access.ts",
+  "lib/ai/display.ts",
   "lib/ai/result-assets.ts",
   "lib/deployment-info.ts",
   "lib/upload-rules.ts",

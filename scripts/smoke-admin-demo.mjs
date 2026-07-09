@@ -75,6 +75,8 @@ async function runAdminChecks() {
   await assertPage("/admin/music", "管理短视频音乐和情绪标签");
   await assertPage("/admin/models", "维护 AI 模型通道与模型能力");
   await assertPage("/admin/jobs", "查看图片、视频和文案生成记录");
+  await assertPage("/admin/jobs", "演示生图模型");
+  await assertPage("/admin/jobs", "演示视频模型");
   await assertPage("/admin/launch", "上线体检");
 }
 

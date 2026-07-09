@@ -3,6 +3,7 @@ import {
   projects as demoProjects,
   publicImages,
 } from "@/lib/demo-data";
+import { formatJobStatusLabel, formatJobTypeLabel } from "@/lib/ai/display";
 import { createClient } from "@/lib/supabase/server";
 import { hasEnvVars } from "@/lib/utils";
 
@@ -296,8 +297,8 @@ export async function getProjectDetailById(projectId: string): Promise<ProjectDe
           id: job.id,
           provider: job.provider,
           model: job.model,
-          type: String(job.job_type || "生成任务"),
-          status: String(job.status || "未知"),
+          type: formatJobTypeLabel(String(job.job_type || "")),
+          status: formatJobStatusLabel(String(job.status || "")),
           prompt: job.prompt || "暂无提示词",
           updatedAt: formatUpdatedAt(job.updated_at),
         })) || [],

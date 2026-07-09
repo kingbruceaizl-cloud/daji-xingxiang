@@ -1,6 +1,12 @@
 import { AdminGuardMessage } from "@/components/admin/admin-guard-message";
-import { getCatalogData } from "@/lib/catalog";
 import { getAdminPageState } from "@/lib/admin-page";
+import {
+  formatJobStatusLabel,
+  formatJobTypeLabel,
+  formatModelLabel,
+  formatProviderLabel,
+} from "@/lib/ai/display";
+import { getCatalogData } from "@/lib/catalog";
 import { ArrowLeft, ListVideo } from "lucide-react";
 import Link from "next/link";
 
@@ -11,24 +17,12 @@ const statusClassName: Record<string, string> = {
   failed: "bg-red-50 text-red-700",
   canceled: "bg-stone-100 text-stone-500",
   已完成: "bg-green-50 text-green-700",
+  生成中: "bg-blue-50 text-blue-700",
+  排队中: "bg-amber-50 text-amber-700",
+  失败: "bg-red-50 text-red-700",
+  已取消: "bg-stone-100 text-stone-500",
   等待生成: "bg-amber-50 text-amber-700",
   待接入: "bg-stone-100 text-stone-500",
-};
-
-const statusLabel: Record<string, string> = {
-  succeeded: "已完成",
-  running: "生成中",
-  queued: "排队中",
-  failed: "失败",
-  canceled: "已取消",
-};
-
-const typeLabel: Record<string, string> = {
-  text_to_image: "文生图",
-  image_to_image: "图生图",
-  image_to_video: "图生视频",
-  video_render: "视频渲染",
-  copywriting: "文案生成",
 };
 
 export default async function AdminJobsPage() {
@@ -83,15 +77,17 @@ export default async function AdminJobsPage() {
                     )}
                   </div>
                   <div className="text-sm text-stone-600">
-                    <p>{job.provider}</p>
-                    <p className="mt-1 text-xs text-stone-400">{job.model}</p>
+                    <p>{formatProviderLabel(job.provider)}</p>
+                    <p className="mt-1 text-xs text-stone-400">
+                      {formatModelLabel(job.model, job.provider)}
+                    </p>
                   </div>
                   <p className="text-sm text-stone-600">
-                    {typeLabel[job.type] || job.type}
+                    {formatJobTypeLabel(job.type)}
                   </p>
                   <div>
                     <span className={`inline-flex rounded-full px-2 py-1 text-xs ${statusClassName[job.status] || "bg-stone-100 text-stone-500"}`}>
-                      {statusLabel[job.status] || job.status}
+                      {formatJobStatusLabel(job.status)}
                     </span>
                     <p className="mt-2 text-xs text-stone-400">{job.updatedAt}</p>
                   </div>

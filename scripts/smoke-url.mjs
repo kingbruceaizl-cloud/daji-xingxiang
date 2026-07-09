@@ -413,6 +413,8 @@ async function main() {
   await assertPage("/projects/new", "创建客户形象设计项目");
   await assertPage("/projects/demo-xinzhongshi", "项目详情");
   await assertPage("/projects/demo-xinzhongshi", "进入形象大师");
+  await assertPage("/projects/demo-xinzhongshi", "演示生图模型");
+  await assertPage("/projects/demo-xinzhongshi", "演示视频模型");
   await assertPage("/studio/demo", "生成形象图片");
   await assertPage("/studio/demo", "全部商品");
   await assertPage("/studio/demo", "已选商品");
