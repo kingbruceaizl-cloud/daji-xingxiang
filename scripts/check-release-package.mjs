@@ -628,6 +628,11 @@ const publishStatus = requireFile("scripts/publish-status.mjs");
 requireIncludes("scripts/publish-status.mjs", publishStatus, [
   "大吉形象发布通道状态",
   "GitHub 远程 origin",
+  "源码交付包",
+  "checkReleasePackage",
+  "daji-xingxiang-release-",
+  "发布清单提交号与当前提交不一致",
+  "确保交付包匹配当前提交",
   "Vercel Token",
   "Supabase Access Token",
   "AI 模型密钥",
