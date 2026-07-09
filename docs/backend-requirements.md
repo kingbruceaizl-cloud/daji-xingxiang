@@ -24,6 +24,14 @@
 - `product-assets`: 商品图和素材图。
 - `music-assets`: 音乐文件。
 
+文件规则：
+
+- `customer-assets`: 支持 JPG、PNG、WebP、MP4、MOV，最大 100MB。
+- `generated-assets`: 支持 JPG、PNG、WebP、MP4，最大 500MB。
+- `product-assets`: 支持 JPG、PNG、WebP，最大 50MB。
+- `music-assets`: 支持 MP3、M4A、WAV，最大 50MB。
+- 上传接口必须先校验文件类型和大小，再读取文件内容或写入存储。
+
 ### Database
 
 建议表：

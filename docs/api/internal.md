@@ -120,6 +120,14 @@ POST /api/upload
 - `product-assets`、`music-assets` 和 `generated-assets` 属于后台素材目录，只允许 `owner` 或 `admin` 上传。
 - AI 回调产生的结果通常由服务端直接转存到 `generated-assets`，不建议前端直接写入。
 
+文件规则：
+
+- `customer-assets`: 支持 JPG、PNG、WebP、MP4、MOV，最大 100MB。
+- `generated-assets`: 支持 JPG、PNG、WebP、MP4，最大 500MB。
+- `product-assets`: 支持 JPG、PNG、WebP，最大 50MB。
+- `music-assets`: 支持 MP3、M4A、WAV，最大 50MB。
+- 服务端会先校验文件类型和大小，再读取文件内容或写入存储。
+
 未配置 Supabase 或未登录时，接口会返回中文提示，不会写入真实存储。
 
 ## 后台管理

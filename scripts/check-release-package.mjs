@@ -458,8 +458,11 @@ requireIncludes("scripts/smoke-prod.mjs", smokeProd, [
   "真实模型通道 kie 需要先登录后再生成",
   "assertAdminWriteGuard",
   "assertAdminAssetUploadGuard",
+  "assertInvalidUploadTypeGuard",
   "/api/upload 匿名上传后台素材不应成功。",
+  "/api/upload 错误文件类型不应成功。",
   "当前账号没有后台素材上传权限",
+  "不支持该文件类型",
   "/api/admin/products 匿名写入不应成功。",
   "请先登录后再操作后台",
   "data.deployment.platform",
@@ -492,8 +495,11 @@ requireIncludes("scripts/smoke-url.mjs", smokeUrl, [
   "twitter:title",
   "assertAdminWriteGuard",
   "assertAdminAssetUploadGuard",
+  "assertInvalidUploadTypeGuard",
   "/api/upload 匿名上传后台素材不应成功。",
+  "/api/upload 错误文件类型不应成功。",
   "当前账号没有后台素材上传权限",
+  "不支持该文件类型",
   "assertMockGenerationAllowed",
   "assertRealProviderGenerationGuard",
   "SMOKE_BASE_URL",
@@ -591,10 +597,16 @@ requireIncludes("app/api/jobs/[id]/route.ts", jobApi, [
 
 const uploadApi = requireFile("app/api/upload/route.ts");
 requireIncludes("app/api/upload/route.ts", uploadApi, [
+  "bucketRules",
+  "validateUploadFile",
+  "104857600",
+  "524288000",
   "adminOnlyBuckets",
   "validateBucketAccess",
   "请先登录后再上传后台素材",
   "当前账号没有后台素材上传权限",
+  "文件过大",
+  "不支持该文件类型",
   "generated-assets",
   "product-assets",
   "music-assets",
@@ -735,12 +747,14 @@ requireIncludes("docs/api/internal.md", internalApiDocs, [
   "普通登录用户只能上传 `customer-assets` 客户素材",
   "`product-assets`、`music-assets` 和 `generated-assets` 属于后台素材目录",
   "AI 回调产生的结果通常由服务端直接转存到 `generated-assets`",
+  "服务端会先校验文件类型和大小，再读取文件内容或写入存储",
 ]);
 
 const backendRequirements = requireFile("docs/backend-requirements.md");
 requireIncludes("docs/backend-requirements.md", backendRequirements, [
   "商品、音乐和生成结果素材桶仅允许 `owner` 或 `admin` 写入",
   "不能写入商品、音乐或生成结果等后台素材桶",
+  "上传接口必须先校验文件类型和大小，再读取文件内容或写入存储",
 ]);
 
 for (const routeFile of [

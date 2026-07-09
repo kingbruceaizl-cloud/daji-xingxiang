@@ -261,6 +261,28 @@ async function assertAdminAssetUploadGuard() {
   }
 }
 
+async function assertInvalidUploadTypeGuard() {
+  const formData = new FormData();
+  formData.set("bucket", "customer-assets");
+  formData.set("file", new Blob(["smoke"], { type: "text/plain" }), "smoke.txt");
+
+  const response = await fetch(`${baseUrl}/api/upload`, {
+    method: "POST",
+    body: formData,
+  });
+  const payload = await response.json().catch(() => ({}));
+  const message = typeof payload.message === "string" ? payload.message : "";
+
+  if (response.status !== 400 || payload.ok) {
+    failures.push("/api/upload 错误文件类型不应成功。");
+    return;
+  }
+
+  if (!message.includes("不支持该文件类型")) {
+    failures.push("/api/upload 错误文件类型未返回中文提示。");
+  }
+}
+
 async function assertTextEndpoint(path, expectedText) {
   const response = await fetch(`${baseUrl}${path}`);
   const text = await response.text();
@@ -384,6 +406,7 @@ async function main() {
   await assertRealProviderGenerationGuard();
   await assertAdminWriteGuard();
   await assertAdminAssetUploadGuard();
+  await assertInvalidUploadTypeGuard();
   await assertTextEndpoint("/robots.txt", `${baseUrl}/sitemap.xml`);
   await assertTextEndpoint("/sitemap.xml", `${baseUrl}/projects/new`);
   await assertManifest();
