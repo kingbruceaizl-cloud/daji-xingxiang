@@ -50,6 +50,8 @@ pnpm run preflight
 
 `check:env` 检查模板是否齐全；`release:env-handoff` 会生成 `dist/daji-xingxiang-env-handoff.md`，用于交接 Vercel、Supabase 和模型通道配置，不输出任何真实密钥值；`release:model-handoff` 会生成 `dist/daji-xingxiang-model-handoff.md`，用于核对 KIE 回调和多模型预留密钥；`release:vercel-env-template` 会生成 `dist/daji-xingxiang-vercel-env-template.env`，用于在 Vercel 面板逐项填写生产变量；`preflight` 检查当前环境是否满足正式上线条件。
 
+`preflight` 不只检查变量是否存在，也会拦截 `你的域名`、`<填写...>`、`example.com` 等占位值，以及明显过短的密钥。
+
 ## 5. 安全提醒
 
 - 不要提交 `.env.local`、`.env.production` 或任何真实密钥。

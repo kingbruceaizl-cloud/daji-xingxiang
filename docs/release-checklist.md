@@ -63,6 +63,8 @@ pnpm run preflight
 
 `preflight` 已包含在 `release:check` 中；单独运行它可以快速确认正式环境变量是否齐全。
 
+它会拦截空值、占位值、示例域名、本地地址、非 HTTPS 地址和明显过短的密钥，不能只把模板里的占位内容复制到 Vercel。
+
 正式上线前必须配置：
 
 - `NEXT_PUBLIC_SUPABASE_URL`

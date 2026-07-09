@@ -250,6 +250,11 @@ requireIncludes("scripts/create-launch-summary.mjs", launchSummary, [
 const preflight = requireFile("scripts/preflight.mjs");
 requireIncludes("scripts/preflight.mjs", preflight, [
   "大吉形象上线前检查",
+  "placeholderTokens",
+  "isPlaceholderValue",
+  "正式环境变量存在问题",
+  "仍是占位值",
+  "长度过短",
   "KIE_CALLBACK_SECRET",
   "启用 KIE 时必须配置 KIE_CALLBACK_SECRET",
   "16 位以上随机强字符串",
@@ -428,6 +433,9 @@ requireIncludes("lib/launch-readiness.ts", launchReadiness, [
   "deployment: DeploymentInfo",
   "deployment: getDeploymentInfo()",
   "createKieCallbackSecretCheck",
+  "isPlaceholderValue",
+  "仍是占位值，正式上线前需要替换为真实配置。",
+  "长度过短，请确认已填写真实密钥。",
   "KIE_CALLBACK_SECRET",
   "已配置 KIE 模型密钥，但缺少 KIE 回调密钥",
 ]);

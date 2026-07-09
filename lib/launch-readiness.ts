@@ -58,23 +58,80 @@ function envConfigured(key: string) {
   return Boolean(process.env[key]?.trim());
 }
 
+const placeholderTokens = ["你的", "填写", "示例", "example", "<", ">", "placeholder", "todo"];
+
+function envValue(key: string) {
+  return process.env[key]?.trim() || "";
+}
+
+function isPlaceholderValue(value: string) {
+  const normalized = value.trim().toLowerCase();
+  return !normalized || placeholderTokens.some((token) => normalized.includes(token));
+}
+
+function isLocalHostname(hostname: string) {
+  return ["localhost", "127.0.0.1", "0.0.0.0", "::1"].includes(hostname);
+}
+
+function validateUrlValue(value: string) {
+  if (!value) {
+    return "未配置，正式上线前必填。";
+  }
+
+  if (isPlaceholderValue(value)) {
+    return "仍是占位值，正式上线前需要替换为真实配置。";
+  }
+
+  try {
+    const parsedUrl = new URL(value);
+
+    if (parsedUrl.protocol !== "https:") {
+      return "需要使用 https 地址。";
+    }
+
+    if (isLocalHostname(parsedUrl.hostname)) {
+      return "已配置为本地地址，正式上线前需要替换为线上域名。";
+    }
+
+  } catch {
+    return "格式无效，正式上线前需要修正。";
+  }
+
+  return "";
+}
+
+function validateSecretValue(value: string, minLength = 20) {
+  if (!value) {
+    return "未配置，正式上线前必填。";
+  }
+
+  if (isPlaceholderValue(value)) {
+    return "仍是占位值，正式上线前需要替换为真实密钥。";
+  }
+
+  if (value.length < minLength) {
+    return "长度过短，请确认已填写真实密钥。";
+  }
+
+  return "";
+}
+
 function createEnvChecks(): LaunchCheckItem[] {
   return requiredEnv.map((item) => {
-    const configured = envConfigured(item.key);
-    const value = process.env[item.key]?.trim();
-    const isLocalhostAppUrl =
-      item.key === "NEXT_PUBLIC_APP_URL" && value?.includes("localhost");
+    const value = envValue(item.key);
+    const issue =
+      item.key === "NEXT_PUBLIC_SUPABASE_URL"
+        ? validateUrlValue(value)
+        : item.key === "NEXT_PUBLIC_APP_URL"
+          ? validateUrlValue(value)
+          : validateSecretValue(value);
 
     return {
       key: item.key,
       label: item.label,
       required: true,
-      status: configured ? (isLocalhostAppUrl ? "warning" : "ready") : "missing",
-      detail: configured
-        ? isLocalhostAppUrl
-          ? "已配置为本地地址，正式上线前需要替换为线上域名。"
-          : "已配置。"
-        : "未配置，正式上线前必填。",
+      status: !value ? "missing" : issue ? "warning" : "ready",
+      detail: issue || "已配置，未发现明显占位值。",
     };
   });
 }

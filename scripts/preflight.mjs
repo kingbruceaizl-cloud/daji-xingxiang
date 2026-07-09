@@ -24,13 +24,6 @@ function loadEnvFile(fileName) {
 loadEnvFile(".env.local");
 loadEnvFile(".env.production");
 
-const requiredForProduction = [
-  "NEXT_PUBLIC_SUPABASE_URL",
-  "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
-  "SUPABASE_SERVICE_ROLE_KEY",
-  "NEXT_PUBLIC_APP_URL",
-];
-
 const aiProviders = [
   "KIE_API_KEY",
   "OPENAI_API_KEY",
@@ -39,22 +32,104 @@ const aiProviders = [
   "TONGYI_API_KEY",
 ];
 
-const missing = requiredForProduction.filter((key) => !process.env[key]);
-const configuredProviders = aiProviders.filter((key) => Boolean(process.env[key]));
-const failures = [...missing];
 const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 const kieCallbackSecret = process.env.KIE_CALLBACK_SECRET?.trim();
+const placeholderTokens = [
+  "你的",
+  "填写",
+  "示例",
+  "example",
+  "<",
+  ">",
+  "placeholder",
+  "todo",
+];
+
+function envValue(key) {
+  return process.env[key]?.trim() || "";
+}
+
+function isPlaceholderValue(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+
+  return !normalized || placeholderTokens.some((token) => normalized.includes(token));
+}
+
+function isLocalHostname(hostname) {
+  return ["localhost", "127.0.0.1", "0.0.0.0", "::1"].includes(hostname);
+}
+
+function validateUrlEnv(key, label) {
+  const value = envValue(key);
+  const issues = [];
+
+  if (!value) {
+    issues.push(`${key} 未配置`);
+    return issues;
+  }
+
+  if (isPlaceholderValue(value)) {
+    issues.push(`${key} 仍是占位值`);
+    return issues;
+  }
+
+  try {
+    const parsedUrl = new URL(value);
+
+    if (parsedUrl.protocol !== "https:") {
+      issues.push(`${label}需要使用 https 地址`);
+    }
+
+    if (isLocalHostname(parsedUrl.hostname)) {
+      issues.push(`${label}不能是本地地址`);
+    }
+
+  } catch {
+    issues.push(`${key} 格式无效`);
+  }
+
+  return issues;
+}
+
+function validateSecretEnv(key, label, minLength = 20) {
+  const value = envValue(key);
+
+  if (!value) {
+    return [`${key} 未配置`];
+  }
+
+  if (isPlaceholderValue(value)) {
+    return [`${key} 仍是占位值`];
+  }
+
+  if (value.length < minLength) {
+    return [`${label}长度过短`];
+  }
+
+  return [];
+}
+
+const envIssues = [
+  ...validateUrlEnv("NEXT_PUBLIC_SUPABASE_URL", "Supabase 项目地址"),
+  ...validateSecretEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "Supabase 公开访问密钥"),
+  ...validateSecretEnv("SUPABASE_SERVICE_ROLE_KEY", "Supabase 服务端密钥"),
+  ...validateUrlEnv("NEXT_PUBLIC_APP_URL", "应用公开访问地址"),
+];
+const configuredProviders = aiProviders.filter(
+  (key) => validateSecretEnv(key, key, 8).length === 0,
+);
+const failures = [...envIssues];
 
 console.log("大吉形象上线前检查");
 console.log("------------------");
 
-if (missing.length) {
-  console.log("缺少必填环境变量：");
-  for (const key of missing) {
-    console.log(`- ${key}`);
+if (envIssues.length) {
+  console.log("正式环境变量存在问题：");
+  for (const issue of envIssues) {
+    console.log(`- ${issue}`);
   }
 } else {
-  console.log("必填环境变量：已配置");
+  console.log("正式环境变量：已配置且未发现明显占位值");
 }
 
 if (configuredProviders.length) {
@@ -64,7 +139,7 @@ if (configuredProviders.length) {
   failures.push("至少一个 AI 模型通道密钥");
 }
 
-if (process.env.KIE_API_KEY) {
+if (envValue("KIE_API_KEY")) {
   if (!kieCallbackSecret) {
     console.log("KIE 回调密钥：未配置");
     failures.push("启用 KIE 时必须配置 KIE_CALLBACK_SECRET");
@@ -79,16 +154,14 @@ if (process.env.KIE_API_KEY) {
 if (appUrl) {
   try {
     const parsedUrl = new URL(appUrl);
-    const isLocalAddress = ["localhost", "127.0.0.1", "0.0.0.0"].includes(
-      parsedUrl.hostname,
-    );
+    const isLocalAddress = isLocalHostname(parsedUrl.hostname);
 
-    if (parsedUrl.protocol !== "https:") {
+    if (isPlaceholderValue(appUrl)) {
+      console.log("应用公开访问地址：仍是占位值");
+    } else if (parsedUrl.protocol !== "https:") {
       console.log("应用公开访问地址：正式上线建议使用 https 地址");
-      failures.push("NEXT_PUBLIC_APP_URL 需要使用 https 地址");
     } else if (isLocalAddress) {
       console.log("应用公开访问地址：当前仍是本地地址");
-      failures.push("NEXT_PUBLIC_APP_URL 不能是本地地址");
     } else {
       console.log("应用公开访问地址：已配置为线上 https 地址");
     }
