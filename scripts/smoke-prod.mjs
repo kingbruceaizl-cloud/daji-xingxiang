@@ -42,6 +42,33 @@ async function assertPage(path, expectedText) {
   }
 }
 
+async function assertHomeMetadata() {
+  const response = await fetch(`${baseUrl}/`);
+  const html = await response.text();
+  const expectedSnippets = [
+    '<html lang="zh-CN"',
+    "<title>大吉形象</title>",
+    'name="description" content="面向形象顾问的 AI 形象设计与变装视频工作台"',
+    'name="application-name" content="大吉形象"',
+    'rel="manifest" href="/manifest.webmanifest"',
+    'property="og:title" content="大吉形象"',
+    'property="og:site_name" content="大吉形象"',
+    'property="og:locale" content="zh_CN"',
+    'name="twitter:title" content="大吉形象"',
+  ];
+
+  if (!response.ok) {
+    failures.push(`首页元信息返回状态异常：${response.status}`);
+    return;
+  }
+
+  for (const snippet of expectedSnippets) {
+    if (!html.includes(snippet)) {
+      failures.push(`首页缺少中文品牌元信息：${snippet}`);
+    }
+  }
+}
+
 async function assertHealth() {
   const response = await fetch(`${baseUrl}/api/health`);
   const data = await response.json();
@@ -231,6 +258,31 @@ async function assertTextEndpoint(path, expectedText) {
   }
 }
 
+async function assertManifest() {
+  const response = await fetch(`${baseUrl}/manifest.webmanifest`);
+  const payload = await response.json().catch(() => null);
+
+  if (!response.ok || !payload) {
+    failures.push("/manifest.webmanifest 返回异常。");
+    return;
+  }
+
+  const expectedValues = {
+    name: "大吉形象",
+    short_name: "大吉形象",
+    description: "中文 AI 形象设计、商品搭配和变装视频工作台",
+    start_url: "/projects/new",
+    display: "standalone",
+    lang: "zh-CN",
+  };
+
+  for (const [key, expectedValue] of Object.entries(expectedValues)) {
+    if (payload[key] !== expectedValue) {
+      failures.push(`/manifest.webmanifest ${key} 配置异常。`);
+    }
+  }
+}
+
 async function assertSecurityHeaders() {
   const response = await fetch(`${baseUrl}/`);
   const expectedHeaders = {
@@ -284,6 +336,7 @@ async function assertPrivateCacheHeaders(paths) {
 
 async function runSmokeChecks() {
   await assertPage("/", "大吉形象");
+  await assertHomeMetadata();
   await assertPage("/projects/new", "创建客户形象设计项目");
   await assertPage("/studio/demo", "生成形象图片");
   await assertPage("/studio/demo", "KIE 图像");
@@ -297,7 +350,7 @@ async function runSmokeChecks() {
   await assertAdminWriteGuard();
   await assertTextEndpoint("/robots.txt", "sitemap.xml");
   await assertTextEndpoint("/sitemap.xml", "/projects/new");
-  await assertTextEndpoint("/manifest.webmanifest", "大吉形象");
+  await assertManifest();
   await assertSecurityHeaders();
   await assertPrivateIndexingHeaders(["/api/health", "/admin/launch"]);
   await assertPrivateCacheHeaders(["/api/health", "/admin/launch"]);
