@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import type { CatalogData } from "@/lib/catalog";
 import { Clapperboard, Download, Loader2, Save, Send, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -32,6 +33,9 @@ type GeneratePanelProps = {
   initialInputImageUrl?: string;
   selectedProducts: string[];
   styleName: string;
+  videoTemplates: CatalogData["videoTemplates"];
+  scriptTemplates: CatalogData["scriptTemplates"];
+  musicTracks: CatalogData["musicTracks"];
 };
 
 async function createJob(endpoint: string, payload: Record<string, unknown>) {
@@ -171,6 +175,9 @@ export function StudioGeneratePanel({
   initialInputImageUrl,
   selectedProducts,
   styleName,
+  videoTemplates,
+  scriptTemplates,
+  musicTracks,
 }: GeneratePanelProps) {
   const [job, setJob] = useState<JobResult | null>(null);
   const [inputImageUrl, setInputImageUrl] = useState(initialInputImageUrl || "");
@@ -181,6 +188,9 @@ export function StudioGeneratePanel({
   const [extraPrompt, setExtraPrompt] = useState("");
   const [imageProviderId, setImageProviderId] = useState<(typeof imageProviders)[number]["id"]>("mock");
   const [videoProviderId, setVideoProviderId] = useState<(typeof videoProviders)[number]["id"]>("mock");
+  const [selectedVideoTemplateName, setSelectedVideoTemplateName] = useState(videoTemplates[0]?.name || "");
+  const [selectedScriptName, setSelectedScriptName] = useState(scriptTemplates[0]?.name || "");
+  const [selectedMusicName, setSelectedMusicName] = useState(musicTracks[0]?.name || "");
   const [isPolling, setIsPolling] = useState(false);
   const latestJobRef = useRef<JobResult | null>(null);
 
@@ -288,6 +298,25 @@ export function StudioGeneratePanel({
   const finalPrompt = cleanedExtraPrompt
     ? `${prompt}补充要求：${cleanedExtraPrompt}。`
     : prompt;
+  const selectedVideoTemplate =
+    videoTemplates.find((template) => template.name === selectedVideoTemplateName) ||
+    videoTemplates[0];
+  const selectedScript =
+    scriptTemplates.find((script) => script.name === selectedScriptName) ||
+    scriptTemplates[0];
+  const selectedMusic =
+    musicTracks.find((track) => track.name === selectedMusicName) ||
+    musicTracks[0];
+  const videoPrompt = [
+    finalPrompt,
+    selectedVideoTemplate
+      ? `短视频模板：${selectedVideoTemplate.name}，${selectedVideoTemplate.promptTemplate}`
+      : "",
+    selectedScript ? `脚本文案：${selectedScript.content}` : "",
+    selectedMusic
+      ? `音乐选择：${selectedMusic.name}，${selectedMusic.usage || selectedMusic.moodTags.join("、")}`
+      : "",
+  ].filter(Boolean).join("");
   const payload = {
     provider: imageProvider.provider,
     model: imageProvider.model,
@@ -332,8 +361,11 @@ export function StudioGeneratePanel({
         projectId,
         styleName,
         selectedProducts,
-        prompt: finalPrompt,
+        prompt: videoPrompt,
         extraPrompt: cleanedExtraPrompt,
+        videoTemplateName: selectedVideoTemplate?.name,
+        scriptTemplateName: selectedScript?.name,
+        musicTrackName: selectedMusic?.name,
         inputImageUrls: videoInputUrl ? [videoInputUrl] : [],
       });
       setJob(result);
@@ -412,6 +444,87 @@ export function StudioGeneratePanel({
               ))}
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="rounded-md border border-stone-200 bg-white p-5">
+        <h2 className="text-sm font-semibold">短视频配置</h2>
+        <div className="mt-4 grid gap-4">
+          <label className="block text-xs font-medium text-stone-500">
+            视频模板
+            <select
+              value={selectedVideoTemplateName}
+              onChange={(event) => setSelectedVideoTemplateName(event.target.value)}
+              disabled={!videoTemplates.length}
+              className="mt-2 w-full rounded-md border border-stone-200 bg-stone-50 px-3 py-2 text-sm text-stone-700 outline-none focus:border-red-300 focus:bg-white"
+            >
+              {videoTemplates.length ? (
+                videoTemplates.map((template) => (
+                  <option key={template.name} value={template.name}>
+                    {template.name}
+                  </option>
+                ))
+              ) : (
+                <option value="">暂未配置视频模板</option>
+              )}
+            </select>
+          </label>
+          {selectedVideoTemplate ? (
+            <p className="rounded-md bg-stone-50 p-3 text-xs leading-5 text-stone-500">
+              {selectedVideoTemplate.aspectRatio}｜{selectedVideoTemplate.durationSeconds} 秒｜
+              {selectedVideoTemplate.transitionStyle}
+            </p>
+          ) : null}
+
+          <label className="block text-xs font-medium text-stone-500">
+            脚本文案
+            <select
+              value={selectedScriptName}
+              onChange={(event) => setSelectedScriptName(event.target.value)}
+              disabled={!scriptTemplates.length}
+              className="mt-2 w-full rounded-md border border-stone-200 bg-stone-50 px-3 py-2 text-sm text-stone-700 outline-none focus:border-red-300 focus:bg-white"
+            >
+              {scriptTemplates.length ? (
+                scriptTemplates.map((script) => (
+                  <option key={script.name} value={script.name}>
+                    {script.name}
+                  </option>
+                ))
+              ) : (
+                <option value="">暂未配置脚本文案</option>
+              )}
+            </select>
+          </label>
+          {selectedScript ? (
+            <p className="rounded-md bg-stone-50 p-3 text-xs leading-5 text-stone-500">
+              {selectedScript.content}
+            </p>
+          ) : null}
+
+          <label className="block text-xs font-medium text-stone-500">
+            音乐选择
+            <select
+              value={selectedMusicName}
+              onChange={(event) => setSelectedMusicName(event.target.value)}
+              disabled={!musicTracks.length}
+              className="mt-2 w-full rounded-md border border-stone-200 bg-stone-50 px-3 py-2 text-sm text-stone-700 outline-none focus:border-red-300 focus:bg-white"
+            >
+              {musicTracks.length ? (
+                musicTracks.map((track) => (
+                  <option key={track.name} value={track.name}>
+                    {track.name}
+                  </option>
+                ))
+              ) : (
+                <option value="">暂未配置音乐</option>
+              )}
+            </select>
+          </label>
+          {selectedMusic ? (
+            <p className="rounded-md bg-stone-50 p-3 text-xs leading-5 text-stone-500">
+              {selectedMusic.usage || selectedMusic.moodTags.join("、")}
+            </p>
+          ) : null}
         </div>
       </div>
 

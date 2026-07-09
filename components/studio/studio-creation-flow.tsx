@@ -259,6 +259,9 @@ export function StudioCreationFlow({
           initialInputImageUrl={publicImages.portrait}
           selectedProducts={selectedProductNames}
           styleName={selectedStyle?.name || "新中式轻礼服"}
+          videoTemplates={catalog.videoTemplates}
+          scriptTemplates={catalog.scriptTemplates}
+          musicTracks={catalog.musicTracks}
         />
       </aside>
     </>

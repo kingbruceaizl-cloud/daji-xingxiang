@@ -412,6 +412,10 @@ async function runSmokeChecks() {
   await assertPage("/studio/demo", "已选商品");
   await assertPage("/studio/demo", "清空选择");
   await assertPage("/studio/demo", "手动补充提示词");
+  await assertPage("/studio/demo", "短视频配置");
+  await assertPage("/studio/demo", "视频模板");
+  await assertPage("/studio/demo", "脚本文案");
+  await assertPage("/studio/demo", "音乐选择");
   await assertPage("/studio/demo", "移除素材");
   await assertPage("/studio/demo", "下载结果");
   await assertPage("/studio/demo", "KIE 图像");

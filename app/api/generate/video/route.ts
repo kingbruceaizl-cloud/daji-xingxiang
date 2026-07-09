@@ -11,9 +11,16 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    const videoConfigText = [
+      body.videoTemplateName ? `短视频模板：${body.videoTemplateName}。` : "",
+      body.scriptTemplateName ? `脚本文案：${body.scriptTemplateName}。` : "",
+      body.musicTrackName ? `音乐选择：${body.musicTrackName}。` : "",
+    ]
+      .filter(Boolean)
+      .join("");
     const prompt =
       body.prompt ||
-      "基于选中的形象图生成 9:16 变装短视频，纯白棚拍背景，快速旋转换装，商品清单卡片叠加。";
+      `基于选中的形象图生成 9:16 变装短视频，纯白棚拍背景，快速旋转换装，商品清单卡片叠加。${videoConfigText}`;
 
     const ownerId = await getCurrentUserId();
     const provider = normalizeAiProvider(body.provider);

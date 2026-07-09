@@ -476,6 +476,10 @@ requireIncludes("scripts/smoke-prod.mjs", smokeProd, [
   "已选商品",
   "清空选择",
   "手动补充提示词",
+  "短视频配置",
+  "视频模板",
+  "脚本文案",
+  "音乐选择",
   "移除素材",
   "下载结果",
   "x-robots-tag",
@@ -525,6 +529,10 @@ requireIncludes("scripts/smoke-url.mjs", smokeUrl, [
   "已选商品",
   "清空选择",
   "手动补充提示词",
+  "短视频配置",
+  "视频模板",
+  "脚本文案",
+  "音乐选择",
   "移除素材",
   "下载结果",
   "data.deployment?.platform",
@@ -680,6 +688,14 @@ requireIncludes("components/studio/generate-panel.tsx", generatePanel, [
   "resultDownloadName",
   "extraPrompt",
   "finalPrompt",
+  "selectedVideoTemplateName",
+  "selectedScriptName",
+  "selectedMusicName",
+  "videoPrompt",
+  "videoTemplateName",
+  "scriptTemplateName",
+  "musicTrackName",
+  "短视频配置",
   "手动补充提示词",
   "补充要求",
   "下载结果",
@@ -702,6 +718,9 @@ requireIncludes("components/studio/studio-creation-flow.tsx", studioCreationFlow
   "setSelectedStyleName",
   "selectedProductNames",
   "StudioGeneratePanel",
+  "videoTemplates={catalog.videoTemplates}",
+  "scriptTemplates={catalog.scriptTemplates}",
+  "musicTracks={catalog.musicTracks}",
 ]);
 
 const customerAssetsPanel = requireFile("components/studio/customer-assets-panel.tsx");
@@ -726,6 +745,10 @@ requireIncludes("app/api/generate/video/route.ts", videoGenerateRoute, [
   "normalizeAiProvider",
   "realAiProviderRequiresLogin",
   "createRealAiProviderLoginMessage",
+  "videoConfigText",
+  "videoTemplateName",
+  "scriptTemplateName",
+  "musicTrackName",
   "{ status: 401 }",
 ]);
 
@@ -858,6 +881,8 @@ requireIncludes("docs/frontend-requirements.md", frontendRequirements, [
   "已选商品固定展示在底部确认栏",
   "同步更新生成提示词和生成任务参数",
   "支持手动补充提示词",
+  "在工作台中选择视频模板、脚本文案和音乐",
+  "同步到视频生成任务参数",
   "支持保存到项目和下载结果",
 ]);
 
