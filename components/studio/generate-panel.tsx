@@ -180,9 +180,21 @@ export function StudioGeneratePanel({
       }
     }
 
+    function handleRemoved(event: Event) {
+      const detail = (event as CustomEvent<{ previewUrl?: string | null }>).detail;
+      setInputImageUrl(detail?.previewUrl || initialInputImageUrl || "");
+      setJob(null);
+      setError(null);
+      setSaveMessage("已移除上传素材，当前恢复为演示客户素材。");
+    }
+
     window.addEventListener("daji:asset-uploaded", handleUploaded);
-    return () => window.removeEventListener("daji:asset-uploaded", handleUploaded);
-  }, []);
+    window.addEventListener("daji:asset-removed", handleRemoved);
+    return () => {
+      window.removeEventListener("daji:asset-uploaded", handleUploaded);
+      window.removeEventListener("daji:asset-removed", handleRemoved);
+    };
+  }, [initialInputImageUrl]);
 
   useEffect(() => {
     latestJobRef.current = job;

@@ -1,7 +1,7 @@
 "use client";
 
 import { UploadButton, type UploadedAsset } from "@/components/upload/upload-button";
-import { Check, Film, ImageIcon } from "lucide-react";
+import { Check, Film, ImageIcon, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -37,6 +37,18 @@ export function CustomerAssetsPanel({
     }
   }
 
+  function handleRemoveAsset() {
+    setAsset(null);
+    setPreviewUrl(initialPreviewUrl);
+    window.dispatchEvent(
+      new CustomEvent("daji:asset-removed", {
+        detail: {
+          previewUrl: initialPreviewUrl,
+        },
+      }),
+    );
+  }
+
   const isVideo = asset?.metadata?.type?.startsWith("video/");
 
   return (
@@ -48,7 +60,18 @@ export function CustomerAssetsPanel({
             上传客户图片后，选择风格和商品即可生成。
           </h1>
         </div>
-        <UploadButton projectId={projectId} onUploaded={handleUploaded} />
+        <div className="flex flex-wrap items-center gap-2">
+          <UploadButton projectId={projectId} onUploaded={handleUploaded} />
+          <button
+            type="button"
+            onClick={handleRemoveAsset}
+            disabled={!asset}
+            className="inline-flex items-center justify-center gap-2 rounded-md border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 disabled:cursor-not-allowed disabled:opacity-45"
+          >
+            <Trash2 className="h-4 w-4" />
+            移除素材
+          </button>
+        </div>
       </div>
       <div className="mt-5 grid gap-4 md:grid-cols-[220px_1fr]">
         <div className="overflow-hidden rounded-md border border-stone-200 bg-stone-50">

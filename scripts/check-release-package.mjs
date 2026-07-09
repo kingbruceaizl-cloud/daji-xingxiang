@@ -469,6 +469,7 @@ requireIncludes("scripts/smoke-prod.mjs", smokeProd, [
   "data.deployment?.appEnv",
   "/admin/launch",
   "/api/catalog",
+  "移除素材",
   "x-robots-tag",
   "cache-control",
 ]);
@@ -509,6 +510,7 @@ requireIncludes("scripts/smoke-url.mjs", smokeUrl, [
   "/api/health",
   "/admin/launch",
   "上线体检",
+  "移除素材",
   "data.deployment?.platform",
   "data.deployment?.appEnv",
   "data.deployment?.publicUrl",
@@ -633,11 +635,22 @@ requireIncludes("components/upload/upload-button.tsx", uploadButton, [
 const generatePanel = requireFile("components/studio/generate-panel.tsx");
 requireIncludes("components/studio/generate-panel.tsx", generatePanel, [
   "KIE 图像",
+  "daji:asset-removed",
+  "已移除上传素材，当前恢复为演示客户素材。",
   "lookupJob",
   "latestJobRef",
   "pollingJobKey",
   "正在自动查询",
   "outputAssets",
+]);
+
+const customerAssetsPanel = requireFile("components/studio/customer-assets-panel.tsx");
+requireIncludes("components/studio/customer-assets-panel.tsx", customerAssetsPanel, [
+  "移除素材",
+  "Trash2",
+  "handleRemoveAsset",
+  "daji:asset-removed",
+  "disabled={!asset}",
 ]);
 
 const imageGenerateRoute = requireFile("app/api/generate/image/route.ts");
