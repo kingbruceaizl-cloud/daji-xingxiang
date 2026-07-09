@@ -291,6 +291,7 @@ async function main() {
   await assertPage("/projects/new", "创建客户形象设计项目");
   await assertPage("/studio/demo", "生成形象图片");
   await assertPage("/auth/login", "登录");
+  await assertPage("/admin/launch", "上线体检");
   await assertHealth();
   await assertCatalog();
   await assertMockGenerationAllowed();
@@ -300,8 +301,8 @@ async function main() {
   await assertTextEndpoint("/sitemap.xml", `${baseUrl}/projects/new`);
   await assertTextEndpoint("/manifest.webmanifest", "大吉形象");
   await assertSecurityHeaders();
-  await assertPrivateIndexingHeaders(["/api/health"]);
-  await assertPrivateCacheHeaders(["/api/health"]);
+  await assertPrivateIndexingHeaders(["/api/health", "/admin/launch"]);
+  await assertPrivateCacheHeaders(["/api/health", "/admin/launch"]);
 
   if (failures.length) {
     log("发现需要处理的问题：");

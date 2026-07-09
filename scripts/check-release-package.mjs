@@ -485,6 +485,8 @@ requireIncludes("scripts/smoke-url.mjs", smokeUrl, [
   "线上冒烟测试必须使用 https 域名",
   "线上冒烟测试不能使用本地地址",
   "/api/health",
+  "/admin/launch",
+  "上线体检",
   "data.deployment?.platform",
   "data.deployment?.appEnv",
   "data.deployment?.publicUrl",
