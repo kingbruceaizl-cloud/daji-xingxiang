@@ -399,6 +399,7 @@ async function main() {
   await assertPage("/projects/new", "创建客户形象设计项目");
   await assertPage("/studio/demo", "生成形象图片");
   await assertPage("/studio/demo", "移除素材");
+  await assertPage("/studio/demo", "下载结果");
   await assertPage("/auth/login", "登录");
   await assertPage("/admin/launch", "上线体检");
   await assertHealth();

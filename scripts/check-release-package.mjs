@@ -470,6 +470,7 @@ requireIncludes("scripts/smoke-prod.mjs", smokeProd, [
   "/admin/launch",
   "/api/catalog",
   "移除素材",
+  "下载结果",
   "x-robots-tag",
   "cache-control",
 ]);
@@ -511,6 +512,7 @@ requireIncludes("scripts/smoke-url.mjs", smokeUrl, [
   "/admin/launch",
   "上线体检",
   "移除素材",
+  "下载结果",
   "data.deployment?.platform",
   "data.deployment?.appEnv",
   "data.deployment?.publicUrl",
@@ -637,6 +639,11 @@ requireIncludes("components/studio/generate-panel.tsx", generatePanel, [
   "KIE 图像",
   "daji:asset-removed",
   "已移除上传素材，当前恢复为演示客户素材。",
+  "isVideoResult",
+  "resultDownloadName",
+  "下载结果",
+  "download={resultDownloadName(job)}",
+  "您的浏览器暂不支持视频预览。",
   "lookupJob",
   "latestJobRef",
   "pollingJobKey",
@@ -791,6 +798,7 @@ requireIncludes("docs/backend-requirements.md", backendRequirements, [
 const frontendRequirements = requireFile("docs/frontend-requirements.md");
 requireIncludes("docs/frontend-requirements.md", frontendRequirements, [
   "上传控件需要在选择文件后先校验文件类型和大小",
+  "支持保存到项目和下载结果",
 ]);
 
 for (const routeFile of [

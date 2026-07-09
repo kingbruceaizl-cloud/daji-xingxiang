@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Clapperboard, Download, Loader2, Send, Sparkles } from "lucide-react";
+import { Clapperboard, Download, Loader2, Save, Send, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
@@ -80,6 +80,20 @@ function bestPreviewUrl(job: Partial<JobResult>) {
     job.outputAssets?.find((asset) => asset.url)?.url ||
     job.resultUrls?.[0]
   );
+}
+
+function isVideoResult(job: JobResult | null, resultUrl?: string) {
+  const normalizedUrl = resultUrl?.split("?")[0].toLowerCase() || "";
+
+  return Boolean(
+    job?.outputAssets?.some((asset) => asset.kind.includes("video")) ||
+      normalizedUrl.endsWith(".mp4") ||
+      normalizedUrl.startsWith("data:video/"),
+  );
+}
+
+function resultDownloadName(job: JobResult | null) {
+  return job ? "大吉形象生成结果" : "大吉形象生成预览";
 }
 
 function normalizeLookupJob(rawJob: Partial<JobResult> & {
@@ -268,6 +282,7 @@ export function StudioGeneratePanel({
 
   const imageProvider = imageProviders.find((item) => item.id === imageProviderId) || imageProviders[0];
   const videoProvider = videoProviders.find((item) => item.id === videoProviderId) || videoProviders[0];
+  const resultUrl = bestPreviewUrl(job || {});
   const payload = {
     provider: imageProvider.provider,
     model: imageProvider.model,
@@ -386,13 +401,22 @@ export function StudioGeneratePanel({
       <div className="rounded-md bg-stone-950 p-5 text-white">
         <h2 className="text-sm font-semibold">生成结果预览</h2>
         <div className="mt-4 grid aspect-[4/5] place-items-center overflow-hidden rounded-md border border-dashed border-white/20 bg-white/5 text-center text-sm leading-6 text-stone-300">
-          {bestPreviewUrl(job || {}) ? (
+          {resultUrl && isVideoResult(job, resultUrl) ? (
+            <video
+              src={resultUrl}
+              controls
+              playsInline
+              className="h-full w-full object-cover"
+            >
+              您的浏览器暂不支持视频预览。
+            </video>
+          ) : resultUrl ? (
             <Image
-              src={bestPreviewUrl(job || {}) || ""}
+              src={resultUrl}
               alt="生成结果预览"
               width={900}
               height={1125}
-              unoptimized={Boolean(bestPreviewUrl(job || {})?.startsWith("data:"))}
+              unoptimized={resultUrl.startsWith("data:")}
               className="h-full w-full object-cover"
             />
           ) : (
@@ -480,9 +504,30 @@ export function StudioGeneratePanel({
             }}
             className="inline-flex items-center justify-center gap-2 rounded-md border border-white/20 bg-transparent px-4 py-3 text-sm font-medium text-white hover:bg-white/10 disabled:opacity-50"
           >
-            <Download className="h-4 w-4" />
+            <Save className="h-4 w-4" />
             保存到项目
           </Button>
+          {resultUrl ? (
+            <a
+              href={resultUrl}
+              target="_blank"
+              rel="noreferrer"
+              download={resultDownloadName(job)}
+              className="inline-flex items-center justify-center gap-2 rounded-md border border-white/20 bg-transparent px-4 py-3 text-sm font-medium text-white hover:bg-white/10"
+            >
+              <Download className="h-4 w-4" />
+              下载结果
+            </a>
+          ) : (
+            <Button
+              type="button"
+              disabled
+              className="inline-flex items-center justify-center gap-2 rounded-md border border-white/20 bg-transparent px-4 py-3 text-sm font-medium text-white disabled:opacity-50"
+            >
+              <Download className="h-4 w-4" />
+              下载结果
+            </Button>
+          )}
         </div>
       </div>
     </div>
