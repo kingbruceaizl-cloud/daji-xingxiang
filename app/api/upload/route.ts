@@ -1,38 +1,17 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentUserId } from "@/lib/supabase/current-user";
+import {
+  isUploadBucket,
+  validateUploadFileInput,
+  type UploadBucket,
+} from "@/lib/upload-rules";
 import { NextResponse } from "next/server";
 
-const bucketRules = {
-  "customer-assets": {
-    label: "客户素材",
-    maxSize: 104857600,
-    mimeTypes: ["image/jpeg", "image/png", "image/webp", "video/mp4", "video/quicktime"],
-  },
-  "generated-assets": {
-    label: "生成结果",
-    maxSize: 524288000,
-    mimeTypes: ["image/jpeg", "image/png", "image/webp", "video/mp4"],
-  },
-  "product-assets": {
-    label: "商品素材",
-    maxSize: 52428800,
-    mimeTypes: ["image/jpeg", "image/png", "image/webp"],
-  },
-  "music-assets": {
-    label: "音乐素材",
-    maxSize: 52428800,
-    mimeTypes: ["audio/mpeg", "audio/mp4", "audio/wav", "audio/x-wav"],
-  },
-} as const;
-
-const allowedBuckets = new Set(Object.keys(bucketRules));
 const adminOnlyBuckets = new Set([
   "generated-assets",
   "product-assets",
   "music-assets",
 ]);
-
-type UploadBucket = keyof typeof bucketRules;
 
 function inferAssetKind(bucket: string, mimeType: string) {
   if (bucket === "music-assets") {
@@ -47,35 +26,15 @@ function inferAssetKind(bucket: string, mimeType: string) {
   return mimeType.startsWith("video/") ? "customer_video" : "customer_image";
 }
 
-function formatFileSize(bytes: number) {
-  if (bytes >= 1024 * 1024) {
-    return `${Math.round(bytes / 1024 / 1024)}MB`;
-  }
-
-  return `${bytes}B`;
-}
-
 function validateUploadFile(file: File, bucket: UploadBucket) {
-  const rules = bucketRules[bucket];
-  const mimeType = file.type || "application/octet-stream";
-
-  if (!rules.mimeTypes.some((allowedMimeType) => allowedMimeType === mimeType)) {
+  const validation = validateUploadFileInput(file, bucket);
+  if (!validation.ok) {
     return NextResponse.json(
       {
         ok: false,
-        message: `${rules.label}不支持该文件类型，请重新选择文件。`,
+        message: validation.message,
       },
-      { status: 400 },
-    );
-  }
-
-  if (file.size > rules.maxSize) {
-    return NextResponse.json(
-      {
-        ok: false,
-        message: `${rules.label}文件过大，最大支持 ${formatFileSize(rules.maxSize)}。`,
-      },
-      { status: 413 },
+      { status: validation.status },
     );
   }
 
@@ -144,15 +103,14 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!allowedBuckets.has(bucket)) {
+  if (!isUploadBucket(bucket)) {
     return NextResponse.json(
       { ok: false, message: "不支持的素材目录。" },
       { status: 400 },
     );
   }
 
-  const uploadBucket = bucket as UploadBucket;
-  const fileValidationResponse = validateUploadFile(file, uploadBucket);
+  const fileValidationResponse = validateUploadFile(file, bucket);
   if (fileValidationResponse) {
     return fileValidationResponse;
   }

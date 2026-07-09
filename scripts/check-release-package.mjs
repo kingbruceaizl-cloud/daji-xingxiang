@@ -597,19 +597,37 @@ requireIncludes("app/api/jobs/[id]/route.ts", jobApi, [
 
 const uploadApi = requireFile("app/api/upload/route.ts");
 requireIncludes("app/api/upload/route.ts", uploadApi, [
-  "bucketRules",
+  "isUploadBucket",
   "validateUploadFile",
-  "104857600",
-  "524288000",
+  "validateUploadFileInput",
   "adminOnlyBuckets",
   "validateBucketAccess",
   "请先登录后再上传后台素材",
   "当前账号没有后台素材上传权限",
-  "文件过大",
-  "不支持该文件类型",
   "generated-assets",
   "product-assets",
   "music-assets",
+]);
+
+const uploadRules = requireFile("lib/upload-rules.ts");
+requireIncludes("lib/upload-rules.ts", uploadRules, [
+  "uploadBucketRules",
+  "isUploadBucket",
+  "getUploadAccept",
+  "validateUploadFileInput",
+  "104857600",
+  "524288000",
+  "文件过大",
+  "不支持该文件类型",
+]);
+
+const uploadButton = requireFile("components/upload/upload-button.tsx");
+requireIncludes("components/upload/upload-button.tsx", uploadButton, [
+  "getUploadAccept",
+  "validateUploadFileInput",
+  "setMessage(validation.message)",
+  "accept={accept}",
+  "aria-live=\"polite\"",
 ]);
 
 const generatePanel = requireFile("components/studio/generate-panel.tsx");
@@ -757,6 +775,11 @@ requireIncludes("docs/backend-requirements.md", backendRequirements, [
   "上传接口必须先校验文件类型和大小，再读取文件内容或写入存储",
 ]);
 
+const frontendRequirements = requireFile("docs/frontend-requirements.md");
+requireIncludes("docs/frontend-requirements.md", frontendRequirements, [
+  "上传控件需要在选择文件后先校验文件类型和大小",
+]);
+
 for (const routeFile of [
   "app/page.tsx",
   "app/projects/new/page.tsx",
@@ -774,6 +797,7 @@ for (const routeFile of [
   "lib/ai/access.ts",
   "lib/ai/result-assets.ts",
   "lib/deployment-info.ts",
+  "lib/upload-rules.ts",
   "app/api/admin/video-templates/route.ts",
   "app/api/admin/music/route.ts",
 ]) {

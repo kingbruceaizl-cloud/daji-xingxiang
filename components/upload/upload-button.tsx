@@ -1,10 +1,15 @@
 "use client";
 
+import {
+  getUploadAccept,
+  validateUploadFileInput,
+  type UploadBucket,
+} from "@/lib/upload-rules";
 import { ImagePlus, Loader2 } from "lucide-react";
 import { useRef, useState } from "react";
 
 type UploadButtonProps = {
-  bucket?: string;
+  bucket?: UploadBucket;
   projectId?: string;
   onUploaded?: (asset: UploadedAsset) => void;
 };
@@ -28,6 +33,7 @@ export function UploadButton({
   const inputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const accept = getUploadAccept(bucket);
 
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -35,8 +41,16 @@ export function UploadButton({
       return;
     }
 
-    setIsUploading(true);
     setMessage(null);
+
+    const validation = validateUploadFileInput(file, bucket);
+    if (!validation.ok) {
+      setMessage(validation.message);
+      event.target.value = "";
+      return;
+    }
+
+    setIsUploading(true);
 
     const formData = new FormData();
     formData.set("file", file);
@@ -77,7 +91,7 @@ export function UploadButton({
       <input
         ref={inputRef}
         type="file"
-        accept="image/*,video/*"
+        accept={accept}
         className="hidden"
         onChange={handleFileChange}
       />
@@ -94,7 +108,11 @@ export function UploadButton({
         )}
         {isUploading ? "上传中" : "上传素材"}
       </button>
-      {message && <p className="max-w-xs text-xs text-stone-500">{message}</p>}
+      {message && (
+        <p className="max-w-xs text-xs text-stone-500" aria-live="polite">
+          {message}
+        </p>
+      )}
     </div>
   );
 }
