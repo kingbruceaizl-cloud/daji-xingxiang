@@ -12,6 +12,16 @@
 
 ## 本地运行
 
+Mac 用户可以直接双击项目根目录中的：
+
+```text
+启动大吉形象.command
+```
+
+它会在后台启动服务并自动打开浏览器。需要停止时，双击 `停止大吉形象.command`。详细说明见 `docs/local-start.md`。
+
+也可以使用命令行启动：
+
 ```bash
 pnpm install
 pnpm run dev

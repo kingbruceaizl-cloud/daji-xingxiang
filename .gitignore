@@ -41,3 +41,9 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# local one-click launcher runtime files
+.daji-local.pid
+.daji-local.port
+.daji-local.log
+.daji-local.error.log
