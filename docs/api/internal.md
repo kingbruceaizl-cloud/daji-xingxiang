@@ -172,6 +172,32 @@ POST /api/admin/styles
 POST /api/admin/models
 ```
 
+示例：
+
+```json
+{
+  "provider": "kie",
+  "providerDisplayName": "KIE",
+  "name": "gpt-image-2-image-to-image",
+  "displayName": "GPT Image 2 图生图",
+  "capabilities": "image_to_image",
+  "defaultParams": {
+    "aspectRatio": "auto",
+    "quality": "high"
+  },
+  "taskRoutes": [
+    {
+      "taskKey": "image_to_image",
+      "displayName": "图生图",
+      "description": "基于客户照片生成换装形象图",
+      "isActive": true
+    }
+  ]
+}
+```
+
+`taskRoutes` 用于配置任务能力路由。工作台默认使用后台自动路由；如果没有配置对应路由，服务端会回退到演示通道。
+
 这些接口依赖 `SUPABASE_SERVICE_ROLE_KEY`，未配置时会返回中文配置提示。
 配置 Supabase 后，调用后台写入接口还需要当前登录用户在 `profiles.role` 中为 `owner` 或 `admin`。
 

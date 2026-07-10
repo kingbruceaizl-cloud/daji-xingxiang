@@ -184,3 +184,70 @@ on conflict (provider_id, name) do update set
   display_name = excluded.display_name,
   capabilities = excluded.capabilities,
   default_params = excluded.default_params;
+
+insert into public.ai_model_routes
+  (task_key, display_name, description, provider, model, default_params)
+values
+  (
+    'text_generation',
+    '文字生成',
+    '用于形象方案、提示词、脚本文案和商品描述。',
+    'mock',
+    'mock-text-v1',
+    '{}'::jsonb
+  ),
+  (
+    'image_understanding',
+    '图片理解',
+    '用于识别客户照片、商品图和风格参考图。',
+    'mock',
+    'mock-vision-v1',
+    '{}'::jsonb
+  ),
+  (
+    'text_to_image',
+    '文生图',
+    '用于没有客户参考图时，根据提示词生成形象图。',
+    'kie',
+    'gpt-image-2-text-to-image',
+    '{"aspectRatio":"3:4","quality":"high"}'::jsonb
+  ),
+  (
+    'image_to_image',
+    '图生图',
+    '用于基于客户照片生成换装图、风格写真和商品搭配图。',
+    'kie',
+    'gpt-image-2-image-to-image',
+    '{"aspectRatio":"3:4","quality":"high"}'::jsonb
+  ),
+  (
+    'image_to_video',
+    '图生视频',
+    '用于把生成形象图或客户素材生成变装短视频。',
+    'mock',
+    'mock-video-v1',
+    '{"aspectRatio":"9:16","durationSeconds":13}'::jsonb
+  ),
+  (
+    'video_generation',
+    '视频生成',
+    '用于直接根据脚本和镜头方案生成视频。',
+    'mock',
+    'mock-video-v1',
+    '{"aspectRatio":"9:16"}'::jsonb
+  ),
+  (
+    'long_video_generation',
+    '长视频生成',
+    '用于后续扩展长视频脚本、镜头和成片生成。',
+    'mock',
+    'mock-long-video-v1',
+    '{}'::jsonb
+  )
+on conflict (task_key) do update set
+  display_name = excluded.display_name,
+  description = excluded.description,
+  provider = excluded.provider,
+  model = excluded.model,
+  default_params = excluded.default_params,
+  is_active = true;

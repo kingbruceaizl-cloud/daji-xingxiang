@@ -203,6 +203,8 @@ requireIncludes("scripts/create-model-handoff.mjs", modelHandoff, [
   "KIE_CALLBACK_SECRET",
   "/api/provider-callback/kie",
   "gpt-image-2-text-to-image",
+  "任务能力路由",
+  "image_to_video",
   "OPENAI_API_KEY",
 ]);
 
@@ -248,6 +250,7 @@ requireIncludes("scripts/verify-release-archive.mjs", verifyReleaseArchive, [
   ".next",
   ".env.production",
   "supabase/migrations/0001_initial_schema.sql",
+  "supabase/migrations/0003_model_task_routes.sql",
   "scripts/check-material-urls.mjs",
   "supabase/seed/0001_seed_demo_data.sql",
 ]);
@@ -292,6 +295,7 @@ requireIncludes("scripts/create-supabase-sql-bundle.mjs", supabaseSqlBundle, [
   "daji-xingxiang-supabase-init.sql",
   "supabase/migrations/0001_initial_schema.sql",
   "supabase/migrations/0002_auth_storage_and_indexes.sql",
+  "supabase/migrations/0003_model_task_routes.sql",
   "supabase/seed/0001_seed_demo_data.sql",
   "Supabase SQL Editor",
 ]);
@@ -309,11 +313,16 @@ requireIncludes("scripts/create-supabase-verify-sql.mjs", supabaseVerifySql, [
   "私有桶归属校验使用 owner_id 与用户路径",
   "KIE 文生图模型",
   "gpt-image-2-text-to-image",
+  "模型能力路由",
+  "image_to_video",
 ]);
 
 const supabaseSetupCheck = requireFile("scripts/check-supabase-setup.mjs");
 requireIncludes("scripts/check-supabase-setup.mjs", supabaseSetupCheck, [
   "大吉形象 Supabase 初始化检查",
+  "0003_model_task_routes.sql",
+  "ai_model_routes",
+  "登录用户可读取模型路由",
   "requiredBucketSettings",
   "requiredTablePolicies",
   "requiredStoragePolicies",
@@ -642,7 +651,27 @@ requireIncludes("lib/catalog.ts", catalogLib, [
   "getCatalogData",
   "formatJobTypeLabel",
   "formatJobStatusLabel",
+  "ai_model_routes",
+  "modelRoutes",
   "jobsResult",
+]);
+
+const modelRoutesLib = requireFile("lib/ai/model-routes.ts");
+requireIncludes("lib/ai/model-routes.ts", modelRoutesLib, [
+  "text_generation",
+  "image_understanding",
+  "text_to_image",
+  "image_to_image",
+  "image_to_video",
+  "long_video_generation",
+]);
+
+const modelRoutingLib = requireFile("lib/ai/model-routing.ts");
+requireIncludes("lib/ai/model-routing.ts", modelRoutingLib, [
+  "resolveAiModelRoute",
+  "ai_model_routes",
+  "source: \"admin\"",
+  "source: \"demo\"",
 ]);
 
 const launchPage = requireFile("app/admin/launch/page.tsx");
@@ -711,6 +740,15 @@ requireIncludes("app/admin/jobs/page.tsx", adminJobsPage, [
   "formatJobStatusLabel",
 ]);
 
+const adminModelsPage = requireFile("app/admin/models/page.tsx");
+requireIncludes("app/admin/models/page.tsx", adminModelsPage, [
+  "任务能力路由",
+  "taskRoutes",
+  "image_to_image",
+  "formatProviderLabel",
+  "formatModelLabel",
+]);
+
 const protectedPage = requireFile("app/protected/page.tsx");
 requireIncludes("app/protected/page.tsx", protectedPage, [
   "登录摘要",
@@ -751,6 +789,14 @@ requireIncludes("lib/upload-rules.ts", uploadRules, [
   "不支持该文件类型",
 ]);
 
+const adminModelsApi = requireFile("app/api/admin/models/route.ts");
+requireIncludes("app/api/admin/models/route.ts", adminModelsApi, [
+  "parseTaskRoutes",
+  "ai_model_routes",
+  "模型能力路由保存",
+  "模型配置和能力路由已保存。",
+]);
+
 const uploadButton = requireFile("components/upload/upload-button.tsx");
 requireIncludes("components/upload/upload-button.tsx", uploadButton, [
   "getUploadAccept",
@@ -781,6 +827,8 @@ for (const formFile of [
 
 const generatePanel = requireFile("components/studio/generate-panel.tsx");
 requireIncludes("components/studio/generate-panel.tsx", generatePanel, [
+  "后台自动",
+  "按能力路由",
   "KIE 图像",
   "daji:asset-removed",
   "已移除上传素材，当前恢复为演示客户素材。",
@@ -837,6 +885,9 @@ requireIncludes("components/studio/customer-assets-panel.tsx", customerAssetsPan
 const imageGenerateRoute = requireFile("app/api/generate/image/route.ts");
 requireIncludes("app/api/generate/image/route.ts", imageGenerateRoute, [
   "normalizeAiProvider",
+  "resolveAiModelRoute",
+  "text_to_image",
+  "image_to_image",
   "realAiProviderRequiresLogin",
   "createRealAiProviderLoginMessage",
   "createSafeServerErrorMessage",
@@ -846,6 +897,8 @@ requireIncludes("app/api/generate/image/route.ts", imageGenerateRoute, [
 const videoGenerateRoute = requireFile("app/api/generate/video/route.ts");
 requireIncludes("app/api/generate/video/route.ts", videoGenerateRoute, [
   "normalizeAiProvider",
+  "resolveAiModelRoute",
+  "image_to_video",
   "realAiProviderRequiresLogin",
   "createRealAiProviderLoginMessage",
   "createSafeServerErrorMessage",
@@ -970,6 +1023,7 @@ requireIncludes("docs/api/internal.md", internalApiDocs, [
   "`product-assets`、`music-assets` 和 `generated-assets` 属于后台素材目录",
   "AI 回调产生的结果通常由服务端直接转存到 `generated-assets`",
   "服务端会先校验文件类型和大小，再读取文件内容或写入存储",
+  "`taskRoutes` 用于配置任务能力路由",
 ]);
 
 const backendRequirements = requireFile("docs/backend-requirements.md");
@@ -978,6 +1032,8 @@ requireIncludes("docs/backend-requirements.md", backendRequirements, [
   "不能写入商品、音乐或生成结果等后台素材桶",
   "上传接口必须先校验文件类型和大小，再读取文件内容或写入存储",
   "不直接暴露数据库、存储或第三方原始错误",
+  "`ai_model_routes`",
+  "如果后台没有配置对应路由，服务端必须回退到演示模型通道",
 ]);
 
 const frontendRequirements = requireFile("docs/frontend-requirements.md");
@@ -988,6 +1044,8 @@ requireIncludes("docs/frontend-requirements.md", frontendRequirements, [
   "同步更新生成提示词和生成任务参数",
   "支持手动补充提示词",
   "不直接暴露内部英文标识",
+  "后台自动路由",
+  "任务能力路由",
   "在工作台中选择视频模板、脚本文案和音乐",
   "同步到视频生成任务参数",
   "需要先展示中文字段说明",
@@ -1001,6 +1059,7 @@ for (const routeFile of [
   "app/projects/new/page.tsx",
   "app/studio/[projectId]/page.tsx",
   "app/admin/launch/page.tsx",
+  "app/admin/models/page.tsx",
   "app/admin/video-templates/page.tsx",
   "app/admin/music/page.tsx",
   "app/admin/jobs/page.tsx",
@@ -1015,6 +1074,8 @@ for (const routeFile of [
   "lib/server-error.ts",
   "lib/ai/access.ts",
   "lib/ai/display.ts",
+  "lib/ai/model-routes.ts",
+  "lib/ai/model-routing.ts",
   "lib/ai/result-assets.ts",
   "lib/deployment-info.ts",
   "lib/upload-rules.ts",
@@ -1025,6 +1086,8 @@ for (const routeFile of [
   "components/update-password-form.tsx",
   "app/api/admin/video-templates/route.ts",
   "app/api/admin/music/route.ts",
+  "app/api/admin/models/route.ts",
+  "supabase/migrations/0003_model_task_routes.sql",
 ]) {
   requireFile(routeFile);
 }

@@ -4,6 +4,7 @@ import {
   normalizeAiProvider,
   realAiProviderRequiresLogin,
 } from "@/lib/ai/access";
+import { resolveAiModelRoute } from "@/lib/ai/model-routing";
 import { persistAiJob } from "@/lib/ai/persistence";
 import { createSafeServerErrorMessage } from "@/lib/server-error";
 import { getCurrentUserId } from "@/lib/supabase/current-user";
@@ -23,12 +24,29 @@ export async function POST(request: Request) {
       body.prompt ||
       `基于选中的形象图生成 9:16 变装短视频，纯白棚拍背景，快速旋转换装，商品清单卡片叠加。${videoConfigText}`;
 
+    const inputImageUrls: string[] = Array.isArray(body.inputImageUrls)
+      ? body.inputImageUrls.map(String)
+      : [];
     const ownerId = await getCurrentUserId();
-    const provider = normalizeAiProvider(body.provider);
+    const modelRoute = await resolveAiModelRoute("image_to_video", {
+      provider: body.provider,
+      model: body.model,
+    });
+    const provider = normalizeAiProvider(modelRoute.provider);
     if (realAiProviderRequiresLogin(provider) && !ownerId) {
       return NextResponse.json(
         { ok: false, message: createRealAiProviderLoginMessage(provider) },
         { status: 401 },
+      );
+    }
+
+    if (provider === "kie" && inputImageUrls.some((url) => url.startsWith("data:"))) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message: "KIE 视频任务需要线上可访问的形象图；请先使用已转存的生成结果。",
+        },
+        { status: 400 },
       );
     }
 
@@ -42,15 +60,18 @@ export async function POST(request: Request) {
 
     const input = {
       provider,
-      model: body.model || (provider === "mock" ? "mock-video-v1" : undefined),
+      model: modelRoute.model || (provider === "mock" ? "mock-video-v1" : undefined),
       jobType: "image_to_video",
       prompt,
       projectId: body.projectId,
-      inputImageUrls: body.inputImageUrls,
+      inputImageUrls,
       selectedProducts: body.selectedProducts,
       styleName: body.styleName,
       ownerId,
       callbackUrl: callbackUrl.toString(),
+      modelRouteKey: modelRoute.taskKey,
+      modelRouteSource: modelRoute.source,
+      modelRouteParams: modelRoute.defaultParams,
     } as const;
 
     const job = await createAiJob(input);

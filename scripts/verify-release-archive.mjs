@@ -203,6 +203,7 @@ if (!manifestName) {
           "docs/material-sources.md",
           "supabase/migrations/0001_initial_schema.sql",
           "supabase/migrations/0002_auth_storage_and_indexes.sql",
+          "supabase/migrations/0003_model_task_routes.sql",
           "supabase/seed/0001_seed_demo_data.sql",
         ]);
         assertForbiddenEntries(entries);

@@ -48,6 +48,7 @@
 - `music_tracks`
 - `ai_providers`
 - `ai_models`
+- `ai_model_routes`
 - `ai_jobs`
 - `job_events`
 
@@ -136,6 +137,19 @@
 - `created_at`
 - `updated_at`
 
+### `ai_model_routes`
+
+- `id`
+- `task_key`: `text_generation`、`image_understanding`、`text_to_image`、`image_to_image`、`image_to_video`、`video_generation`、`long_video_generation`
+- `display_name`
+- `description`
+- `provider`
+- `model`
+- `default_params`
+- `is_active`
+- `created_at`
+- `updated_at`
+
 ## 4. 服务端 API 草案
 
 - `POST /api/upload`: 上传客户素材；商品、音乐和生成结果素材桶仅允许 `owner` 或 `admin` 写入。
@@ -163,6 +177,17 @@
 - `normalizeCallback`
 
 业务层只调用统一接口，不直接依赖 KIE、OpenAI、即梦、可灵或通义的具体请求格式。
+
+创建生成任务前，服务端需要先按任务能力解析默认模型路由：
+
+- 文字生成：用于形象方案、提示词、脚本文案。
+- 图片理解：用于客户照片、商品图和风格参考图识别。
+- 文生图：未上传客户素材时生成形象图。
+- 图生图：基于客户照片生成换装形象图。
+- 图生视频：基于形象图生成变装短视频。
+- 视频生成和长视频生成：作为后续扩展位。
+
+如果后台没有配置对应路由，服务端必须回退到演示模型通道，保证本地和上线前演示流程可用。
 
 ## 6. 回调与异步任务
 

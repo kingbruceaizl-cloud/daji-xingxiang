@@ -1,5 +1,6 @@
 import { JsonCreateForm } from "@/components/admin/json-create-form";
 import { AdminGuardMessage } from "@/components/admin/admin-guard-message";
+import { formatModelLabel, formatProviderLabel } from "@/lib/ai/display";
 import { getCatalogData } from "@/lib/catalog";
 import { getAdminPageState } from "@/lib/admin-page";
 import { ArrowLeft } from "lucide-react";
@@ -14,7 +15,15 @@ const sampleModel = `{
   "defaultParams": {
     "aspectRatio": "auto",
     "quality": "high"
-  }
+  },
+  "taskRoutes": [
+    {
+      "taskKey": "image_to_image",
+      "displayName": "图生图",
+      "description": "基于客户照片生成换装形象图",
+      "isActive": true
+    }
+  ]
 }`;
 
 const modelFieldHints = [
@@ -23,6 +32,7 @@ const modelFieldHints = [
   "模型名称：供应商接口要求的模型标识。",
   "模型显示名：后台展示用的中文模型名称。",
   "能力类型：文生图、图生图、图生视频等能力的内部标记。",
+  "任务路由：声明这个模型默认处理哪些行动内容，例如图生图或图生视频。",
   "默认参数：模型调用时默认使用的画幅、质量等参数。",
 ];
 
@@ -53,6 +63,7 @@ export default async function AdminModelsPage() {
             当前已预留 KIE、OpenAI、即梦、可灵和通义。密钥仍然只放在服务端环境变量。
           </p>
           <div className="mt-6 space-y-3">
+            <h2 className="text-sm font-semibold">模型通道</h2>
             {catalog.providers.map((provider) => (
               <div key={provider.name} className="rounded-md border border-stone-200 bg-white p-4">
                 <div className="flex items-center justify-between">
@@ -60,6 +71,29 @@ export default async function AdminModelsPage() {
                   <span className="text-xs text-red-700">{provider.status}</span>
                 </div>
                 <p className="mt-2 text-xs leading-5 text-stone-500">{provider.ability}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8 space-y-3">
+            <h2 className="text-sm font-semibold">任务能力路由</h2>
+            {catalog.modelRoutes.map((route) => (
+              <div
+                key={route.taskKey}
+                className="rounded-md border border-stone-200 bg-white p-4"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className="text-sm font-semibold">{route.name}</h3>
+                    <p className="mt-2 text-xs leading-5 text-stone-500">
+                      {route.description}
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-xs text-red-700">{route.status}</span>
+                </div>
+                <p className="mt-3 text-xs text-stone-500">
+                  当前路由：{formatProviderLabel(route.provider)} /{" "}
+                  {formatModelLabel(route.model, route.provider)}
+                </p>
               </div>
             ))}
           </div>

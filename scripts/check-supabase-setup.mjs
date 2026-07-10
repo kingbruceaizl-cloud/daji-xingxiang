@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 const requiredFiles = [
   "supabase/migrations/0001_initial_schema.sql",
   "supabase/migrations/0002_auth_storage_and_indexes.sql",
+  "supabase/migrations/0003_model_task_routes.sql",
   "supabase/seed/0001_seed_demo_data.sql",
 ];
 
@@ -19,6 +20,7 @@ const requiredTables = [
   "music_tracks",
   "ai_providers",
   "ai_models",
+  "ai_model_routes",
   "ai_jobs",
   "job_events",
 ];
@@ -65,6 +67,7 @@ const requiredTablePolicies = [
   "登录用户可读取音乐库",
   "登录用户可读取模型配置",
   "登录用户可读取模型",
+  "登录用户可读取模型路由",
   "用户可管理自己的生成任务",
   "用户可读取自己任务事件",
 ];
@@ -110,14 +113,16 @@ for (const file of requiredFiles) {
 
 const initialSchema = readProjectFile(requiredFiles[0]) || "";
 const storageSchema = readProjectFile(requiredFiles[1]) || "";
-const seedData = readProjectFile(requiredFiles[2]) || "";
+const modelRouteSchema = readProjectFile(requiredFiles[2]) || "";
+const seedData = readProjectFile(requiredFiles[3]) || "";
+const tableSchema = `${initialSchema}\n${modelRouteSchema}`;
 
 for (const table of requiredTables) {
-  if (!initialSchema.includes(`create table public.${table}`)) {
+  if (!tableSchema.includes(`create table if not exists public.${table}`) && !tableSchema.includes(`create table public.${table}`)) {
     findings.push(`缺少数据表定义：${table}`);
   }
 
-  if (!initialSchema.includes(`alter table public.${table} enable row level security`)) {
+  if (!tableSchema.includes(`alter table public.${table} enable row level security`)) {
     findings.push(`缺少 RLS 开启语句：${table}`);
   }
 }
@@ -153,7 +158,7 @@ if (!storageSchema.includes("on_auth_user_created")) {
 }
 
 for (const policy of requiredTablePolicies) {
-  if (!initialSchema.includes(`create policy "${policy}"`)) {
+  if (!tableSchema.includes(`create policy "${policy}"`)) {
     findings.push(`缺少数据表 RLS 策略：${policy}`);
   }
 }
@@ -208,6 +213,20 @@ if (!seedData.includes("gpt-image-2-text-to-image")) {
 
 if (!seedData.includes("gpt-image-2-image-to-image")) {
   findings.push("缺少 KIE 图生图模型种子数据。");
+}
+
+for (const routeKey of [
+  "text_generation",
+  "image_understanding",
+  "text_to_image",
+  "image_to_image",
+  "image_to_video",
+  "video_generation",
+  "long_video_generation",
+]) {
+  if (!seedData.includes(`'${routeKey}'`)) {
+    findings.push(`缺少模型能力路由种子数据：${routeKey}`);
+  }
 }
 
 if (!seedData.includes("柔雾底妆盘") || !seedData.includes("简约通勤手袋")) {

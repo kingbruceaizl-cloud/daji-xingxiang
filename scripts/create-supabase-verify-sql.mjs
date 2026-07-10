@@ -19,6 +19,7 @@ const requiredTables = [
   "music_tracks",
   "ai_providers",
   "ai_models",
+  "ai_model_routes",
   "ai_jobs",
   "job_events",
 ];
@@ -51,6 +52,16 @@ const requiredBucketSettings = [
 ];
 
 const requiredProviders = ["kie", "openai", "jimeng", "kling", "tongyi"];
+
+const requiredModelRoutes = [
+  "text_generation",
+  "image_understanding",
+  "text_to_image",
+  "image_to_image",
+  "image_to_video",
+  "video_generation",
+  "long_video_generation",
+];
 
 const requiredStoragePolicies = [
   "用户可读取自己的客户素材",
@@ -92,6 +103,10 @@ ${bucketValuesList(requiredBucketSettings)}
 expected_providers(name) as (
   values
 ${valuesList(requiredProviders)}
+),
+expected_model_routes(name) as (
+  values
+${valuesList(requiredModelRoutes)}
 ),
 expected_storage_policies(name) as (
   values
@@ -269,6 +284,19 @@ model_checks as (
     'gpt-image-2-image-to-image',
     '重新执行种子数据 SQL。'
 ),
+model_route_checks as (
+  select
+    '模型能力路由'::text as check_group,
+    expected_model_routes.name as check_item,
+    case when public.ai_model_routes.task_key is not null then '通过' else '未通过' end as result,
+    coalesce(
+      public.ai_model_routes.provider || ' / ' || nullif(public.ai_model_routes.model, ''),
+      '缺失'
+    ) as current_value,
+    '重新执行模型能力路由迁移和种子数据 SQL。'::text as suggestion
+  from expected_model_routes
+  left join public.ai_model_routes on public.ai_model_routes.task_key = expected_model_routes.name
+),
 function_checks as (
   select
     '认证触发器'::text as check_group,
@@ -308,6 +336,7 @@ from (
   union all select * from provider_checks
   union all select * from seed_checks
   union all select * from model_checks
+  union all select * from model_route_checks
   union all select * from function_checks
   union all select * from trigger_checks
 ) checks

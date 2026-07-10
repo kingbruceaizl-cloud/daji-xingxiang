@@ -58,7 +58,7 @@ pnpm run supabase:sql
 
 将 `supabase:sql` 输出复制到 Supabase SQL Editor 中执行。
 
-生成交付包后，还要在 Supabase SQL Editor 中执行 `dist/daji-xingxiang-supabase-verify.sql`，确认数据表、RLS、RLS 策略、存储桶配置、存储对象策略、模型通道和种子数据全部通过。
+生成交付包后，还要在 Supabase SQL Editor 中执行 `dist/daji-xingxiang-supabase-verify.sql`，确认数据表、RLS、RLS 策略、存储桶配置、存储对象策略、模型通道、模型能力路由和种子数据全部通过。
 
 ## 3. 正式环境变量
 

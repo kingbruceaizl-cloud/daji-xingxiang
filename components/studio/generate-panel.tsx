@@ -141,6 +141,13 @@ function normalizeLookupJob(rawJob: Partial<JobResult> & {
 
 const imageProviders = [
   {
+    id: "auto",
+    label: "后台自动",
+    detail: "按能力路由",
+    provider: undefined,
+    model: undefined,
+  },
+  {
     id: "mock",
     label: "演示通道",
     detail: "本地预览",
@@ -157,6 +164,13 @@ const imageProviders = [
 ] as const;
 
 const videoProviders = [
+  {
+    id: "auto",
+    label: "后台自动",
+    detail: "按能力路由",
+    provider: undefined,
+    model: undefined,
+  },
   {
     id: "mock",
     label: "演示通道",
@@ -190,8 +204,8 @@ export function StudioGeneratePanel({
   const [error, setError] = useState<string | null>(null);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [extraPrompt, setExtraPrompt] = useState("");
-  const [imageProviderId, setImageProviderId] = useState<(typeof imageProviders)[number]["id"]>("mock");
-  const [videoProviderId, setVideoProviderId] = useState<(typeof videoProviders)[number]["id"]>("mock");
+  const [imageProviderId, setImageProviderId] = useState<(typeof imageProviders)[number]["id"]>("auto");
+  const [videoProviderId, setVideoProviderId] = useState<(typeof videoProviders)[number]["id"]>("auto");
   const [selectedVideoTemplateName, setSelectedVideoTemplateName] = useState(videoTemplates[0]?.name || "");
   const [selectedScriptName, setSelectedScriptName] = useState(scriptTemplates[0]?.name || "");
   const [selectedMusicName, setSelectedMusicName] = useState(musicTracks[0]?.name || "");
@@ -409,7 +423,7 @@ export function StudioGeneratePanel({
         <div className="mt-4 grid gap-4">
           <div>
             <p className="text-xs text-stone-400">形象图通道</p>
-            <div className="mt-2 grid grid-cols-2 gap-2">
+            <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
               {imageProviders.map((item) => (
                 <button
                   key={item.id}
@@ -430,7 +444,7 @@ export function StudioGeneratePanel({
 
           <div>
             <p className="text-xs text-stone-400">变装视频通道</p>
-            <div className="mt-2 grid grid-cols-2 gap-2">
+            <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
               {videoProviders.map((item) => (
                 <button
                   key={item.id}

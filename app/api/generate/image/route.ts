@@ -4,6 +4,7 @@ import {
   normalizeAiProvider,
   realAiProviderRequiresLogin,
 } from "@/lib/ai/access";
+import { resolveAiModelRoute } from "@/lib/ai/model-routing";
 import { persistAiJob } from "@/lib/ai/persistence";
 import { createSafeServerErrorMessage } from "@/lib/server-error";
 import { getCurrentUserId } from "@/lib/supabase/current-user";
@@ -20,12 +21,31 @@ export async function POST(request: Request) {
         extraPrompt: body.extraPrompt,
       });
 
+    const inputImageUrls: string[] = Array.isArray(body.inputImageUrls)
+      ? body.inputImageUrls.map(String)
+      : [];
+    const jobType = inputImageUrls.length ? "image_to_image" : "text_to_image";
     const ownerId = await getCurrentUserId();
-    const provider = normalizeAiProvider(body.provider);
+    const modelRoute = await resolveAiModelRoute(jobType, {
+      provider: body.provider,
+      model: body.model,
+    });
+    const provider = normalizeAiProvider(modelRoute.provider);
     if (realAiProviderRequiresLogin(provider) && !ownerId) {
       return NextResponse.json(
         { ok: false, message: createRealAiProviderLoginMessage(provider) },
         { status: 401 },
+      );
+    }
+
+    if (provider === "kie" && inputImageUrls.some((url) => url.startsWith("data:"))) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message:
+            "KIE 图生图需要线上可访问的客户素材；请配置 Supabase 后上传素材，或先使用演示通道。",
+        },
+        { status: 400 },
       );
     }
 
@@ -39,15 +59,18 @@ export async function POST(request: Request) {
 
     const input = {
       provider,
-      model: body.model,
-      jobType: body.inputImageUrls?.length ? "image_to_image" : "text_to_image",
+      model: modelRoute.model || undefined,
+      jobType,
       prompt,
       projectId: body.projectId,
-      inputImageUrls: body.inputImageUrls,
+      inputImageUrls,
       selectedProducts: body.selectedProducts,
       styleName: body.styleName,
       ownerId,
       callbackUrl: callbackUrl.toString(),
+      modelRouteKey: modelRoute.taskKey,
+      modelRouteSource: modelRoute.source,
+      modelRouteParams: modelRoute.defaultParams,
     } as const;
 
     const job = await createAiJob(input);

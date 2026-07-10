@@ -18,6 +18,9 @@ export type CreateJobInput = {
   styleName?: string;
   callbackUrl?: string;
   ownerId?: string | null;
+  modelRouteKey?: string;
+  modelRouteSource?: string;
+  modelRouteParams?: Record<string, unknown>;
 };
 
 export type CreateJobResult = {

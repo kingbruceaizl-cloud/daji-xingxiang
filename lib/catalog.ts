@@ -9,6 +9,10 @@ import {
   videoTemplates,
 } from "@/lib/demo-data";
 import { formatJobStatusLabel, formatJobTypeLabel } from "@/lib/ai/display";
+import {
+  aiTaskRouteDefinitions,
+  formatAiTaskRouteLabel,
+} from "@/lib/ai/model-routes";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export type CatalogData = {
@@ -40,6 +44,15 @@ export type CatalogData = {
     name: string;
     status: string;
     ability: string;
+  }>;
+  modelRoutes: Array<{
+    id?: string;
+    taskKey: string;
+    name: string;
+    description: string;
+    provider: string;
+    model: string;
+    status: string;
   }>;
   videoTemplates: Array<{
     id?: string;
@@ -90,6 +103,14 @@ function demoCatalog(): CatalogData {
       status: provider.status,
       ability: provider.ability,
     })),
+    modelRoutes: aiTaskRouteDefinitions.map((route) => ({
+      taskKey: route.key,
+      name: route.label,
+      description: route.description,
+      provider: route.fallbackProvider,
+      model: route.fallbackModel,
+      status: "演示兜底",
+    })),
     videoTemplates,
     scriptTemplates,
     musicTracks,
@@ -112,6 +133,7 @@ export async function getCatalogData(): Promise<CatalogData> {
     videoTemplatesResult,
     scriptTemplatesResult,
     musicTracksResult,
+    modelRoutesResult,
     jobsResult,
   ] = await Promise.all([
       supabase
@@ -155,6 +177,11 @@ export async function getCatalogData(): Promise<CatalogData> {
         .order("created_at", { ascending: false })
         .limit(24),
       supabase
+        .from("ai_model_routes")
+        .select("id,task_key,display_name,description,provider,model,is_active,updated_at")
+        .eq("is_active", true)
+        .order("created_at"),
+      supabase
         .from("ai_jobs")
         .select("id,provider,model,job_type,status,prompt,error_message,updated_at,created_at")
         .order("created_at", { ascending: false })
@@ -169,6 +196,7 @@ export async function getCatalogData(): Promise<CatalogData> {
     videoTemplatesResult.error ||
     scriptTemplatesResult.error ||
     musicTracksResult.error ||
+    modelRoutesResult.error ||
     jobsResult.error
   ) {
     return demoCatalog();
@@ -209,6 +237,15 @@ export async function getCatalogData(): Promise<CatalogData> {
       name: provider.display_name,
       status: "已配置",
       ability: "能力由模型配置决定",
+    })),
+    modelRoutes: (modelRoutesResult.data || []).map((route) => ({
+      id: route.id,
+      taskKey: route.task_key,
+      name: route.display_name || formatAiTaskRouteLabel(route.task_key),
+      description: route.description,
+      provider: route.provider,
+      model: route.model,
+      status: "已启用",
     })),
     videoTemplates: (videoTemplatesResult.data || []).map((template) => ({
       id: template.id,

@@ -177,6 +177,8 @@ if (!findings.length) {
     "KIE_API_KEY",
     "/api/provider-callback/kie",
     "gpt-image-2-text-to-image",
+    "任务能力路由",
+    "image_to_video",
     "OPENAI_API_KEY",
   ]);
 
