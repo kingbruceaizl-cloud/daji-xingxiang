@@ -3,7 +3,9 @@ import { AdminGuardMessage } from "@/components/admin/admin-guard-message";
 import { getCatalogData } from "@/lib/catalog";
 import { getAdminPageState } from "@/lib/admin-page";
 import { ArrowLeft, Clapperboard, FileText } from "lucide-react";
+import { connection } from "next/server";
 import Link from "next/link";
+import { Suspense } from "react";
 
 const sampleTemplate = `{
   "name": "白底旋转换装",
@@ -26,7 +28,9 @@ const videoTemplateFieldHints = [
   "脚本文案：用于字幕、商品卡片和短视频故事节奏。",
 ];
 
-export default async function AdminVideoTemplatesPage() {
+async function AdminVideoTemplatesContent() {
+  await connection();
+
   const adminState = await getAdminPageState();
   if (!adminState.allowed) {
     return <AdminGuardMessage message={adminState.message} />;
@@ -111,5 +115,19 @@ export default async function AdminVideoTemplatesPage() {
         />
       </div>
     </main>
+  );
+}
+
+export default function AdminVideoTemplatesPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#fbfaf7] p-8 text-stone-950">
+          正在加载视频脚本...
+        </main>
+      }
+    >
+      <AdminVideoTemplatesContent />
+    </Suspense>
   );
 }

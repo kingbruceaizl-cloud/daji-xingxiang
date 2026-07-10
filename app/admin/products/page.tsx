@@ -5,7 +5,9 @@ import { getAdminPageState } from "@/lib/admin-page";
 import { publicImages } from "@/lib/demo-data";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
+import { connection } from "next/server";
 import Link from "next/link";
+import { Suspense } from "react";
 
 const sampleProduct = `{
   "name": "云纹缎面上衣",
@@ -27,7 +29,9 @@ const productFieldHints = [
   "标签：多个标签用中文逗号分隔，方便后续筛选。",
 ];
 
-export default async function AdminProductsPage() {
+async function AdminProductsContent() {
+  await connection();
+
   const adminState = await getAdminPageState();
   if (!adminState.allowed) {
     return <AdminGuardMessage message={adminState.message} />;
@@ -85,5 +89,19 @@ export default async function AdminProductsPage() {
         />
       </div>
     </main>
+  );
+}
+
+export default function AdminProductsPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#fbfaf7] p-8 text-stone-950">
+          正在加载商品库...
+        </main>
+      }
+    >
+      <AdminProductsContent />
+    </Suspense>
   );
 }

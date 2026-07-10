@@ -8,7 +8,9 @@ import {
 } from "@/lib/ai/display";
 import { getCatalogData } from "@/lib/catalog";
 import { ArrowLeft, ListVideo } from "lucide-react";
+import { connection } from "next/server";
 import Link from "next/link";
+import { Suspense } from "react";
 
 const statusClassName: Record<string, string> = {
   succeeded: "bg-green-50 text-green-700",
@@ -25,7 +27,9 @@ const statusClassName: Record<string, string> = {
   待接入: "bg-stone-100 text-stone-500",
 };
 
-export default async function AdminJobsPage() {
+async function AdminJobsContent() {
+  await connection();
+
   const adminState = await getAdminPageState();
   if (!adminState.allowed) {
     return <AdminGuardMessage message={adminState.message} />;
@@ -98,5 +102,19 @@ export default async function AdminJobsPage() {
         </section>
       </div>
     </main>
+  );
+}
+
+export default function AdminJobsPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#fbfaf7] p-8 text-stone-950">
+          正在加载生成任务...
+        </main>
+      }
+    >
+      <AdminJobsContent />
+    </Suspense>
   );
 }

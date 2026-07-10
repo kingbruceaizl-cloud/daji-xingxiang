@@ -1,9 +1,13 @@
 import { getProjectsData } from "@/lib/projects";
 import { ArrowLeft, CalendarClock, Plus } from "lucide-react";
 import Image from "next/image";
+import { connection } from "next/server";
 import Link from "next/link";
+import { Suspense } from "react";
 
-export default async function ProjectsPage() {
+async function ProjectsContent() {
+  await connection();
+
   const { projects, source } = await getProjectsData();
 
   return (
@@ -69,5 +73,19 @@ export default async function ProjectsPage() {
         </section>
       </div>
     </main>
+  );
+}
+
+export default function ProjectsPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#fbfaf7] p-8 text-stone-950">
+          正在加载项目列表...
+        </main>
+      }
+    >
+      <ProjectsContent />
+    </Suspense>
   );
 }

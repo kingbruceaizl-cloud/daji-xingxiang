@@ -12,6 +12,7 @@ import {
 import { getProjectsData } from "@/lib/projects";
 import Link from "next/link";
 import Image from "next/image";
+import { connection } from "next/server";
 import { ArrowRight, Bell, CheckCircle2, Clock3, PlayCircle } from "lucide-react";
 
 const generationQueue = [
@@ -63,7 +64,9 @@ async function UserDetails() {
   );
 }
 
-export default async function ProtectedPage() {
+async function ProtectedContent() {
+  await connection();
+
   const { projects, source } = await getProjectsData();
 
   return (
@@ -245,5 +248,19 @@ export default async function ProtectedPage() {
         开始生成
       </Link>
     </div>
+  );
+}
+
+export default function ProtectedPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="rounded-md border border-stone-200 bg-white p-6">
+          正在加载工作台...
+        </div>
+      }
+    >
+      <ProtectedContent />
+    </Suspense>
   );
 }

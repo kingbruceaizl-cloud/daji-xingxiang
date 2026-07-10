@@ -9,9 +9,13 @@ import { getAdminPageState } from "@/lib/admin-page";
 import { AdminGuardMessage } from "@/components/admin/admin-guard-message";
 import { ArrowLeft, Plus, Search } from "lucide-react";
 import Image from "next/image";
+import { connection } from "next/server";
 import Link from "next/link";
+import { Suspense } from "react";
 
-export default async function AdminPage() {
+async function AdminContent() {
+  await connection();
+
   const adminState = await getAdminPageState();
   if (!adminState.allowed) {
     return <AdminGuardMessage message={adminState.message} />;
@@ -203,5 +207,19 @@ export default async function AdminPage() {
         </section>
       </div>
     </main>
+  );
+}
+
+export default function AdminPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#fbfaf7] p-8 text-stone-950">
+          正在加载后台控制台...
+        </main>
+      }
+    >
+      <AdminContent />
+    </Suspense>
   );
 }

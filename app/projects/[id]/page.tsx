@@ -14,6 +14,7 @@ import {
   WandSparkles,
 } from "lucide-react";
 import Image from "next/image";
+import { connection } from "next/server";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -22,6 +23,8 @@ async function ProjectDetailContent({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await connection();
+
   const { id } = await params;
   const { project, source, assets, jobs } = await getProjectDetailById(id);
   const studioHref = `/studio/${project.id || id}?name=${encodeURIComponent(project.name)}`;

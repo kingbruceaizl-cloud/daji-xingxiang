@@ -4,7 +4,9 @@ import { formatModelLabel, formatProviderLabel } from "@/lib/ai/display";
 import { getCatalogData } from "@/lib/catalog";
 import { getAdminPageState } from "@/lib/admin-page";
 import { ArrowLeft } from "lucide-react";
+import { connection } from "next/server";
 import Link from "next/link";
+import { Suspense } from "react";
 
 const sampleModel = `{
   "provider": "kie",
@@ -36,7 +38,9 @@ const modelFieldHints = [
   "默认参数：模型调用时默认使用的画幅、质量等参数。",
 ];
 
-export default async function AdminModelsPage() {
+async function AdminModelsContent() {
+  await connection();
+
   const adminState = await getAdminPageState();
   if (!adminState.allowed) {
     return <AdminGuardMessage message={adminState.message} />;
@@ -106,5 +110,19 @@ export default async function AdminModelsPage() {
         />
       </div>
     </main>
+  );
+}
+
+export default function AdminModelsPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#fbfaf7] p-8 text-stone-950">
+          正在加载模型配置...
+        </main>
+      }
+    >
+      <AdminModelsContent />
+    </Suspense>
   );
 }

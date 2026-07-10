@@ -3,7 +3,9 @@ import { AdminGuardMessage } from "@/components/admin/admin-guard-message";
 import { getCatalogData } from "@/lib/catalog";
 import { getAdminPageState } from "@/lib/admin-page";
 import { ArrowLeft } from "lucide-react";
+import { connection } from "next/server";
 import Link from "next/link";
+import { Suspense } from "react";
 
 const sampleStyle = `{
   "name": "新中式轻礼服",
@@ -21,7 +23,9 @@ const styleFieldHints = [
   "标签：多个标签用中文逗号分隔。",
 ];
 
-export default async function AdminStylesPage() {
+async function AdminStylesContent() {
+  await connection();
+
   const adminState = await getAdminPageState();
   if (!adminState.allowed) {
     return <AdminGuardMessage message={adminState.message} />;
@@ -69,5 +73,19 @@ export default async function AdminStylesPage() {
         />
       </div>
     </main>
+  );
+}
+
+export default function AdminStylesPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#fbfaf7] p-8 text-stone-950">
+          正在加载风格模板...
+        </main>
+      }
+    >
+      <AdminStylesContent />
+    </Suspense>
   );
 }

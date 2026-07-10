@@ -10,10 +10,13 @@ import {
 import { getCatalogData } from "@/lib/catalog";
 import { ArrowRight, Check, Sparkles, Upload, WandSparkles } from "lucide-react";
 import Image from "next/image";
+import { connection } from "next/server";
 import Link from "next/link";
 import { Suspense } from "react";
 
-export default async function Home() {
+async function HomeContent() {
+  await connection();
+
   const catalog = await getCatalogData();
   const featuredProducts = catalog.products.slice(0, 3);
   const featuredStyles = catalog.styles.slice(0, 4);
@@ -283,5 +286,19 @@ export default async function Home() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#fbfaf7] p-8 text-stone-950">
+          正在加载大吉形象...
+        </main>
+      }
+    >
+      <HomeContent />
+    </Suspense>
   );
 }

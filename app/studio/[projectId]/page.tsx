@@ -1,5 +1,6 @@
 import { StudioWorkspace } from "@/components/studio/studio-workspace";
 import { getProjectById } from "@/lib/projects";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 async function StudioProjectContent({
@@ -9,6 +10,8 @@ async function StudioProjectContent({
   params: Promise<{ projectId: string }>;
   searchParams: Promise<{ name?: string | string[] }>;
 }) {
+  await connection();
+
   const [{ projectId }, resolvedSearchParams] = await Promise.all([
     params,
     searchParams,

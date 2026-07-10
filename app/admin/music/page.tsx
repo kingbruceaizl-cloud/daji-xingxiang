@@ -3,7 +3,9 @@ import { AdminGuardMessage } from "@/components/admin/admin-guard-message";
 import { getCatalogData } from "@/lib/catalog";
 import { getAdminPageState } from "@/lib/admin-page";
 import { ArrowLeft, Music2 } from "lucide-react";
+import { connection } from "next/server";
 import Link from "next/link";
+import { Suspense } from "react";
 
 const sampleMusic = `{
   "name": "松弛低能量节拍",
@@ -21,7 +23,9 @@ const musicFieldHints = [
   "使用场景：说明适合哪类变装视频、客户气质或商品展示。",
 ];
 
-export default async function AdminMusicPage() {
+async function AdminMusicContent() {
+  await connection();
+
   const adminState = await getAdminPageState();
   if (!adminState.allowed) {
     return <AdminGuardMessage message={adminState.message} />;
@@ -82,5 +86,19 @@ export default async function AdminMusicPage() {
         />
       </div>
     </main>
+  );
+}
+
+export default function AdminMusicPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#fbfaf7] p-8 text-stone-950">
+          正在加载音乐库...
+        </main>
+      }
+    >
+      <AdminMusicContent />
+    </Suspense>
   );
 }
