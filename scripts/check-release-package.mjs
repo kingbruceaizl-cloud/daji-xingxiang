@@ -394,7 +394,7 @@ requireIncludes(".github/workflows/verify.yml", githubWorkflow, [
   "大吉形象发布验证",
   "pnpm run verify:ci",
   "pnpm run check:materials:urls",
-  "node-version-file: .node-version",
+  "node-version: 22",
   "pnpm install --frozen-lockfile",
 ]);
 
@@ -404,6 +404,7 @@ requireIncludes(".github/workflows/online-smoke.yml", onlineSmokeWorkflow, [
   "workflow_dispatch",
   "base_url",
   "SMOKE_BASE_URL",
+  "node-version: 22",
   "pnpm run smoke:url",
 ]);
 
@@ -413,6 +414,7 @@ requireIncludes(".github/workflows/release-package.yml", releasePackageWorkflow,
   "workflow_dispatch",
   "pnpm run verify:ci",
   "pnpm run check:materials:urls",
+  "node-version: 22",
   "pnpm run release:package",
   "actions/upload-artifact@v4",
   "dist/daji-xingxiang-source-*.zip",

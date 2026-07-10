@@ -25,7 +25,7 @@ pnpm run verify:ci
 pnpm run check:materials:urls
 ```
 
-GitHub Actions 会读取项目根目录的 `.node-version` 来安装 Node.js，避免本地、CI 和 Vercel 运行版本漂移。
+GitHub Actions 使用 Node.js 22 LTS 运行自动验证；本地和 Vercel 仍可按项目根目录 `.node-version` 使用 20.18.0 或更高版本。
 
 它会先执行 `verify:local`，再启动生产模式服务并运行 `smoke:prod`，随后检查线上示例素材是否仍可访问。
 
