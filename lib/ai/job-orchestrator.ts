@@ -688,11 +688,30 @@ export async function runAiWorkerBatch(input: {
     deferred: 0,
     retrying: 0,
     failed: 0,
+    monitoring: {
+      detected: 0,
+      resolved: 0,
+    },
   };
 
   for (const job of jobs) {
     const outcome = await processClaimedJob(supabase, job);
     result[outcome] += 1;
+  }
+
+  const alertRefresh = await supabase.rpc("refresh_ai_job_system_alerts", {
+    p_stale_minutes: 15,
+  });
+  if (
+    !alertRefresh.error &&
+    alertRefresh.data &&
+    typeof alertRefresh.data === "object"
+  ) {
+    const monitoring = alertRefresh.data as Record<string, unknown>;
+    result.monitoring = {
+      detected: Number(monitoring.detected || 0),
+      resolved: Number(monitoring.resolved || 0),
+    };
   }
 
   return result;

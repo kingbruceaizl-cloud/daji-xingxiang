@@ -1,7 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getDeploymentInfo, type DeploymentInfo } from "@/lib/deployment-info";
 import {
-  createSafeServerErrorMessage,
   createSafeStorageErrorMessage,
 } from "@/lib/server-error";
 
@@ -85,6 +84,14 @@ const modelChannels = [
   { key: "JIMENG_API_KEY", label: "即梦模型通道" },
   { key: "KLING_API_KEY", label: "可灵模型通道" },
   { key: "TONGYI_API_KEY", label: "通义模型通道" },
+];
+
+const requiredDatabaseTables = [
+  { name: "product_categories", label: "商品分类" },
+  { name: "ai_jobs", label: "生成任务" },
+  { name: "ai_job_runtime", label: "任务恢复" },
+  { name: "usage_limits", label: "团队额度" },
+  { name: "system_alerts", label: "运行告警" },
 ];
 
 const requiredBucketSettings = [
@@ -265,18 +272,33 @@ async function createDatabaseCheck(): Promise<LaunchCheckItem> {
     };
   }
 
-  const { error } = await supabase
-    .from("product_categories")
-    .select("id", { count: "exact", head: true });
+  const [tableResults, overviewResult] = await Promise.all([
+    Promise.all(
+      requiredDatabaseTables.map(async (table) => ({
+        ...table,
+        result: await supabase
+          .from(table.name)
+          .select("id", { count: "exact", head: true }),
+      })),
+    ),
+    supabase.rpc("get_operations_overview", { p_days: 1 }),
+  ]);
+  const missingTables = tableResults
+    .filter((item) => item.result.error)
+    .map((item) => item.label);
+  const migrationIssues = [
+    ...missingTables,
+    ...(overviewResult.error ? ["运行指标"] : []),
+  ];
 
   return {
     key: "DATABASE",
     label: "数据库连接",
     required: true,
-    status: error ? "warning" : "ready",
-    detail: error
-      ? createSafeServerErrorMessage("数据库连接检查")
-      : "连接正常，基础表可访问。",
+    status: migrationIssues.length ? "warning" : "ready",
+    detail: migrationIssues.length
+      ? `数据库已连接，但缺少：${migrationIssues.join("、")}。请按顺序执行最新 Supabase 迁移。`
+      : "连接正常，业务表、任务恢复、团队额度和运行监控均可访问。",
   };
 }
 

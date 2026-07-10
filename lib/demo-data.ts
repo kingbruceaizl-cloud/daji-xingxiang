@@ -1,4 +1,5 @@
 import {
+  Activity,
   Boxes,
   Brush,
   Camera,
@@ -360,5 +361,6 @@ export const adminModules = [
   { name: "音乐库", detail: "情绪标签、节奏、授权备注", icon: Music2 },
   { name: "模型配置", detail: "模型通道、能力、参数", icon: Database },
   { name: "生成任务", detail: "状态、模型、失败原因", icon: ListVideo },
+  { name: "运行监控", detail: "成功率、耗时与系统告警", icon: Activity },
   { name: "上线体检", detail: "环境、数据库、存储和模型", icon: Rocket },
 ];

@@ -311,6 +311,7 @@ requireIncludes("scripts/create-supabase-sql-bundle.mjs", supabaseSqlBundle, [
   "supabase/migrations/0006_durable_ai_worker.sql",
   "supabase/migrations/0007_volcengine_video.sql",
   "supabase/migrations/0008_team_roles_and_quotas.sql",
+  "supabase/migrations/0009_operations_monitoring.sql",
   "supabase/seed/0001_seed_demo_data.sql",
   "Supabase SQL Editor",
 ]);
@@ -326,6 +327,7 @@ requireIncludes("scripts/print-supabase-sql.mjs", supabaseSqlPrint, [
   "supabase/migrations/0006_durable_ai_worker.sql",
   "supabase/migrations/0007_volcengine_video.sql",
   "supabase/migrations/0008_team_roles_and_quotas.sql",
+  "supabase/migrations/0009_operations_monitoring.sql",
   "supabase/seed/0001_seed_demo_data.sql",
 ]);
 
@@ -343,6 +345,8 @@ requireIncludes("scripts/create-supabase-verify-sql.mjs", supabaseVerifySql, [
   "Seedream 5.0 完整版",
   "doubao-seedream-5-0-260128",
   "模型能力路由",
+  "refresh_ai_job_system_alerts 告警刷新函数",
+  "get_operations_overview 指标聚合函数",
   "image_to_video",
 ]);
 
@@ -503,6 +507,7 @@ requireIncludes("scripts/smoke-prod.mjs", smokeProd, [
   "真实模型通道 volcengine 需要先登录后再生成",
   "assertAdminWriteGuard",
   "assertTeamAdminGuard",
+  "assertAlertAdminGuard",
   "assertAdminAssetUploadGuard",
   "assertInvalidUploadTypeGuard",
   "/api/upload 匿名上传后台素材不应成功。",
@@ -514,6 +519,7 @@ requireIncludes("scripts/smoke-prod.mjs", smokeProd, [
   "data.deployment.platform",
   "data.deployment?.appEnv",
   "/admin/launch",
+  "/admin/operations",
   "/api/catalog",
   "assertProjectDetail",
   "/projects/demo-xinzhongshi",
@@ -540,8 +546,10 @@ requireIncludes("scripts/smoke-admin-demo.mjs", smokeAdminDemo, [
   "/admin/video-templates",
   "/admin/music",
   "/admin/jobs",
+  "/admin/operations",
   "字段说明",
-  "配置模板",
+  "商品列表",
+  "当前显示演示指标",
   "演示生图模型",
   "演示视频模型",
   "NEXT_PUBLIC_SUPABASE_URL",
@@ -560,6 +568,7 @@ requireIncludes("scripts/smoke-url.mjs", smokeUrl, [
   "twitter:title",
   "assertAdminWriteGuard",
   "assertTeamAdminGuard",
+  "assertAlertAdminGuard",
   "assertAdminAssetUploadGuard",
   "assertInvalidUploadTypeGuard",
   "/api/upload 匿名上传后台素材不应成功。",
@@ -574,6 +583,7 @@ requireIncludes("scripts/smoke-url.mjs", smokeUrl, [
   "线上冒烟测试不能使用本地地址",
   "/api/health",
   "/admin/launch",
+  "/admin/operations",
   "assertProjectDetail",
   "/projects/demo-xinzhongshi",
   "/api/projects/demo-xinzhongshi",
@@ -608,7 +618,9 @@ requireIncludes("lib/launch-readiness.ts", launchReadiness, [
   "getDeploymentInfo",
   "deployment: DeploymentInfo",
   "deployment: getDeploymentInfo()",
-  "createSafeServerErrorMessage",
+  "requiredDatabaseTables",
+  "get_operations_overview",
+  "运行监控",
   "createSafeStorageErrorMessage",
   "requiredBucketSettings",
   "file_size_limit",
@@ -802,6 +814,40 @@ requireIncludes("app/api/admin/team/invite/route.ts", teamInviteApi, [
   "inviteUserByEmail",
   "/auth/confirm?next=/auth/update-password",
   "员工邀请已发送",
+]);
+
+const operationsMigration = requireFile(
+  "supabase/migrations/0009_operations_monitoring.sql",
+);
+requireIncludes(
+  "supabase/migrations/0009_operations_monitoring.sql",
+  operationsMigration,
+  [
+    "public.system_alerts",
+    "public.sync_ai_job_system_alert",
+    "public.refresh_ai_job_system_alerts",
+    "public.get_operations_overview",
+    "ai_job_stalled",
+    "service_role",
+  ],
+);
+
+const operationsMonitor = requireFile("components/admin/operations-monitor.tsx");
+requireIncludes("components/admin/operations-monitor.tsx", operationsMonitor, [
+  "运行监控数据库尚未升级",
+  "模型通道表现",
+  "主要失败原因",
+  "系统告警",
+  "/api/admin/alerts/",
+]);
+
+const alertAdminApi = requireFile("app/api/admin/alerts/[id]/route.ts");
+requireIncludes("app/api/admin/alerts/[id]/route.ts", alertAdminApi, [
+  "requireAdminAccess",
+  "system_alerts",
+  "acknowledge",
+  "resolve",
+  "reopen",
 ]);
 
 const resultAssets = requireFile("lib/ai/result-assets.ts");
@@ -1213,6 +1259,7 @@ for (const routeFile of [
   "app/admin/music/page.tsx",
   "app/admin/jobs/page.tsx",
   "app/admin/team/page.tsx",
+  "app/admin/operations/page.tsx",
   "app/api/health/route.ts",
   "app/api/jobs/[id]/route.ts",
   "app/api/projects/[id]/route.ts",
@@ -1242,10 +1289,13 @@ for (const routeFile of [
   "app/api/admin/models/route.ts",
   "app/api/admin/team/[id]/route.ts",
   "app/api/admin/team/invite/route.ts",
+  "app/api/admin/alerts/[id]/route.ts",
+  "lib/admin-operations.ts",
   "lib/admin-team.ts",
   "lib/signup-policy.ts",
   "supabase/migrations/0003_model_task_routes.sql",
   "supabase/migrations/0008_team_roles_and_quotas.sql",
+  "supabase/migrations/0009_operations_monitoring.sql",
 ]) {
   requireFile(routeFile);
 }

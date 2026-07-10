@@ -54,6 +54,7 @@ SUPABASE_SERVICE_ROLE_KEY=
 - `job_events`
 - `ai_job_runtime`
 - `usage_limits`
+- `system_alerts`
 
 详细操作见 `docs/supabase-setup.md`。
 

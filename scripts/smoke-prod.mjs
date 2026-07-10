@@ -320,6 +320,37 @@ async function assertTeamAdminGuard() {
   }
 }
 
+async function assertAlertAdminGuard() {
+  const response = await fetch(
+    `${baseUrl}/api/admin/alerts/00000000-0000-4000-8000-000000000000`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "acknowledge" }),
+    },
+  );
+  const payload = await response.json().catch(() => ({}));
+  const message = typeof payload.message === "string" ? payload.message : "";
+  const allowedMessages = [
+    "请先配置 Supabase Service Role Key",
+    "请先登录后再操作后台",
+    "当前账号没有后台管理权限",
+  ];
+
+  if (response.ok || payload.ok) {
+    failures.push("/api/admin/alerts 匿名更新告警不应成功。");
+    return;
+  }
+
+  if (![400, 401, 403].includes(response.status)) {
+    failures.push(`/api/admin/alerts 匿名访问返回状态异常：${response.status}`);
+  }
+
+  if (!allowedMessages.some((item) => message.includes(item))) {
+    failures.push("/api/admin/alerts 匿名访问未返回中文权限提示。");
+  }
+}
+
 async function assertAdminAssetUploadGuard() {
   const formData = new FormData();
   formData.set("bucket", "product-assets");
@@ -509,6 +540,7 @@ async function runSmokeChecks() {
   await assertPage("/auth/sign-up", "当前仅限邀请注册");
   await assertProtectedOrDemo("/admin/launch", "上线体检");
   await assertProtectedOrDemo("/admin/team", "团队权限");
+  await assertProtectedOrDemo("/admin/operations", "运行监控");
   await assertHealth();
   await assertCatalog();
   await assertWorkerGuard();
@@ -519,6 +551,7 @@ async function runSmokeChecks() {
   await assertRealProviderGenerationGuard();
   await assertAdminWriteGuard();
   await assertTeamAdminGuard();
+  await assertAlertAdminGuard();
   await assertAdminAssetUploadGuard();
   await assertInvalidUploadTypeGuard();
   await assertTextEndpoint("/robots.txt", "sitemap.xml");

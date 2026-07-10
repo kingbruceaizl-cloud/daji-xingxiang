@@ -138,7 +138,7 @@ SMOKE_BASE_URL=https://你的域名 pnpm run smoke:url
 
 线上冒烟测试也会检查 API 防索引和私有缓存响应头；后台、登录后页面和 API 应返回 `X-Robots-Tag: noindex, nofollow, noarchive` 与 `Cache-Control: no-store, max-age=0`。
 
-在 Supabase Auth 设置中关闭公开注册，并通过 `/admin/team` 邀请员工。执行 `0008_team_roles_and_quotas.sql` 后，还要确认首位账号保留负责人角色、后续账号默认是员工、`usage_limits` 与 `enqueue_ai_job` 验收项通过。
+在 Supabase Auth 设置中关闭公开注册，并通过 `/admin/team` 邀请员工。执行 `0008_team_roles_and_quotas.sql` 后，还要确认首位账号保留负责人角色、后续账号默认是员工、`usage_limits` 与 `enqueue_ai_job` 验收项通过。继续执行 `0009_operations_monitoring.sql`，确认 `system_alerts`、告警触发器和运行指标聚合函数通过验收。
 
 线上冒烟测试还会验证匿名请求不能写入后台商品或邀请员工，防止后台配置和团队接口被公开误用。
 

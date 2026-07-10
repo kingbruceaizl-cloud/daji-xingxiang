@@ -31,6 +31,7 @@ async function AdminContent() {
     音乐库: "/admin/music",
     模型配置: "/admin/models",
     生成任务: "/admin/jobs",
+    运行监控: "/admin/operations",
     上线体检: "/admin/launch",
   };
 
@@ -56,7 +57,7 @@ async function AdminContent() {
             管理商品库、风格模板、视频脚本、音乐和模型。
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-stone-500">
-            第一阶段后台只给项目负责人使用。后续接入多员工、多角色权限。
+            负责人和管理员可维护业务配置、团队权限，并查看生成任务与运行告警。
           </p>
           <p className="mt-3 text-xs text-stone-400">
             当前数据源：{catalog.source === "supabase" ? "Supabase" : "演示数据"}

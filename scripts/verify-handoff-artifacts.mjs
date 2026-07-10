@@ -193,6 +193,9 @@ if (!findings.length) {
     "doubao-seedream-5-0-260128",
     "create table if not exists public.ai_job_runtime",
     "public.claim_ai_jobs",
+    "create table if not exists public.system_alerts",
+    "public.refresh_ai_job_system_alerts",
+    "public.get_operations_overview",
   ]);
 
   const supabaseVerifySql = readDistFile("daji-xingxiang-supabase-verify.sql");
@@ -209,6 +212,8 @@ if (!findings.length) {
     "Seedream 5.0 完整版",
     "doubao-seedream-5-0-260128",
     "claim_ai_jobs 原子领取函数",
+    "refresh_ai_job_system_alerts 告警刷新函数",
+    "get_operations_overview 指标聚合函数",
   ]);
 
   const vercelEnvTemplate = readDistFile("daji-xingxiang-vercel-env-template.env");

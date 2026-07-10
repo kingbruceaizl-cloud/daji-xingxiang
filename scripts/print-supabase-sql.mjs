@@ -10,6 +10,7 @@ const orderedFiles = [
   "supabase/migrations/0006_durable_ai_worker.sql",
   "supabase/migrations/0007_volcengine_video.sql",
   "supabase/migrations/0008_team_roles_and_quotas.sql",
+  "supabase/migrations/0009_operations_monitoring.sql",
   "supabase/seed/0001_seed_demo_data.sql",
 ];
 

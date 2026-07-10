@@ -10,6 +10,7 @@ const requiredFiles = [
   "supabase/migrations/0006_durable_ai_worker.sql",
   "supabase/migrations/0007_volcengine_video.sql",
   "supabase/migrations/0008_team_roles_and_quotas.sql",
+  "supabase/migrations/0009_operations_monitoring.sql",
   "supabase/seed/0001_seed_demo_data.sql",
 ];
 
@@ -30,6 +31,7 @@ const requiredTables = [
   "job_events",
   "ai_job_runtime",
   "usage_limits",
+  "system_alerts",
 ];
 
 const requiredBucketSettings = [
@@ -78,6 +80,8 @@ const requiredTablePolicies = [
   "用户可管理自己的生成任务",
   "用户可读取自己任务事件",
   "用户可读取自己的用量限制",
+  "后台管理员可读取系统告警",
+  "后台管理员可更新系统告警",
 ];
 
 const requiredStoragePolicies = [
@@ -127,8 +131,9 @@ const productionJobSchema = readProjectFile("supabase/migrations/0005_production
 const durableWorkerSchema = readProjectFile("supabase/migrations/0006_durable_ai_worker.sql") || "";
 const volcengineVideoSchema = readProjectFile("supabase/migrations/0007_volcengine_video.sql") || "";
 const teamQuotaSchema = readProjectFile("supabase/migrations/0008_team_roles_and_quotas.sql") || "";
+const operationsSchema = readProjectFile("supabase/migrations/0009_operations_monitoring.sql") || "";
 const seedData = readProjectFile("supabase/seed/0001_seed_demo_data.sql") || "";
-const tableSchema = `${initialSchema}\n${modelRouteSchema}\n${productionEnumSchema}\n${productionJobSchema}\n${durableWorkerSchema}\n${teamQuotaSchema}`;
+const tableSchema = `${initialSchema}\n${modelRouteSchema}\n${productionEnumSchema}\n${productionJobSchema}\n${durableWorkerSchema}\n${teamQuotaSchema}\n${operationsSchema}`;
 
 for (const table of requiredTables) {
   if (!tableSchema.includes(`create table if not exists public.${table}`) && !tableSchema.includes(`create table public.${table}`)) {
@@ -219,6 +224,17 @@ if (
   !teamQuotaSchema.includes("assigned_role := 'staff'")
 ) {
   findings.push("缺少团队角色和真实模型用量限制。");
+}
+
+if (
+  !operationsSchema.includes("public.system_alerts") ||
+  !operationsSchema.includes("public.sync_ai_job_system_alert") ||
+  !operationsSchema.includes("public.refresh_ai_job_system_alerts") ||
+  !operationsSchema.includes("public.get_operations_overview") ||
+  !operationsSchema.includes("ai_job_stalled") ||
+  !operationsSchema.includes("service_role")
+) {
+  findings.push("缺少运行监控、任务告警或运营指标聚合能力。");
 }
 
 for (const provider of requiredProviders) {

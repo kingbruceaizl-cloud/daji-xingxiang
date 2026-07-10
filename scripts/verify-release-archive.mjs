@@ -196,6 +196,10 @@ if (!manifestName) {
           "app/api/health/route.ts",
           "app/api/generate/image/route.ts",
           "app/api/generate/video/route.ts",
+          "app/admin/operations/page.tsx",
+          "app/api/admin/alerts/[id]/route.ts",
+          "components/admin/operations-monitor.tsx",
+          "lib/admin-operations.ts",
           "scripts/check-material-urls.mjs",
           "docs/prd.md",
           "docs/deployment.md",
@@ -209,6 +213,7 @@ if (!manifestName) {
           "supabase/migrations/0006_durable_ai_worker.sql",
           "supabase/migrations/0007_volcengine_video.sql",
           "supabase/migrations/0008_team_roles_and_quotas.sql",
+          "supabase/migrations/0009_operations_monitoring.sql",
           "supabase/seed/0001_seed_demo_data.sql",
         ]);
         assertForbiddenEntries(entries);

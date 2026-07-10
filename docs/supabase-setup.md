@@ -19,7 +19,8 @@
 6. `supabase/migrations/0006_durable_ai_worker.sql`
 7. `supabase/migrations/0007_volcengine_video.sql`
 8. `supabase/migrations/0008_team_roles_and_quotas.sql`
-9. `supabase/seed/0001_seed_demo_data.sql`
+9. `supabase/migrations/0009_operations_monitoring.sql`
+10. `supabase/seed/0001_seed_demo_data.sql`
 
 也可以在本地运行以下命令，把三段 SQL 合并输出后复制到 SQL Editor：
 
@@ -52,6 +53,7 @@ dist/daji-xingxiang-supabase-verify.sql
 - 默认商品分类、演示商品、风格模板、视频模板、模型通道、模型能力路由和 Seedream 5.0 完整版。
 - AI 后台运行表、任务租约和 `claim_ai_jobs` 原子领取函数。
 - 团队角色、员工模型用量限制和带原子额度检查的任务入队函数。
+- 系统告警表、失败任务自动告警、卡住任务扫描和 30 天运行指标聚合函数。
 
 ## 4. 关闭公开注册
 

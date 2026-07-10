@@ -24,6 +24,7 @@ const requiredTables = [
   "job_events",
   "ai_job_runtime",
   "usage_limits",
+  "system_alerts",
 ];
 
 const requiredBucketSettings = [
@@ -323,6 +324,20 @@ function_checks as (
         and pg_proc.proname = 'enqueue_ai_job'
     ) then '已创建' else '缺失' end,
     '重新执行团队角色与额度迁移。'::text
+  union all
+  select
+    '运行监控'::text,
+    'refresh_ai_job_system_alerts 告警刷新函数'::text,
+    case when to_regprocedure('public.refresh_ai_job_system_alerts(integer)') is not null then '通过' else '未通过' end,
+    case when to_regprocedure('public.refresh_ai_job_system_alerts(integer)') is not null then '已创建' else '缺失' end,
+    '重新执行运行监控迁移。'::text
+  union all
+  select
+    '运行监控'::text,
+    'get_operations_overview 指标聚合函数'::text,
+    case when to_regprocedure('public.get_operations_overview(integer)') is not null then '通过' else '未通过' end,
+    case when to_regprocedure('public.get_operations_overview(integer)') is not null then '已创建' else '缺失' end,
+    '重新执行运行监控迁移。'::text
 ),
 trigger_checks as (
   select
@@ -339,6 +354,21 @@ trigger_checks as (
     ) then '通过' else '未通过' end as result,
     'on_auth_user_created'::text as current_value,
     '重新执行 Supabase 初始化 SQL 中的认证触发器部分。'::text as suggestion
+  union all
+  select
+    '运行监控'::text,
+    '任务状态自动同步系统告警'::text,
+    case when exists (
+      select 1
+      from pg_trigger
+      join pg_class on pg_class.oid = pg_trigger.tgrelid
+      join pg_namespace on pg_namespace.oid = pg_class.relnamespace
+      where pg_trigger.tgname = 'sync_ai_job_system_alert'
+        and pg_namespace.nspname = 'public'
+        and pg_class.relname = 'ai_jobs'
+    ) then '通过' else '未通过' end,
+    'sync_ai_job_system_alert'::text,
+    '重新执行运行监控迁移。'::text
 )
 select check_group as "检查分组",
   check_item as "检查项",

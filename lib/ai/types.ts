@@ -69,6 +69,10 @@ export type AiWorkerRunResult = {
   deferred: number;
   retrying: number;
   failed: number;
+  monitoring: {
+    detected: number;
+    resolved: number;
+  };
 };
 
 export type JobStatusResult = {
