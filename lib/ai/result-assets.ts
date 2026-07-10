@@ -1,4 +1,8 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  createSafeServerErrorMessage,
+  createSafeStorageErrorMessage,
+} from "@/lib/server-error";
 import type { AiJobType } from "./types";
 
 const GENERATED_BUCKET = "generated-assets";
@@ -137,7 +141,7 @@ export async function saveGeneratedResultAssets(
         });
 
       if (uploadError) {
-        failures.push(`${resultUrl} 转存失败：${uploadError.message}`);
+        failures.push(createSafeStorageErrorMessage("生成结果转存"));
         continue;
       }
 
@@ -163,14 +167,13 @@ export async function saveGeneratedResultAssets(
         .single();
 
       if (assetError) {
-        failures.push(`${resultUrl} 素材记录创建失败：${assetError.message}`);
+        failures.push(createSafeServerErrorMessage("生成结果素材记录创建"));
         continue;
       }
 
       assetIds.push(asset.id);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "未知错误";
-      failures.push(`${resultUrl} 转存异常：${message}`);
+    } catch {
+      failures.push(createSafeStorageErrorMessage("生成结果转存"));
     }
   }
 
@@ -191,7 +194,7 @@ export async function saveGeneratedResultAssets(
       .eq("id", input.jobId);
 
     if (updateError) {
-      failures.push(`生成任务素材关联失败：${updateError.message}`);
+      failures.push(createSafeServerErrorMessage("生成任务素材关联"));
     }
   }
 

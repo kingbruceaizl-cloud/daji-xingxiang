@@ -1,6 +1,7 @@
 import { getProjectsData } from "@/lib/projects";
 import { getCurrentUserId } from "@/lib/supabase/current-user";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createSafeServerErrorMessage } from "@/lib/server-error";
 import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 
@@ -50,7 +51,7 @@ export async function POST(request: Request) {
 
   if (error) {
     return NextResponse.json(
-      { ok: false, message: `创建项目失败：${error.message}` },
+      { ok: false, message: createSafeServerErrorMessage("创建项目") },
       { status: 400 },
     );
   }

@@ -1,4 +1,5 @@
 import { requireAdminAccess, parsePrice, parseTags } from "@/lib/admin-api";
+import { createSafeServerErrorMessage } from "@/lib/server-error";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -40,7 +41,7 @@ export async function POST(request: Request) {
 
     if (categoryError) {
       return NextResponse.json(
-        { ok: false, message: `商品分类保存失败：${categoryError.message}` },
+        { ok: false, message: createSafeServerErrorMessage("商品分类保存") },
         { status: 400 },
       );
     }
@@ -67,7 +68,7 @@ export async function POST(request: Request) {
 
   if (error) {
     return NextResponse.json(
-      { ok: false, message: `商品保存失败：${error.message}` },
+      { ok: false, message: createSafeServerErrorMessage("商品保存") },
       { status: 400 },
     );
   }

@@ -6,6 +6,8 @@ import type {
   JobStatusResult,
 } from "./types";
 
+import { createSafeServerErrorMessage } from "@/lib/server-error";
+
 function createFallbackJobId() {
   return `kie_pending_${Date.now().toString(36)}`;
 }
@@ -143,7 +145,7 @@ export const kieProvider: AiProvider = {
         model: payload.model,
         jobType: input.jobType,
         status: "failed",
-        message: `KIE 创建任务失败：${json.msg || response.statusText}`,
+        message: createSafeServerErrorMessage("KIE 创建任务"),
         createdAt: new Date().toISOString(),
       };
     }
@@ -188,7 +190,7 @@ export const kieProvider: AiProvider = {
         provider: "kie",
         providerJobId,
         status: "failed",
-        message: `KIE 查询任务失败：${json.msg || response.statusText}`,
+        message: createSafeServerErrorMessage("KIE 查询任务"),
         raw: json,
         updatedAt: new Date().toISOString(),
       };
@@ -198,7 +200,10 @@ export const kieProvider: AiProvider = {
       provider: "kie",
       providerJobId,
       status: normalizeKieState(data.state),
-      message: data.failMsg || json.msg || "KIE 任务状态已更新。",
+      message:
+        normalizeKieState(data.state) === "failed"
+          ? "KIE 任务失败，请在模型平台查看详情。"
+          : "KIE 任务状态已更新。",
       progress: data.progress,
       resultUrls: parseResultUrls(data.resultJson),
       raw: json,

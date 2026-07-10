@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentUserId } from "@/lib/supabase/current-user";
 import { hasEnvVars } from "@/lib/utils";
+import { createSafeServerErrorMessage } from "@/lib/server-error";
 import { redirect } from "next/navigation";
 
 export async function getAdminPageState() {
@@ -44,7 +45,7 @@ export async function getAdminPageState() {
       userId,
       role: null,
       allowed: false,
-      message: error ? `权限校验失败：${error.message}` : "当前账号没有后台资料。",
+      message: error ? createSafeServerErrorMessage("权限校验") : "当前账号没有后台资料。",
     };
   }
 

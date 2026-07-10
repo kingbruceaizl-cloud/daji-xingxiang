@@ -1,4 +1,5 @@
 import { requireAdminAccess, parseTags } from "@/lib/admin-api";
+import { createSafeServerErrorMessage } from "@/lib/server-error";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
 
   if (error) {
     return NextResponse.json(
-      { ok: false, message: `风格保存失败：${error.message}` },
+      { ok: false, message: createSafeServerErrorMessage("风格保存") },
       { status: 400 },
     );
   }

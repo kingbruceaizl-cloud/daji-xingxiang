@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentUserId } from "@/lib/supabase/current-user";
+import { createSafeServerErrorMessage } from "@/lib/server-error";
 import { NextResponse } from "next/server";
 
 export function requireAdminClient() {
@@ -52,7 +53,7 @@ export async function requireAdminAccess() {
       supabase: null,
       userId,
       response: NextResponse.json(
-        { ok: false, message: `权限校验失败：${error.message}` },
+        { ok: false, message: createSafeServerErrorMessage("权限校验") },
         { status: 403 },
       ),
     };

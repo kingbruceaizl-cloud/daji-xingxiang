@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { saveGeneratedResultAssets } from "@/lib/ai/result-assets";
+import { createSafeServerErrorMessage } from "@/lib/server-error";
 
 type KieCallbackPayload = {
   code?: number;
@@ -111,7 +112,7 @@ export async function POST(request: Request) {
   const status = normalizeStatus(data.state || data.status || payload.state || payload.status);
   const resultUrls = parseResultUrls(data.resultJson || payload.resultJson);
   const errorMessage =
-    data.failMsg || data.errorMessage || payload.failMsg || payload.errorMessage || null;
+    status === "failed" ? "KIE 回调通知任务失败，请在模型平台查看详情。" : null;
 
   if (!taskId) {
     return NextResponse.json(
@@ -139,7 +140,7 @@ export async function POST(request: Request) {
 
   if (findError) {
     return NextResponse.json(
-      { ok: false, message: `KIE 回调查询任务失败：${findError.message}` },
+      { ok: false, message: createSafeServerErrorMessage("KIE 回调查询任务") },
       { status: 500 },
     );
   }
@@ -189,7 +190,7 @@ export async function POST(request: Request) {
 
   if (updateError) {
     return NextResponse.json(
-      { ok: false, message: `KIE 回调更新任务失败：${updateError.message}` },
+      { ok: false, message: createSafeServerErrorMessage("KIE 回调更新任务") },
       { status: 500 },
     );
   }
@@ -212,7 +213,7 @@ export async function POST(request: Request) {
 
   if (eventError) {
     return NextResponse.json(
-      { ok: false, message: `KIE 回调写入任务事件失败：${eventError.message}` },
+      { ok: false, message: createSafeServerErrorMessage("KIE 回调写入任务事件") },
       { status: 500 },
     );
   }

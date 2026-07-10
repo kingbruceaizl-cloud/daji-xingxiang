@@ -5,6 +5,7 @@ import {
   realAiProviderRequiresLogin,
 } from "@/lib/ai/access";
 import { persistAiJob } from "@/lib/ai/persistence";
+import { createSafeServerErrorMessage } from "@/lib/server-error";
 import { getCurrentUserId } from "@/lib/supabase/current-user";
 import { NextResponse } from "next/server";
 
@@ -56,8 +57,10 @@ export async function POST(request: Request) {
     const persistence = await persistAiJob(input, job);
 
     return NextResponse.json({ ok: true, job, persistence });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "创建视频任务失败";
-    return NextResponse.json({ ok: false, message }, { status: 400 });
+  } catch {
+    return NextResponse.json(
+      { ok: false, message: createSafeServerErrorMessage("创建视频任务") },
+      { status: 400 },
+    );
   }
 }

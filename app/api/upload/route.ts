@@ -1,4 +1,8 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  createSafeServerErrorMessage,
+  createSafeStorageErrorMessage,
+} from "@/lib/server-error";
 import { getCurrentUserId } from "@/lib/supabase/current-user";
 import {
   isUploadBucket,
@@ -75,7 +79,7 @@ async function validateBucketAccess(
 
   if (error) {
     return NextResponse.json(
-      { ok: false, message: `素材权限校验失败：${error.message}` },
+      { ok: false, message: createSafeServerErrorMessage("素材权限校验") },
       { status: 403 },
     );
   }
@@ -168,7 +172,7 @@ export async function POST(request: Request) {
 
   if (uploadError) {
     return NextResponse.json(
-      { ok: false, message: `上传失败：${uploadError.message}` },
+      { ok: false, message: createSafeStorageErrorMessage("上传") },
       { status: 400 },
     );
   }
@@ -200,7 +204,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         ok: false,
-        message: `文件已上传，但素材记录创建失败：${assetError.message}`,
+        message: createSafeServerErrorMessage("素材记录创建"),
       },
       { status: 400 },
     );

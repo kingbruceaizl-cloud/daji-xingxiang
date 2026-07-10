@@ -1,4 +1,5 @@
 import { requireAdminAccess } from "@/lib/admin-api";
+import { createSafeServerErrorMessage } from "@/lib/server-error";
 import { NextResponse } from "next/server";
 
 function parseCapabilities(value: unknown) {
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
 
   if (providerError) {
     return NextResponse.json(
-      { ok: false, message: `模型通道保存失败：${providerError.message}` },
+      { ok: false, message: createSafeServerErrorMessage("模型通道保存") },
       { status: 400 },
     );
   }
@@ -74,7 +75,7 @@ export async function POST(request: Request) {
 
   if (error) {
     return NextResponse.json(
-      { ok: false, message: `模型保存失败：${error.message}` },
+      { ok: false, message: createSafeServerErrorMessage("模型保存") },
       { status: 400 },
     );
   }

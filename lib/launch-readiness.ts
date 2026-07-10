@@ -1,5 +1,9 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getDeploymentInfo, type DeploymentInfo } from "@/lib/deployment-info";
+import {
+  createSafeServerErrorMessage,
+  createSafeStorageErrorMessage,
+} from "@/lib/server-error";
 
 type CheckStatus = "ready" | "warning" | "missing";
 
@@ -274,7 +278,7 @@ async function createDatabaseCheck(): Promise<LaunchCheckItem> {
     required: true,
     status: error ? "warning" : "ready",
     detail: error
-      ? `连接失败或表未迁移：${error.message}`
+      ? createSafeServerErrorMessage("数据库连接检查")
       : "连接正常，基础表可访问。",
   };
 }
@@ -300,7 +304,7 @@ async function createStorageCheck(): Promise<LaunchCheckItem> {
       label: "素材存储桶",
       required: true,
       status: "warning",
-      detail: `存储桶检查失败：${error.message}`,
+      detail: createSafeStorageErrorMessage("存储桶检查"),
     };
   }
 

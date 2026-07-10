@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createSafeServerErrorMessage } from "@/lib/server-error";
 import type { CreateJobInput, CreateJobResult } from "./types";
 
 type PersistResult = {
@@ -35,7 +36,7 @@ export async function persistAiJob(
   if (error) {
     return {
       status: "failed",
-      message: `任务返回成功，但写入 Supabase 失败：${error.message}`,
+      message: createSafeServerErrorMessage("任务写入"),
     };
   }
 

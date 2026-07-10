@@ -563,6 +563,8 @@ requireIncludes("lib/launch-readiness.ts", launchReadiness, [
   "getDeploymentInfo",
   "deployment: DeploymentInfo",
   "deployment: getDeploymentInfo()",
+  "createSafeServerErrorMessage",
+  "createSafeStorageErrorMessage",
   "requiredBucketSettings",
   "file_size_limit",
   "allowed_mime_types",
@@ -607,6 +609,14 @@ requireIncludes("lib/auth-error.ts", authError, [
   "操作过于频繁，请稍后再试。",
 ]);
 
+const serverError = requireFile("lib/server-error.ts");
+requireIncludes("lib/server-error.ts", serverError, [
+  "createSafeServerErrorMessage",
+  "createSafeStorageErrorMessage",
+  "失败，请稍后重试。",
+  "失败，请检查存储配置后重试。",
+]);
+
 const deploymentInfo = requireFile("lib/deployment-info.ts");
 requireIncludes("lib/deployment-info.ts", deploymentInfo, [
   "getDeploymentInfo",
@@ -645,6 +655,8 @@ requireIncludes("app/admin/launch/page.tsx", launchPage, [
 const kieCallback = requireFile("app/api/provider-callback/kie/route.ts");
 requireIncludes("app/api/provider-callback/kie/route.ts", kieCallback, [
   "KIE 回调已处理，生成任务状态已更新。",
+  "KIE 回调通知任务失败，请在模型平台查看详情。",
+  "createSafeServerErrorMessage",
   "provider_job_id",
   "job_events",
   "normalizedStatus",
@@ -657,6 +669,8 @@ requireIncludes("lib/ai/result-assets.ts", resultAssets, [
   "asset_files",
   "output_asset_ids",
   "createSignedUrl",
+  "createSafeServerErrorMessage",
+  "createSafeStorageErrorMessage",
   "sourceUrl",
 ]);
 
@@ -711,6 +725,8 @@ requireExcludes("app/protected/page.tsx", protectedPage, [
 
 const uploadApi = requireFile("app/api/upload/route.ts");
 requireIncludes("app/api/upload/route.ts", uploadApi, [
+  "createSafeServerErrorMessage",
+  "createSafeStorageErrorMessage",
   "isUploadBucket",
   "validateUploadFile",
   "validateUploadFileInput",
@@ -823,6 +839,7 @@ requireIncludes("app/api/generate/image/route.ts", imageGenerateRoute, [
   "normalizeAiProvider",
   "realAiProviderRequiresLogin",
   "createRealAiProviderLoginMessage",
+  "createSafeServerErrorMessage",
   "{ status: 401 }",
 ]);
 
@@ -831,6 +848,7 @@ requireIncludes("app/api/generate/video/route.ts", videoGenerateRoute, [
   "normalizeAiProvider",
   "realAiProviderRequiresLogin",
   "createRealAiProviderLoginMessage",
+  "createSafeServerErrorMessage",
   "videoConfigText",
   "videoTemplateName",
   "scriptTemplateName",
@@ -959,6 +977,7 @@ requireIncludes("docs/backend-requirements.md", backendRequirements, [
   "商品、音乐和生成结果素材桶仅允许 `owner` 或 `admin` 写入",
   "不能写入商品、音乐或生成结果等后台素材桶",
   "上传接口必须先校验文件类型和大小，再读取文件内容或写入存储",
+  "不直接暴露数据库、存储或第三方原始错误",
 ]);
 
 const frontendRequirements = requireFile("docs/frontend-requirements.md");
@@ -993,6 +1012,7 @@ for (const routeFile of [
   "app/api/generate/video/route.ts",
   "app/api/provider-callback/kie/route.ts",
   "lib/auth-error.ts",
+  "lib/server-error.ts",
   "lib/ai/access.ts",
   "lib/ai/display.ts",
   "lib/ai/result-assets.ts",
