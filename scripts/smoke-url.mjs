@@ -426,6 +426,15 @@ async function assertPrivateCacheHeaders(paths) {
   }
 }
 
+async function assertProtectedRedirect(path) {
+  const response = await fetch(`${baseUrl}${path}`, { redirect: "manual" });
+  const location = response.headers.get("location") || "";
+
+  if (![307, 308].includes(response.status) || !location.includes("/auth/login")) {
+    failures.push(`${path} 未登录访问应跳转到登录页。`);
+  }
+}
+
 async function main() {
   log("大吉形象线上地址冒烟测试");
   log("------------------------");
@@ -449,7 +458,7 @@ async function main() {
 
   await assertPage("/", "大吉形象");
   await assertHomeMetadata();
-  await assertPage("/projects/new", "创建客户形象设计项目");
+  await assertProtectedRedirect("/projects/new");
   await assertPage("/projects/demo-xinzhongshi", "项目详情");
   await assertPage("/projects/demo-xinzhongshi", "进入形象大师");
   await assertPage("/projects/demo-xinzhongshi", "演示生图模型");
@@ -467,7 +476,8 @@ async function main() {
   await assertPage("/studio/demo", "下载结果");
   await assertPage("/auth/login", "当前仅限团队邀请账号登录");
   await assertPage("/auth/sign-up", "当前仅限邀请注册");
-  await assertPage("/admin/launch", "上线体检");
+  await assertProtectedRedirect("/admin/launch");
+  await assertProtectedRedirect("/admin/team");
   await assertHealth();
   await assertCatalog();
   await assertWorkerGuard();

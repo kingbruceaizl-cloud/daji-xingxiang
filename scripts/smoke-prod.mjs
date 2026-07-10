@@ -145,8 +145,8 @@ async function assertDemoJobLookup() {
   const response = await fetch(`${baseUrl}/api/jobs/smoke-job-id`);
   const payload = await response.json();
 
-  if (response.status !== 400 || payload.ok) {
-    failures.push("/api/jobs/smoke-job-id 应拒绝无效任务编号。");
+  if (![400, 503].includes(response.status) || payload.ok) {
+    failures.push("/api/jobs/smoke-job-id 应拒绝无效或未连接的任务查询。");
   }
 }
 
@@ -463,20 +463,28 @@ async function assertPrivateCacheHeaders(paths) {
   }
 }
 
-async function assertProtectedRedirect(path) {
+async function assertProtectedOrDemo(path, expectedDemoText) {
   const response = await fetch(`${baseUrl}${path}`, { redirect: "manual" });
   const location = response.headers.get("location") || "";
 
-  if (![307, 308].includes(response.status) || !location.includes("/auth/login")) {
-    failures.push(`${path} 未登录访问应跳转到登录页。`);
+  if ([307, 308].includes(response.status)) {
+    if (!location.includes("/auth/login")) {
+      failures.push(`${path} 未登录跳转地址异常。`);
+    }
+    return;
+  }
+
+  const text = await response.text();
+  if (!response.ok || !text.includes(expectedDemoText)) {
+    failures.push(`${path} 既未进入登录保护，也未返回安全演示页面。`);
   }
 }
 
 async function runSmokeChecks() {
   await assertPage("/", "大吉形象");
   await assertHomeMetadata();
-  await assertProtectedRedirect("/protected");
-  await assertProtectedRedirect("/projects/new");
+  await assertProtectedOrDemo("/protected", "当前为本地演示模式");
+  await assertProtectedOrDemo("/projects/new", "创建客户形象设计项目");
   await assertPage("/projects/demo-xinzhongshi", "项目详情");
   await assertPage("/projects/demo-xinzhongshi", "进入形象大师");
   await assertPage("/projects/demo-xinzhongshi", "演示生图模型");
@@ -499,8 +507,8 @@ async function runSmokeChecks() {
   await assertPage("/studio/demo", "生成提示词");
   await assertPage("/auth/login", "当前仅限团队邀请账号登录");
   await assertPage("/auth/sign-up", "当前仅限邀请注册");
-  await assertProtectedRedirect("/admin/launch");
-  await assertProtectedRedirect("/admin/team");
+  await assertProtectedOrDemo("/admin/launch", "上线体检");
+  await assertProtectedOrDemo("/admin/team", "团队权限");
   await assertHealth();
   await assertCatalog();
   await assertWorkerGuard();
