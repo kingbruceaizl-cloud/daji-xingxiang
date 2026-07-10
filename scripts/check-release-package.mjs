@@ -212,7 +212,7 @@ requireIncludes("scripts/create-model-handoff.mjs", modelHandoff, [
   "daji-xingxiang-model-handoff.md",
   "ARK_API_KEY",
   "doubao-seedream-5-0-260128",
-  "默认能力路由",
+  "默认任务能力路由",
   "image_to_video",
   "OPENAI_API_KEY",
 ]);
