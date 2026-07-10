@@ -7,8 +7,15 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "中文 AI 形象设计、商品搭配和变装视频工作台",
     start_url: "/projects/new",
     display: "standalone",
-    background_color: "#fbfaf7",
-    theme_color: "#991b1b",
+    background_color: "#f7f6f3",
+    theme_color: "#c91d16",
+    icons: [
+      {
+        src: "/brand/daji-favicon.png",
+        sizes: "300x300",
+        type: "image/png",
+      },
+    ],
     lang: "zh-CN",
     categories: ["productivity", "business", "photo"],
   };

@@ -11,8 +11,8 @@ export async function AuthButton() {
   const user = data?.claims;
 
   return user ? (
-    <div className="flex items-center gap-4">
-      <span className="text-sm text-stone-600">{user.email}</span>
+    <div className="flex items-center gap-3">
+      <span className="hidden max-w-48 truncate text-sm text-[#6f6a65] sm:block">{user.email}</span>
       <LogoutButton />
     </div>
   ) : (
@@ -20,7 +20,7 @@ export async function AuthButton() {
       <Button asChild size="sm" variant={"outline"}>
         <Link href="/auth/login">登录</Link>
       </Button>
-      <Button asChild size="sm" variant={"default"}>
+      <Button asChild size="sm" variant={"default"} className="rounded-full px-4">
         <Link href="/auth/sign-up">注册</Link>
       </Button>
     </div>

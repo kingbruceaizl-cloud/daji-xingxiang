@@ -13,6 +13,7 @@ import {
   Sparkles,
   WandSparkles,
 } from "lucide-react";
+import { ProductHeader } from "@/components/brand/product-header";
 import Image from "next/image";
 import { connection } from "next/server";
 import Link from "next/link";
@@ -32,24 +33,27 @@ async function ProjectDetailContent({
     source === "supabase" ? "真实项目" : source === "local" ? "本地项目" : "演示项目";
 
   return (
-    <main className="min-h-screen bg-[#fbfaf7] text-stone-950">
-      <header className="border-b border-stone-200 bg-white">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5">
-          <Link href="/projects" className="flex items-center gap-3 text-sm font-semibold">
-            <ArrowLeft className="h-4 w-4" />
-            返回项目列表
-          </Link>
-          <Link
-            href={studioHref}
-            className="inline-flex items-center gap-2 rounded-md bg-stone-950 px-4 py-2 text-sm font-medium text-white"
-          >
-            <WandSparkles className="h-4 w-4" />
-            进入形象大师
-          </Link>
-        </div>
-      </header>
+    <main className="min-h-screen bg-[#f7f6f3] text-[#171513]">
+      <ProductHeader
+        section="项目详情"
+        action={
+          <div className="flex items-center gap-3">
+            <Link href="/projects" className="flex items-center gap-3 text-sm font-semibold">
+              <ArrowLeft className="h-4 w-4" />
+              <span className="hidden xl:inline">返回项目</span>
+            </Link>
+            <Link
+              href={studioHref}
+              className="brand-focus inline-flex h-10 items-center gap-2 whitespace-nowrap rounded-full bg-[#c91d16] px-4 text-sm font-semibold text-white hover:bg-[#a91410]"
+            >
+              <WandSparkles className="h-4 w-4" />
+              <span className="hidden sm:inline">进入形象大师</span>
+            </Link>
+          </div>
+        }
+      />
 
-      <div className="mx-auto grid max-w-7xl gap-6 px-5 py-8 lg:grid-cols-[1fr_360px]">
+      <div className="mx-auto grid max-w-7xl gap-6 px-5 py-8 lg:grid-cols-[1fr_360px] lg:px-8">
         <section className="space-y-6">
           <div className="rounded-md border border-stone-200 bg-white p-6">
             <p className="text-sm font-medium text-red-700">项目详情</p>
@@ -177,7 +181,7 @@ export default function ProjectDetailPage({
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-[#fbfaf7] p-8 text-stone-950">
+        <main className="min-h-screen bg-[#f7f6f3] p-8 text-[#171513]">
           正在打开项目详情...
         </main>
       }

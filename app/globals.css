@@ -4,25 +4,25 @@
 
 @layer base {
   :root {
-    --background: 45 33% 98%;
-    --foreground: 24 10% 10%;
+    --background: 40 18% 96%;
+    --foreground: 30 8% 8%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
-    --primary: 0 74% 28%;
+    --primary: 2 80% 44%;
     --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
+    --secondary: 35 15% 94%;
     --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 42 52% 92%;
+    --muted: 35 15% 94%;
+    --muted-foreground: 28 5% 42%;
+    --accent: 3 74% 95%;
     --accent-foreground: 0 0% 9%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
+    --border: 30 10% 88%;
+    --input: 30 10% 84%;
+    --ring: 2 80% 44%;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -64,5 +64,47 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-noto-sans-sc), "PingFang SC", "Microsoft YaHei", sans-serif;
+    letter-spacing: 0;
+  }
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-montserrat), var(--font-noto-sans-sc), "PingFang SC", sans-serif;
+    letter-spacing: 0;
+  }
+  ::selection {
+    background: rgb(201 29 22 / 18%);
+    color: #171513;
+  }
+}
+
+@layer utilities {
+  .brand-focus {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
+  }
+  .text-red-700 {
+    color: #c91d16;
+  }
+  .bg-red-700 {
+    background-color: #c91d16;
+  }
+  .border-red-200 {
+    border-color: rgb(201 29 22 / 24%);
+  }
+  .hover\:bg-red-800:hover {
+    background-color: #a91410;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

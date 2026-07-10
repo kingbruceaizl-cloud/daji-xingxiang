@@ -1,5 +1,23 @@
 # 线上素材来源记录
 
+## 大吉形象品牌素材
+
+用户已确认本项目可以使用大吉形象官网现有 LOGO、图片和品牌素材。当前品牌素材来源于：https://dajixx.com/
+
+- 品牌标志：https://dajixx.com/wp-content/uploads/2026/05/logo.png
+- 白色品牌标志：https://dajixx.com/wp-content/uploads/2026/05/white-logo.png
+- 品牌图标：https://dajixx.com/wp-content/uploads/2026/05/djxx-favicon-300x300.png
+- 白云门店：https://dajixx.com/wp-content/uploads/2026/05/store-baiyun.jpg
+- 场合服饰：https://dajixx.com/wp-content/uploads/2026/05/occasion-wear.jpg
+- 团队服务：https://dajixx.com/wp-content/uploads/2026/05/team-service.jpg
+- 形象咨询：https://dajixx.com/wp-content/uploads/2026/05/image-consultation.jpg
+- 妆造服务：https://dajixx.com/wp-content/uploads/2026/05/makeup-and-styling.jpg
+- 量体服务：https://dajixx.com/wp-content/uploads/2026/05/body-measurements.jpg
+- 联营服务：https://dajixx.com/wp-content/uploads/2026/05/allied-business.jpg
+- 引号图形：https://dajixx.com/wp-content/uploads/2026/05/quote-1.png
+
+以上文件已保存到 `/public/brand/`，用于品牌首页、登录入口和产品演示。正式商业发布前仍需由品牌方确认素材使用范围和最新版本。
+
 MVP 页面目前使用 Pexels 公开图片作为示例素材。后续正式上线前，建议替换为自有商品图、授权模特图或 AI 生成的品牌素材。
 
 ## 授权说明

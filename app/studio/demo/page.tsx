@@ -17,7 +17,7 @@ export default function StudioDemoPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-[#fbfaf7] p-8 text-stone-950">
+        <main className="min-h-screen bg-[#f7f6f3] p-8 text-[#171513]">
           正在打开形象大师演示...
         </main>
       }

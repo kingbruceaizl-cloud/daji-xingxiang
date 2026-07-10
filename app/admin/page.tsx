@@ -7,7 +7,8 @@ import { getCatalogData } from "@/lib/catalog";
 import { getCategoryIcon } from "@/lib/category-icons";
 import { getAdminPageState } from "@/lib/admin-page";
 import { AdminGuardMessage } from "@/components/admin/admin-guard-message";
-import { ArrowLeft, Plus, Search } from "lucide-react";
+import { ProductHeader } from "@/components/brand/product-header";
+import { Plus, Search } from "lucide-react";
 import Image from "next/image";
 import { connection } from "next/server";
 import Link from "next/link";
@@ -33,24 +34,21 @@ async function AdminContent() {
   };
 
   return (
-    <main className="min-h-screen bg-[#fbfaf7] text-stone-950">
-      <header className="border-b border-stone-200 bg-white">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5">
-          <Link href="/" className="flex items-center gap-3 text-sm font-semibold">
-            <ArrowLeft className="h-4 w-4" />
-            返回大吉形象
-          </Link>
+    <main className="min-h-screen bg-[#f7f6f3] text-[#171513]">
+      <ProductHeader
+        section="后台控制台"
+        action={
           <Link
             href="/admin/products"
-            className="inline-flex items-center gap-2 rounded-md bg-stone-950 px-4 py-2 text-sm font-medium text-white"
+            className="brand-focus inline-flex h-10 items-center gap-2 whitespace-nowrap rounded-full bg-[#c91d16] px-4 text-sm font-semibold text-white hover:bg-[#a91410]"
           >
             <Plus className="h-4 w-4" />
             新增配置
           </Link>
-        </div>
-      </header>
+        }
+      />
 
-      <div className="mx-auto max-w-7xl px-5 py-8">
+      <div className="mx-auto max-w-7xl px-5 py-8 lg:px-8">
         <section className="mb-8 rounded-md border border-stone-200 bg-white p-6">
           <p className="text-sm font-medium text-red-700">后台控制台</p>
           <h1 className="mt-2 text-3xl font-semibold">
@@ -214,7 +212,7 @@ export default function AdminPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-[#fbfaf7] p-8 text-stone-950">
+        <main className="min-h-screen bg-[#f7f6f3] p-8 text-[#171513]">
           正在加载后台控制台...
         </main>
       }

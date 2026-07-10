@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Montserrat, Noto_Sans_SC } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
@@ -18,6 +18,10 @@ export const metadata: Metadata = {
   description: "面向形象顾问的 AI 形象设计与变装视频工作台",
   applicationName: "大吉形象",
   manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/brand/daji-favicon.png",
+    apple: "/brand/daji-favicon.png",
+  },
   openGraph: {
     title: "大吉形象",
     description: "中文 AI 形象设计、商品搭配和变装视频工作台",
@@ -27,8 +31,14 @@ export const metadata: Metadata = {
   },
 };
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const notoSans = Noto_Sans_SC({
+  variable: "--font-noto-sans-sc",
+  display: "swap",
+  subsets: ["latin"],
+});
+
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
   display: "swap",
   subsets: ["latin"],
 });
@@ -40,11 +50,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
-      <body className={`${geistSans.className} antialiased`}>
+      <body className={`${notoSans.variable} ${montserrat.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="light"
+          enableSystem={false}
           disableTransitionOnChange
         >
           {children}

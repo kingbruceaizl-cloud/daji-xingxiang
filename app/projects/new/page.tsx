@@ -1,20 +1,22 @@
+import { ProductHeader } from "@/components/brand/product-header";
 import { NewProjectForm } from "@/components/projects/new-project-form";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 export default function NewProjectPage() {
   return (
-    <main className="min-h-screen bg-[#fbfaf7] text-stone-950">
-      <header className="border-b border-stone-200 bg-white">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5">
+    <main className="min-h-screen bg-[#f7f6f3] text-[#171513]">
+      <ProductHeader
+        section="新建项目"
+        action={
           <Link href="/projects" className="flex items-center gap-3 text-sm font-semibold">
             <ArrowLeft className="h-4 w-4" />
-            返回项目列表
+            <span className="hidden sm:inline">返回项目列表</span>
           </Link>
-        </div>
-      </header>
+        }
+      />
 
-      <div className="mx-auto grid max-w-7xl gap-8 px-5 py-8 lg:grid-cols-[0.85fr_1.15fr]">
+      <div className="mx-auto grid max-w-7xl gap-8 px-5 py-8 lg:grid-cols-[0.85fr_1.15fr] lg:px-8">
         <section className="rounded-md border border-stone-200 bg-white p-6">
           <p className="text-sm font-medium text-red-700">新建项目</p>
           <h1 className="mt-2 text-3xl font-semibold">创建客户形象设计项目。</h1>

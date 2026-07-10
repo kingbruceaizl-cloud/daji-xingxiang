@@ -20,24 +20,15 @@ import {
 } from "lucide-react";
 
 export const publicImages = {
-  portrait:
-    "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=900",
-  hair:
-    "https://images.pexels.com/photos/2983464/pexels-photo-2983464.jpeg?auto=compress&cs=tinysrgb&w=900",
-  flatlay:
-    "https://images.pexels.com/photos/934063/pexels-photo-934063.jpeg?auto=compress&cs=tinysrgb&w=900",
-  rack:
-    "https://images.pexels.com/photos/1884584/pexels-photo-1884584.jpeg?auto=compress&cs=tinysrgb&w=900",
-  makeup:
-    "https://images.pexels.com/photos/37356602/pexels-photo-37356602.jpeg?auto=compress&cs=tinysrgb&w=900",
-  pants:
-    "https://images.pexels.com/photos/3927390/pexels-photo-3927390.jpeg?auto=compress&cs=tinysrgb&w=900",
-  shoes:
-    "https://images.pexels.com/photos/336372/pexels-photo-336372.jpeg?auto=compress&cs=tinysrgb&w=900",
-  bag:
-    "https://images.pexels.com/photos/28973056/pexels-photo-28973056.jpeg?auto=compress&cs=tinysrgb&w=900",
-  cameraProp:
-    "https://images.pexels.com/photos/18530979/pexels-photo-18530979.jpeg?auto=compress&cs=tinysrgb&w=900",
+  portrait: "/brand/image-consultation.jpg",
+  hair: "/brand/makeup-and-styling.jpg",
+  flatlay: "/brand/body-measurements.jpg",
+  rack: "/brand/occasion-wear.jpg",
+  makeup: "/brand/makeup-and-styling.jpg",
+  pants: "/brand/occasion-wear.jpg",
+  shoes: "/brand/team-service.jpg",
+  bag: "/brand/image-consultation.jpg",
+  cameraProp: "/brand/team-service.jpg",
 };
 
 export const stats = [

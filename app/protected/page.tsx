@@ -71,10 +71,10 @@ async function ProtectedContent() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-md border border-stone-200 bg-white p-6">
+      <section className="rounded-md border border-[#e6e2dd] bg-white p-6">
         <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
           <div>
-            <p className="text-sm font-medium text-red-700">今日工作台</p>
+            <p className="text-sm font-semibold text-[#c91d16]">今日工作台</p>
             <h1 className="mt-2 text-3xl font-semibold">
               形象项目、生成任务和后台配置都在这里。
             </h1>
@@ -88,7 +88,7 @@ async function ProtectedContent() {
           <div className="flex flex-wrap gap-3">
             <Link
               href="/projects/new"
-              className="inline-flex items-center gap-2 rounded-md bg-stone-950 px-4 py-2 text-sm font-medium text-white"
+              className="brand-focus inline-flex h-11 items-center gap-2 rounded-full bg-[#c91d16] px-5 text-sm font-semibold text-white hover:bg-[#a91410]"
             >
               新建设计
               <ArrowRight className="h-4 w-4" />
@@ -242,7 +242,7 @@ async function ProtectedContent() {
 
       <Link
         href="/projects/new"
-        className="fixed bottom-5 right-5 inline-flex items-center gap-2 rounded-full bg-red-700 px-5 py-3 text-sm font-medium text-white shadow-lg shadow-red-900/20"
+        className="brand-focus fixed bottom-5 right-5 inline-flex items-center gap-2 rounded-full bg-[#c91d16] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-black/10 hover:bg-[#a91410]"
       >
         <PlayCircle className="h-4 w-4" />
         开始生成

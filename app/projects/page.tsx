@@ -1,5 +1,6 @@
 import { getProjectsData } from "@/lib/projects";
-import { ArrowLeft, CalendarClock, Plus } from "lucide-react";
+import { ProductHeader } from "@/components/brand/product-header";
+import { CalendarClock, Plus } from "lucide-react";
 import Image from "next/image";
 import { connection } from "next/server";
 import Link from "next/link";
@@ -11,24 +12,21 @@ async function ProjectsContent() {
   const { projects, source } = await getProjectsData();
 
   return (
-    <main className="min-h-screen bg-[#fbfaf7] text-stone-950">
-      <header className="border-b border-stone-200 bg-white">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5">
-          <Link href="/" className="flex items-center gap-3 text-sm font-semibold">
-            <ArrowLeft className="h-4 w-4" />
-            返回大吉形象
-          </Link>
+    <main className="min-h-screen bg-[#f7f6f3] text-[#171513]">
+      <ProductHeader
+        section="客户项目"
+        action={
           <Link
             href="/projects/new"
-            className="inline-flex items-center gap-2 rounded-md bg-stone-950 px-4 py-2 text-sm font-medium text-white"
+            className="brand-focus inline-flex h-10 items-center gap-2 whitespace-nowrap rounded-full bg-[#c91d16] px-4 text-sm font-semibold text-white hover:bg-[#a91410]"
           >
             <Plus className="h-4 w-4" />
             新建项目
           </Link>
-        </div>
-      </header>
+        }
+      />
 
-      <div className="mx-auto max-w-7xl px-5 py-8">
+      <div className="mx-auto max-w-7xl px-5 py-8 lg:px-8">
         <section className="mb-8 rounded-md border border-stone-200 bg-white p-6">
           <p className="text-sm font-medium text-red-700">项目列表</p>
           <h1 className="mt-2 text-3xl font-semibold">
@@ -47,14 +45,14 @@ async function ProjectsContent() {
             <Link
               key={project.name}
               href={project.id ? `/projects/${project.id}` : "/projects/demo-xinzhongshi"}
-              className="overflow-hidden rounded-md border border-stone-200 bg-white"
+              className="group overflow-hidden rounded-md border border-[#e6e2dd] bg-white transition-colors hover:border-[#c91d16]/30"
             >
               <Image
                 src={project.cover}
                 alt={project.name}
                 width={640}
                 height={480}
-                className="aspect-[4/3] w-full object-cover"
+                className="aspect-[4/3] w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
               />
               <div className="p-5">
                 <h2 className="font-semibold">{project.name}</h2>
@@ -80,7 +78,7 @@ export default function ProjectsPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-[#fbfaf7] p-8 text-stone-950">
+        <main className="min-h-screen bg-[#f7f6f3] p-8 text-[#171513]">
           正在加载项目列表...
         </main>
       }
