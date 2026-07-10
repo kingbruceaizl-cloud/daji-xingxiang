@@ -13,7 +13,8 @@
 
 1. `supabase/migrations/0001_initial_schema.sql`
 2. `supabase/migrations/0002_auth_storage_and_indexes.sql`
-3. `supabase/seed/0001_seed_demo_data.sql`
+3. `supabase/migrations/0003_model_task_routes.sql`
+4. `supabase/seed/0001_seed_demo_data.sql`
 
 也可以在本地运行以下命令，把三段 SQL 合并输出后复制到 SQL Editor：
 
@@ -29,7 +30,7 @@ dist/daji-xingxiang-supabase-init.sql
 
 创建 Supabase 项目后，可直接复制该文件全部内容到 SQL Editor 执行。
 
-执行完成后，复制验收 SQL 到 SQL Editor，检查表、RLS、RLS 策略、存储桶配置、存储对象策略、模型通道和种子数据：
+执行完成后，复制验收 SQL 到 SQL Editor，检查表、RLS、RLS 策略、存储桶配置、存储对象策略、模型通道、模型能力路由和种子数据：
 
 ```text
 dist/daji-xingxiang-supabase-verify.sql

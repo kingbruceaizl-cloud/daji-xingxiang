@@ -300,6 +300,15 @@ requireIncludes("scripts/create-supabase-sql-bundle.mjs", supabaseSqlBundle, [
   "Supabase SQL Editor",
 ]);
 
+const supabaseSqlPrint = requireFile("scripts/print-supabase-sql.mjs");
+requireIncludes("scripts/print-supabase-sql.mjs", supabaseSqlPrint, [
+  "大吉形象 Supabase 初始化 SQL",
+  "supabase/migrations/0001_initial_schema.sql",
+  "supabase/migrations/0002_auth_storage_and_indexes.sql",
+  "supabase/migrations/0003_model_task_routes.sql",
+  "supabase/seed/0001_seed_demo_data.sql",
+]);
+
 const supabaseVerifySql = requireFile("scripts/create-supabase-verify-sql.mjs");
 requireIncludes("scripts/create-supabase-verify-sql.mjs", supabaseVerifySql, [
   "大吉形象 Supabase 验收 SQL 生成",
