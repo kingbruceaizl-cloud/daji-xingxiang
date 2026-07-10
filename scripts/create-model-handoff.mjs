@@ -5,9 +5,13 @@ import { spawnSync } from "node:child_process";
 const distDir = resolve(process.cwd(), "dist");
 const outputPath = resolve(distDir, "daji-xingxiang-model-handoff.md");
 const modelEnvKeys = [
-  "KIE_BASE_URL",
-  "KIE_API_KEY",
-  "KIE_CALLBACK_SECRET",
+  "AI_EXECUTION_MODE",
+  "ARK_BASE_URL",
+  "ARK_API_KEY",
+  "ARK_TEXT_MODEL_ID",
+  "ARK_IMAGE_MODEL_ID",
+  "ARK_VIDEO_MODEL_ID",
+  "CRON_SECRET",
   "OPENAI_API_KEY",
   "JIMENG_API_KEY",
   "KLING_API_KEY",
@@ -21,10 +25,7 @@ function run(command, args) {
     stdio: ["ignore", "pipe", "pipe"],
   });
 
-  return {
-    ok: result.status === 0,
-    stdout: result.stdout.trim(),
-  };
+  return result.status === 0 ? result.stdout.trim() : "";
 }
 
 function loadEnvFile(fileName) {
@@ -34,8 +35,7 @@ function loadEnvFile(fileName) {
   }
 
   const env = {};
-  const content = readFileSync(filePath, "utf8");
-  for (const line of content.split(/\r?\n/)) {
+  for (const line of readFileSync(filePath, "utf8").split(/\r?\n/)) {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith("#") || !trimmed.includes("=")) {
       continue;
@@ -49,23 +49,24 @@ function loadEnvFile(fileName) {
 }
 
 function isPlaceholder(value) {
-  const normalized = String(value || "").trim();
-
+  const normalized = String(value || "").trim().toLowerCase();
   return (
     !normalized ||
     normalized.includes("你的") ||
+    normalized.includes("填写") ||
     normalized.includes("localhost") ||
-    normalized.includes("127.0.0.1")
+    normalized.includes("<") ||
+    normalized.includes(">")
   );
 }
 
-function getMergedEnv() {
+function mergedEnv() {
   const env = {
     ...loadEnvFile(".env.production"),
     ...loadEnvFile(".env.local"),
   };
 
-  for (const key of ["NEXT_PUBLIC_APP_URL", ...modelEnvKeys]) {
+  for (const key of modelEnvKeys) {
     if (process.env[key]) {
       env[key] = process.env[key];
     }
@@ -75,99 +76,51 @@ function getMergedEnv() {
 }
 
 function statusFor(key, env) {
+  if (key === "AI_EXECUTION_MODE") {
+    return env[key] === "real" ? "已配置" : "待配置";
+  }
   return isPlaceholder(env[key]) ? "待配置" : "已配置";
 }
 
 console.log("大吉形象 AI 模型通道交接单生成");
 console.log("--------------------------------");
 
-const branch = run("git", ["branch", "--show-current"]);
-const latestCommit = run("git", ["log", "--oneline", "--decorate", "-1"]);
-const env = getMergedEnv();
-const publicAppUrl = isPlaceholder(env.NEXT_PUBLIC_APP_URL)
-  ? "https://你的域名"
-  : String(env.NEXT_PUBLIC_APP_URL).replace(/\/+$/, "");
-const callbackUrl = `${publicAppUrl}/api/provider-callback/kie`;
-const configuredModelKeys = [
-  "KIE_API_KEY",
-  "OPENAI_API_KEY",
-  "JIMENG_API_KEY",
-  "KLING_API_KEY",
-  "TONGYI_API_KEY",
-].filter((key) => statusFor(key, env) === "已配置");
-
+const env = mergedEnv();
 const lines = [
   "# 大吉形象 AI 模型通道交接单",
   "",
   `生成时间：${new Date().toISOString()}`,
   "",
-  "该文件用于 AI 模型账号、密钥和回调配置交接，不输出任何真实密钥值。",
+  `- 当前分支：${run("git", ["branch", "--show-current"]) || "main"}`,
+  `- 当前提交：${run("git", ["log", "--oneline", "-1"]) || "未知"}`,
+  "- 正式 Provider：火山方舟（volcengine）",
+  "- 生图主模型：Seedream 5.0 完整版",
+  "- 当前生图模型 ID：`doubao-seedream-5-0-260128`",
+  "- KIE：不进入正式调用链路",
   "",
-  "## 当前代码状态",
-  "",
-  `- 当前分支：${branch.stdout || "main"}`,
-  `- 当前提交：${latestCommit.stdout || "未知"}`,
-  `- 已配置模型密钥状态：${
-    configuredModelKeys.length ? configuredModelKeys.join("、") : "待配置至少一个"
-  }`,
-  "",
-  "## 第一阶段推荐接入",
-  "",
-  "- 推荐优先接入：KIE",
-  "- 已实现能力：文生图、图生图、任务查询、KIE 回调处理、生成结果转存到 Supabase。",
-  "- 已接入模型：`gpt-image-2-text-to-image`、`gpt-image-2-image-to-image`。",
-  "- 视频模型：当前保留配置位，等确认具体 KIE 视频模型文档后接入。",
-  "- 工作台默认使用后台任务能力路由：文字生成、图片理解、文生图、图生图、图生视频、视频生成和长视频生成可以分别配置不同通道。",
-  "",
-  "## KIE 环境变量",
+  "## 火山方舟环境变量",
   "",
   "| 变量 | 当前状态 | 用途 |",
   "| --- | --- | --- |",
-  `| \`KIE_BASE_URL\` | ${statusFor("KIE_BASE_URL", env)} | KIE API 基础地址，默认可使用 \`https://api.kie.ai\` |`,
-  `| \`KIE_API_KEY\` | ${statusFor("KIE_API_KEY", env)} | 服务端调用 KIE 创建任务和查询任务 |`,
-  `| \`KIE_CALLBACK_SECRET\` | ${statusFor("KIE_CALLBACK_SECRET", env)} | 校验 KIE 回调请求，建议正式上线必须配置 |`,
-  `| \`NEXT_PUBLIC_APP_URL\` | ${statusFor("NEXT_PUBLIC_APP_URL", env)} | 生成公网回调地址，正式上线必须是 https 域名 |`,
+  `| \`AI_EXECUTION_MODE\` | ${statusFor("AI_EXECUTION_MODE", env)} | 生产环境固定为 \`real\` |`,
+  `| \`ARK_BASE_URL\` | ${statusFor("ARK_BASE_URL", env)} | 火山方舟 API 基础地址 |`,
+  `| \`ARK_API_KEY\` | ${statusFor("ARK_API_KEY", env)} | 服务端鉴权 |`,
+  `| \`ARK_TEXT_MODEL_ID\` | ${statusFor("ARK_TEXT_MODEL_ID", env)} | 文字与图片理解 |`,
+  `| \`ARK_IMAGE_MODEL_ID\` | ${statusFor("ARK_IMAGE_MODEL_ID", env)} | Seedream 生图 |`,
+  `| \`ARK_VIDEO_MODEL_ID\` | ${statusFor("ARK_VIDEO_MODEL_ID", env)} | Seedance 视频 |`,
+  `| \`CRON_SECRET\` | ${statusFor("CRON_SECRET", env)} | 后台任务 Worker 鉴权 |`,
   "",
-  "## KIE 回调配置",
+  "## 默认能力路由",
   "",
-  "在 KIE 控制台或创建任务参数中使用以下回调地址：",
-  "",
-  "```text",
-  callbackUrl,
-  "```",
-  "",
-  "项目回调入口：",
-  "",
-  "```http",
-  "POST /api/provider-callback/kie",
-  "```",
-  "",
-  "如果配置了 `KIE_CALLBACK_SECRET`，回调请求需要携带以下 Header，或使用任务创建时自动拼接的 `secret` 查询参数：",
-  "",
-  "```http",
-  "x-daji-callback-secret: <KIE_CALLBACK_SECRET>",
-  "```",
-  "",
-  "## 预留模型通道",
-  "",
-  "| 通道 | 环境变量 | 当前状态 | 说明 |",
-  "| --- | --- | --- | --- |",
-  `| OpenAI | \`OPENAI_API_KEY\` | ${statusFor("OPENAI_API_KEY", env)} | 预留文案、生图、多模态能力 |`,
-  `| 即梦 | \`JIMENG_API_KEY\` | ${statusFor("JIMENG_API_KEY", env)} | 预留图像和视频生成能力 |`,
-  `| 可灵 | \`KLING_API_KEY\` | ${statusFor("KLING_API_KEY", env)} | 预留视频生成能力 |`,
-  `| 通义 | \`TONGYI_API_KEY\` | ${statusFor("TONGYI_API_KEY", env)} | 预留图像、视频和文案能力 |`,
-  "",
-  "## 任务能力路由",
-  "",
-  "| 行动内容 | 路由键 | 推荐模型类型 |",
+  "| 行动内容 | 路由键 | 正式模型 |",
   "| --- | --- | --- |",
-  "| 生成形象方案、提示词和脚本 | `text_generation` | 文字生成模型 |",
-  "| 识别客户照片、商品图和参考图 | `image_understanding` | 图片理解模型 |",
-  "| 没有客户参考图时生成图片 | `text_to_image` | 文生图模型 |",
-  "| 基于客户照片生成形象图 | `image_to_image` | 图生图模型 |",
-  "| 基于形象图生成变装短视频 | `image_to_video` | 图生视频模型 |",
-  "| 根据脚本直接生成视频 | `video_generation` | 生视频模型 |",
-  "| 后续长视频扩展 | `long_video_generation` | 长视频模型 |",
+  "| 形象方案、提示词和脚本 | `text_generation` | `ARK_TEXT_MODEL_ID` |",
+  "| 客户图片理解 | `image_understanding` | `ARK_TEXT_MODEL_ID` |",
+  "| 文生图 | `text_to_image` | `ARK_IMAGE_MODEL_ID` |",
+  "| 图生图 | `image_to_image` | `ARK_IMAGE_MODEL_ID` |",
+  "| 图生视频 | `image_to_video` | `ARK_VIDEO_MODEL_ID` |",
+  "| 视频生成 | `video_generation` | `ARK_VIDEO_MODEL_ID` |",
+  "| 长视频 | `long_video_generation` | 暂不启用 |",
   "",
   "## 部署后验证",
   "",
@@ -176,21 +129,13 @@ const lines = [
   "SMOKE_BASE_URL=https://你的域名 pnpm run smoke:url",
   "```",
   "",
-  "然后打开：",
-  "",
-  "```text",
-  "/admin/launch",
-  "/admin/models",
-  "/studio/demo",
-  "```",
-  "",
-  "确认模型通道显示已配置，并用 KIE 图像模型创建一次真实生成任务。",
+  "确认 `/admin/launch` 和 `/admin/models` 显示火山方舟配置，Vercel Cron 可以调用 `/api/internal/ai-worker`，并分别完成一次文生图与图生图真实测试。",
   "",
   "## 安全要求",
   "",
-  "- 所有模型密钥只能填写在 Vercel 服务端环境变量中。",
-  "- 不要将模型密钥写入代码仓库、交付 Markdown 或浏览器可见变量。",
-  "- `KIE_CALLBACK_SECRET` 应使用随机强字符串，并和 KIE 回调配置保持一致。",
+  "- `ARK_API_KEY` 只能配置在服务端环境变量。",
+  "- 生产环境缺少密钥或模型 ID 时必须失败，不能返回 Mock。",
+  "- 不在交接文档、日志、任务快照或浏览器请求中输出密钥。",
   "",
 ];
 

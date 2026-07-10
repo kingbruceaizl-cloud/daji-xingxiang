@@ -4,6 +4,7 @@ import {
   isAiTaskRouteKey,
   type AiTaskRouteKey,
 } from "./model-routes";
+import { getAiExecutionMode } from "./execution-mode";
 
 type RequestedRoute = {
   provider?: unknown;
@@ -14,7 +15,7 @@ export type ResolvedAiModelRoute = {
   taskKey: AiTaskRouteKey;
   provider: string;
   model: string;
-  source: "manual" | "admin" | "demo";
+  source: "manual" | "admin" | "environment" | "demo";
   defaultParams: Record<string, unknown>;
 };
 
@@ -24,6 +25,26 @@ function cleanString(value: unknown) {
 
 function fallbackRoute(taskKey: AiTaskRouteKey): ResolvedAiModelRoute {
   const definition = getAiTaskRouteDefinition(taskKey);
+  const mode = getAiExecutionMode();
+
+  if (mode === "real") {
+    const modelByTask: Partial<Record<AiTaskRouteKey, string>> = {
+      text_generation: process.env.ARK_TEXT_MODEL_ID || "",
+      image_understanding: process.env.ARK_TEXT_MODEL_ID || "",
+      text_to_image: process.env.ARK_IMAGE_MODEL_ID || "",
+      image_to_image: process.env.ARK_IMAGE_MODEL_ID || "",
+      image_to_video: process.env.ARK_VIDEO_MODEL_ID || "",
+      video_generation: process.env.ARK_VIDEO_MODEL_ID || "",
+    };
+
+    return {
+      taskKey,
+      provider: "volcengine",
+      model: modelByTask[taskKey] || "",
+      source: "environment",
+      defaultParams: {},
+    };
+  }
 
   return {
     taskKey,
@@ -39,6 +60,7 @@ export async function resolveAiModelRoute(
   requested: RequestedRoute = {},
 ): Promise<ResolvedAiModelRoute> {
   const fallback = fallbackRoute(taskKey);
+  const executionMode = getAiExecutionMode();
   const requestedProvider = cleanString(requested.provider).toLowerCase();
   const requestedModel = cleanString(requested.model);
 
@@ -50,6 +72,11 @@ export async function resolveAiModelRoute(
       source: "manual",
       defaultParams: {},
     };
+  }
+
+
+  if (executionMode === "mock") {
+    return fallback;
   }
 
   const supabase = createAdminClient();

@@ -47,28 +47,84 @@ const variables = [
     note: "正式环境填写 production。",
   },
   {
-    key: "KIE_BASE_URL",
-    required: false,
-    browser: false,
-    source: "KIE 接口文档或供应商控制台",
-    target: "Vercel Production / Preview / Development",
-    note: "默认可使用 https://api.kie.ai。",
+    key: "NEXT_PUBLIC_ALLOW_PUBLIC_SIGNUP",
+    required: true,
+    browser: true,
+    source: "固定填写 false",
+    target: "Vercel Production",
+    note: "团队内测阶段关闭公开注册，员工由后台邀请。",
   },
   {
-    key: "KIE_API_KEY",
-    required: false,
+    key: "AI_EXECUTION_MODE",
+    required: true,
     browser: false,
-    source: "KIE 控制台",
-    target: "Vercel Production / Preview / Development",
-    note: "至少配置一个 AI 模型密钥；第一阶段建议优先配置 KIE。",
+    source: "固定填写 real",
+    target: "Vercel Production",
+    note: "正式环境必须为 real，禁止自动回退 Mock。",
   },
   {
-    key: "KIE_CALLBACK_SECRET",
+    key: "CRON_SECRET",
+    required: true,
+    browser: false,
+    source: "本地生成的至少 24 位随机字符串",
+    target: "Vercel Production / Preview / Development",
+    note: "Vercel Cron 调用后台任务 Worker 的鉴权密钥。",
+  },
+  {
+    key: "AI_WORKER_SECRET",
     required: false,
     browser: false,
-    source: "自行生成并同步给 KIE 回调配置",
+    source: "可选的独立 Worker 随机密钥",
     target: "Vercel Production / Preview / Development",
-    note: "用于校验模型回调请求。",
+    note: "未配置时后台 Worker 复用 CRON_SECRET。",
+  },
+  {
+    key: "AI_WORKER_BATCH_SIZE",
+    required: true,
+    browser: false,
+    source: "固定填写 1",
+    target: "Vercel Production / Preview / Development",
+    note: "单次领取任务数，当前建议为 1。",
+  },
+  {
+    key: "ARK_BASE_URL",
+    required: true,
+    browser: false,
+    source: "火山方舟快速 API 接入",
+    target: "Vercel Production / Preview / Development",
+    note: "默认使用北京地域 API 地址。",
+  },
+  {
+    key: "ARK_API_KEY",
+    required: true,
+    browser: false,
+    source: "火山方舟控制台",
+    target: "Vercel Production / Preview / Development",
+    note: "大吉形象 1.0 正式模型密钥。",
+  },
+  {
+    key: "ARK_TEXT_MODEL_ID",
+    required: true,
+    browser: false,
+    source: "火山方舟控制台",
+    target: "Vercel Production / Preview / Development",
+    note: "文字与图片理解模型的完整 ID。",
+  },
+  {
+    key: "ARK_IMAGE_MODEL_ID",
+    required: true,
+    browser: false,
+    source: "火山方舟控制台",
+    target: "Vercel Production / Preview / Development",
+    note: "Seedream 5.0 完整版模型 ID。",
+  },
+  {
+    key: "ARK_VIDEO_MODEL_ID",
+    required: true,
+    browser: false,
+    source: "火山方舟控制台",
+    target: "Vercel Production / Preview / Development",
+    note: "Seedance 视频模型的完整 ID。",
   },
   {
     key: "OPENAI_API_KEY",
@@ -105,7 +161,7 @@ const variables = [
 ];
 
 const aiKeys = [
-  "KIE_API_KEY",
+  "ARK_API_KEY",
   "OPENAI_API_KEY",
   "JIMENG_API_KEY",
   "KLING_API_KEY",
@@ -162,6 +218,10 @@ function mergeEnv() {
 function statusFor(key, env) {
   if (key === "NEXT_PUBLIC_APP_ENV") {
     return String(env[key] || "").trim() === "production" ? "已配置" : "待配置";
+  }
+
+  if (key === "NEXT_PUBLIC_ALLOW_PUBLIC_SIGNUP") {
+    return String(env[key] || "").trim() === "false" ? "已配置" : "待配置";
   }
 
   return isPlaceholder(env[key]) ? "待配置" : "已配置";
@@ -241,7 +301,7 @@ lines.push(
   "## 安全要求",
   "",
   "- 不要把 `.env.local`、`.env.production` 或任何真实密钥提交到 Git。",
-  "- `SUPABASE_SERVICE_ROLE_KEY`、模型密钥和回调密钥只能放在服务端环境变量中。",
+  "- `SUPABASE_SERVICE_ROLE_KEY`、模型密钥和 Worker 密钥只能放在服务端环境变量中。",
   "- 只有 `NEXT_PUBLIC_` 开头的变量可以被浏览器读取。",
   "",
 );

@@ -19,6 +19,7 @@ export type UploadedAsset = {
   title?: string;
   kind?: string;
   public_url?: string | null;
+  preview_url?: string | null;
   metadata?: {
     type?: string;
     size?: number;
@@ -73,7 +74,7 @@ export function UploadButton({
           new CustomEvent("daji:asset-uploaded", {
             detail: {
               asset: data.asset,
-              previewUrl: data.asset.public_url,
+              previewUrl: data.asset.preview_url || data.asset.public_url,
             },
           }),
         );

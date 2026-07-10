@@ -9,14 +9,15 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 const sampleModel = `{
-  "provider": "kie",
-  "providerDisplayName": "KIE",
-  "name": "gpt-image-2-image-to-image",
-  "displayName": "GPT Image 2 图生图",
-  "capabilities": "image_to_image",
+  "provider": "volcengine",
+  "providerDisplayName": "火山方舟（豆包）",
+  "name": "doubao-seedream-5-0-260128",
+  "displayName": "Seedream 5.0 完整版",
+  "capabilities": ["text_to_image", "image_to_image"],
   "defaultParams": {
-    "aspectRatio": "auto",
-    "quality": "high"
+    "size": "2K",
+    "sequential_image_generation": "disabled",
+    "watermark": false
   },
   "taskRoutes": [
     {
@@ -29,7 +30,7 @@ const sampleModel = `{
 }`;
 
 const modelFieldHints = [
-  "通道标识：用于服务端识别模型供应商，例如 kie。",
+  "通道标识：用于服务端识别模型供应商，正式通道使用 volcengine。",
   "通道显示名：后台和工作台展示给操作者看的名称。",
   "模型名称：供应商接口要求的模型标识。",
   "模型显示名：后台展示用的中文模型名称。",
@@ -64,7 +65,7 @@ async function AdminModelsContent() {
           <p className="text-sm font-medium text-red-700">模型配置</p>
           <h1 className="mt-2 text-3xl font-semibold">维护 AI 模型通道与模型能力。</h1>
           <p className="mt-3 text-sm leading-6 text-stone-500">
-            当前已预留 KIE、OpenAI、即梦、可灵和通义。密钥仍然只放在服务端环境变量。
+            当前正式通道为火山方舟，并预留 OpenAI、即梦、可灵和通义。密钥只放在服务端环境变量。
           </p>
           <div className="mt-6 space-y-3">
             <h2 className="text-sm font-semibold">模型通道</h2>

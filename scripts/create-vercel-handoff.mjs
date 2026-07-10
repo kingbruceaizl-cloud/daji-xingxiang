@@ -11,11 +11,18 @@ const requiredEnvKeys = [
   "SUPABASE_SERVICE_ROLE_KEY",
   "NEXT_PUBLIC_APP_URL",
   "NEXT_PUBLIC_APP_ENV",
+  "NEXT_PUBLIC_ALLOW_PUBLIC_SIGNUP",
+  "AI_EXECUTION_MODE",
+  "CRON_SECRET",
+  "AI_WORKER_BATCH_SIZE",
 ];
 const aiEnvKeys = [
-  "KIE_BASE_URL",
-  "KIE_API_KEY",
-  "KIE_CALLBACK_SECRET",
+  "AI_WORKER_SECRET",
+  "ARK_BASE_URL",
+  "ARK_API_KEY",
+  "ARK_TEXT_MODEL_ID",
+  "ARK_IMAGE_MODEL_ID",
+  "ARK_VIDEO_MODEL_ID",
   "OPENAI_API_KEY",
   "JIMENG_API_KEY",
   "KLING_API_KEY",
@@ -99,7 +106,7 @@ for (const key of requiredEnvKeys) {
   lines.push(`- \`${key}\``);
 }
 
-lines.push("", "### AI 模型通道变量", "", "至少先配置一个真实模型密钥，第一阶段建议优先配置 `KIE_API_KEY`。", "");
+lines.push("", "### AI 模型通道变量", "", "正式通道直连火山方舟，必须配置 API Key 和对应模型 ID。", "");
 
 for (const key of aiEnvKeys) {
   lines.push(`- \`${key}\``);
@@ -134,6 +141,7 @@ lines.push(
   "```",
   "",
   "4. 打开 `/admin/launch` 查看 Supabase、数据库、存储桶配置和模型通道状态。",
+  "5. 确认 Vercel Cron 每分钟调用 `/api/internal/ai-worker`，并在任务记录中看到后台领取事件。",
   "",
   "## GitHub Actions",
   "",

@@ -81,14 +81,21 @@ export type CatalogData = {
     provider: string;
     model: string;
     type: string;
+    rawType?: string;
     status: string;
+    rawStatus?: string;
     prompt: string;
     updatedAt: string;
     errorMessage?: string | null;
   }>;
 };
 
-function demoCatalog(): CatalogData {
+type CatalogOptions = {
+  jobScope?: "none" | "all" | "owner";
+  ownerId?: string | null;
+};
+
+function demoCatalog(options: CatalogOptions = {}): CatalogData {
   return {
     source: "demo",
     productCategories: productCategories.map((category) => ({
@@ -114,15 +121,17 @@ function demoCatalog(): CatalogData {
     videoTemplates,
     scriptTemplates,
     musicTracks,
-    jobs: generationJobs,
+    jobs: options.jobScope === "none" || !options.jobScope ? [] : generationJobs,
   };
 }
 
-export async function getCatalogData(): Promise<CatalogData> {
+export async function getCatalogData(
+  options: CatalogOptions = {},
+): Promise<CatalogData> {
   const supabase = createAdminClient();
 
   if (!supabase) {
-    return demoCatalog();
+    return demoCatalog(options);
   }
 
   const [
@@ -134,7 +143,6 @@ export async function getCatalogData(): Promise<CatalogData> {
     scriptTemplatesResult,
     musicTracksResult,
     modelRoutesResult,
-    jobsResult,
   ] = await Promise.all([
       supabase
         .from("product_categories")
@@ -181,12 +189,37 @@ export async function getCatalogData(): Promise<CatalogData> {
         .select("id,task_key,display_name,description,provider,model,is_active,updated_at")
         .eq("is_active", true)
         .order("created_at"),
-      supabase
-        .from("ai_jobs")
-        .select("id,provider,model,job_type,status,prompt,error_message,updated_at,created_at")
-        .order("created_at", { ascending: false })
-        .limit(16),
     ]);
+
+  let jobsResult: {
+    data: Array<{
+      id: string;
+      provider: string;
+      model: string;
+      job_type: string;
+      status: string;
+      prompt: string;
+      error_message: string | null;
+      updated_at: string;
+      created_at: string;
+    }> | null;
+    error: unknown;
+  } = { data: [], error: null };
+
+  if (options.jobScope === "all") {
+    jobsResult = await supabase
+      .from("ai_jobs")
+      .select("id,provider,model,job_type,status,prompt,error_message,updated_at,created_at")
+      .order("created_at", { ascending: false })
+      .limit(16);
+  } else if (options.jobScope === "owner" && options.ownerId) {
+    jobsResult = await supabase
+      .from("ai_jobs")
+      .select("id,provider,model,job_type,status,prompt,error_message,updated_at,created_at")
+      .eq("owner_id", options.ownerId)
+      .order("created_at", { ascending: false })
+      .limit(16);
+  }
 
   if (
     categoriesResult.error ||
@@ -199,7 +232,7 @@ export async function getCatalogData(): Promise<CatalogData> {
     modelRoutesResult.error ||
     jobsResult.error
   ) {
-    return demoCatalog();
+    return demoCatalog(options);
   }
 
   return {
@@ -274,7 +307,9 @@ export async function getCatalogData(): Promise<CatalogData> {
       provider: job.provider,
       model: job.model,
       type: formatJobTypeLabel(job.job_type),
+      rawType: job.job_type,
       status: formatJobStatusLabel(job.status),
+      rawStatus: job.status,
       prompt: job.prompt,
       updatedAt: job.updated_at || job.created_at,
       errorMessage: job.error_message,

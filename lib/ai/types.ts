@@ -1,11 +1,24 @@
 export type AiJobType =
+  | "text_generation"
+  | "image_understanding"
   | "text_to_image"
   | "image_to_image"
   | "image_to_video"
+  | "video_generation"
+  | "long_video_generation"
   | "video_render"
   | "copywriting";
 
-export type AiJobStatus = "queued" | "running" | "succeeded" | "failed";
+export type AiJobStatus =
+  | "pending"
+  | "queued"
+  | "submitting"
+  | "running"
+  | "persisting"
+  | "retrying"
+  | "succeeded"
+  | "failed"
+  | "canceled";
 
 export type CreateJobInput = {
   provider?: string;
@@ -18,6 +31,9 @@ export type CreateJobInput = {
   styleName?: string;
   callbackUrl?: string;
   ownerId?: string | null;
+  localJobId?: string;
+  idempotencyKey?: string;
+  inputAssetIds?: string[];
   modelRouteKey?: string;
   modelRouteSource?: string;
   modelRouteParams?: Record<string, unknown>;
@@ -31,8 +47,28 @@ export type CreateJobResult = {
   status: AiJobStatus;
   message: string;
   previewUrl?: string;
+  resultUrls?: string[];
   providerJobId?: string;
+  providerMetadata?: Record<string, unknown>;
+  textOutput?: string;
+  structuredOutput?: Record<string, unknown>;
+  outputAssetIds?: string[];
+  outputAssets?: Array<{
+    id: string;
+    kind: string;
+    title: string | null;
+    url: string | null;
+  }>;
   createdAt: string;
+};
+
+export type AiWorkerRunResult = {
+  workerId: string;
+  claimed: number;
+  succeeded: number;
+  deferred: number;
+  retrying: number;
+  failed: number;
 };
 
 export type JobStatusResult = {

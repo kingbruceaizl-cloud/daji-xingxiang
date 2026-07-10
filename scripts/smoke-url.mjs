@@ -148,6 +148,19 @@ async function assertCatalog() {
   if (!Array.isArray(data.products) || data.products.length < 8) {
     failures.push("/api/catalog 示例商品不足。");
   }
+
+  if (!Array.isArray(data.jobs) || data.jobs.length !== 0) {
+    failures.push("/api/catalog 公共目录不应返回生成任务。");
+  }
+}
+
+async function assertWorkerGuard() {
+  const response = await fetch(`${baseUrl}/api/internal/ai-worker`);
+  const payload = await response.json().catch(() => ({}));
+
+  if (response.status !== 401 || payload.ok) {
+    failures.push("/api/internal/ai-worker 未携带密钥时不应执行任务。");
+  }
 }
 
 async function assertProjectDetail() {
@@ -164,7 +177,7 @@ async function assertProjectDetail() {
   }
 }
 
-async function assertMockGenerationAllowed() {
+async function assertMockGenerationBlocked() {
   const response = await fetch(`${baseUrl}/api/generate/image`, {
     method: "POST",
     headers: {
@@ -177,13 +190,9 @@ async function assertMockGenerationAllowed() {
   });
   const payload = await response.json().catch(() => ({}));
 
-  if (!response.ok || !payload.ok || !payload.job) {
-    failures.push("/api/generate/image 演示生成未正常返回。");
+  if (response.status !== 503 || payload.ok) {
+    failures.push("线上真实环境不应允许 Mock 生图。");
     return;
-  }
-
-  if (payload.job.provider !== "mock") {
-    failures.push("/api/generate/image 演示生成未使用 mock 通道。");
   }
 }
 
@@ -194,7 +203,7 @@ async function assertRealProviderGenerationGuard() {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      provider: "kie",
+      provider: "volcengine",
       prompt: "大吉形象线上冒烟真实模型保护",
     }),
   });
@@ -206,7 +215,7 @@ async function assertRealProviderGenerationGuard() {
     return;
   }
 
-  if (!message.includes("真实模型通道 kie 需要先登录后再生成")) {
+  if (!message.includes("真实模型通道 volcengine 需要先登录后再生成")) {
     failures.push("/api/generate/image 匿名真实模型请求未返回中文登录提示。");
   }
 }
@@ -241,6 +250,36 @@ async function assertAdminWriteGuard() {
 
   if (!allowedMessages.some((item) => message.includes(item))) {
     failures.push("/api/admin/products 匿名写入未返回中文权限提示。");
+  }
+}
+
+async function assertTeamAdminGuard() {
+  const response = await fetch(`${baseUrl}/api/admin/team/invite`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email: "smoke-team@example.com" }),
+  });
+  const payload = await response.json().catch(() => ({}));
+  const message = typeof payload.message === "string" ? payload.message : "";
+  const allowedMessages = [
+    "请先配置 Supabase Service Role Key",
+    "请先登录后再操作后台",
+    "当前账号没有后台管理权限",
+  ];
+
+  if (response.ok || payload.ok) {
+    failures.push("/api/admin/team/invite 匿名邀请员工不应成功。");
+    return;
+  }
+
+  if (![400, 401, 403].includes(response.status)) {
+    failures.push(`/api/admin/team/invite 匿名访问返回状态异常：${response.status}`);
+  }
+
+  if (!allowedMessages.some((item) => message.includes(item))) {
+    failures.push("/api/admin/team/invite 匿名访问未返回中文权限提示。");
   }
 }
 
@@ -426,14 +465,17 @@ async function main() {
   await assertPage("/studio/demo", "音乐选择");
   await assertPage("/studio/demo", "移除素材");
   await assertPage("/studio/demo", "下载结果");
-  await assertPage("/auth/login", "登录");
+  await assertPage("/auth/login", "当前仅限团队邀请账号登录");
+  await assertPage("/auth/sign-up", "当前仅限邀请注册");
   await assertPage("/admin/launch", "上线体检");
   await assertHealth();
   await assertCatalog();
+  await assertWorkerGuard();
   await assertProjectDetail();
-  await assertMockGenerationAllowed();
+  await assertMockGenerationBlocked();
   await assertRealProviderGenerationGuard();
   await assertAdminWriteGuard();
+  await assertTeamAdminGuard();
   await assertAdminAssetUploadGuard();
   await assertInvalidUploadTypeGuard();
   await assertTextEndpoint("/robots.txt", `${baseUrl}/sitemap.xml`);

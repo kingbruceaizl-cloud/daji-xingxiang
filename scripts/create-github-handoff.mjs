@@ -95,7 +95,7 @@ const lines = [
   "1. 在 Vercel 导入该 GitHub 仓库。",
   "2. 创建 Supabase 项目，执行 `daji-xingxiang-supabase-init.sql` 后用 `daji-xingxiang-supabase-verify.sql` 验收。",
   "3. 按 `daji-xingxiang-env-handoff.md` 和 `daji-xingxiang-vercel-env-template.env` 填写 Vercel 环境变量。",
-  "4. 按 `daji-xingxiang-model-handoff.md` 配置 KIE 或其他模型通道。",
+  "4. 按 `daji-xingxiang-model-handoff.md` 配置火山方舟、Seedream 和后台 Worker。",
   "5. 按 `daji-xingxiang-vercel-handoff.md` 完成 Vercel 部署。",
   "6. 按 `daji-xingxiang-launch-runbook.md` 逐项执行上线验收。",
   "",

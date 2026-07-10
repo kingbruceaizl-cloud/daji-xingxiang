@@ -1,17 +1,27 @@
 "use client";
 
 import { CustomerAssetsPanel } from "@/components/studio/customer-assets-panel";
+import {
+  AppearanceWorkflowPanel,
+  type PromptPackage,
+} from "@/components/studio/appearance-workflow-panel";
 import { StudioGeneratePanel } from "@/components/studio/generate-panel";
 import { getCategoryIcon } from "@/lib/category-icons";
 import type { CatalogData } from "@/lib/catalog";
 import { publicImages } from "@/lib/demo-data";
+import type { ProjectAssetSummary, ProjectJobSummary } from "@/lib/projects";
 import { Check, SlidersHorizontal, X } from "lucide-react";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 type StudioCreationFlowProps = {
   catalog: CatalogData;
   projectId?: string;
+  initialAssets?: ProjectAssetSummary[];
+  initialJob?: ProjectJobSummary;
+  initialAnalysis?: Record<string, unknown>;
+  initialPlan?: Record<string, unknown>;
+  initialPromptPackage?: PromptPackage;
 };
 
 function buildPrompt(style: CatalogData["styles"][number] | undefined, productNames: string[]) {
@@ -25,12 +35,24 @@ function buildPrompt(style: CatalogData["styles"][number] | undefined, productNa
 export function StudioCreationFlow({
   catalog,
   projectId,
+  initialAssets = [],
+  initialJob,
+  initialAnalysis,
+  initialPlan,
+  initialPromptPackage,
 }: StudioCreationFlowProps) {
+  const initialCustomerAsset = initialAssets.find(
+    (asset) => asset.rawKind === "customer_image" && asset.previewUrl,
+  );
+  const initialPreviewUrl = initialCustomerAsset?.previewUrl || publicImages.portrait;
   const initialStyleName = catalog.styles[0]?.name || "新中式轻礼服";
   const [selectedStyleName, setSelectedStyleName] = useState(initialStyleName);
   const [activeCategoryName, setActiveCategoryName] = useState("全部");
   const [selectedProductNames, setSelectedProductNames] = useState(
     catalog.products.slice(0, 3).map((product) => product.name),
+  );
+  const [confirmedImagePrompt, setConfirmedImagePrompt] = useState(
+    initialPromptPackage?.imagePrompt || "",
   );
 
   const selectedStyle =
@@ -47,9 +69,13 @@ export function StudioCreationFlow({
   const selectedProducts = catalog.products.filter((product) =>
     selectedProductSet.has(product.name),
   );
-  const prompt = buildPrompt(selectedStyle, selectedProductNames);
+  const prompt = confirmedImagePrompt || buildPrompt(selectedStyle, selectedProductNames);
+  const handlePromptPackage = useCallback((value: PromptPackage | null) => {
+    setConfirmedImagePrompt(value?.imagePrompt || "");
+  }, []);
 
   function toggleProduct(productName: string) {
+    setConfirmedImagePrompt("");
     setSelectedProductNames((current) =>
       current.includes(productName)
         ? current.filter((name) => name !== productName)
@@ -61,7 +87,7 @@ export function StudioCreationFlow({
     <>
       <section className="space-y-6">
         <CustomerAssetsPanel
-          initialPreviewUrl={publicImages.portrait}
+          initialPreviewUrl={initialPreviewUrl}
           projectId={projectId}
         />
 
@@ -84,7 +110,10 @@ export function StudioCreationFlow({
                   key={style.name}
                   type="button"
                   aria-pressed={isSelected}
-                  onClick={() => setSelectedStyleName(style.name)}
+                  onClick={() => {
+                    setSelectedStyleName(style.name);
+                    setConfirmedImagePrompt("");
+                  }}
                   className={`rounded-md border p-4 text-left ${
                     isSelected
                       ? "border-red-200 bg-red-50"
@@ -220,7 +249,10 @@ export function StudioCreationFlow({
                   <p className="text-sm font-semibold">已选商品</p>
                   <button
                     type="button"
-                    onClick={() => setSelectedProductNames([])}
+                    onClick={() => {
+                      setSelectedProductNames([]);
+                      setConfirmedImagePrompt("");
+                    }}
                     disabled={!selectedProductNames.length}
                     className="text-xs text-stone-500 disabled:opacity-40"
                   >
@@ -250,13 +282,39 @@ export function StudioCreationFlow({
             </div>
           </div>
         </div>
+
+        <AppearanceWorkflowPanel
+          projectId={projectId}
+          initialAssetId={initialCustomerAsset?.id}
+          initialImageUrl={initialPreviewUrl}
+          styleName={selectedStyle?.name || "新中式轻礼服"}
+          selectedProducts={selectedProductNames}
+          initialAnalysis={initialAnalysis}
+          initialPlan={initialPlan}
+          initialPromptPackage={initialPromptPackage}
+          onPromptPackage={handlePromptPackage}
+        />
       </section>
 
       <aside>
         <StudioGeneratePanel
           prompt={prompt}
           projectId={projectId}
-          initialInputImageUrl={publicImages.portrait}
+          initialInputImageUrl={initialPreviewUrl}
+          initialInputAssetId={initialCustomerAsset?.id}
+          initialJob={
+            initialJob?.rawStatus
+              ? {
+                  jobId: initialJob.id,
+                  provider: initialJob.provider,
+                  model: initialJob.model,
+                  status: initialJob.rawStatus,
+                  message: initialJob.message || "任务状态已恢复。",
+                  providerJobId: initialJob.providerJobId || undefined,
+                  outputAssets: initialJob.outputAssets,
+                }
+              : undefined
+          }
           selectedProducts={selectedProductNames}
           styleName={selectedStyle?.name || "新中式轻礼服"}
           videoTemplates={catalog.videoTemplates}

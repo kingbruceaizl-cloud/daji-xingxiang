@@ -52,7 +52,7 @@ dist/daji-xingxiang-vercel-env-template.env
 dist/daji-xingxiang-vercel-handoff.md
 ```
 
-该压缩包只包含 Git 已提交文件，不包含 `node_modules`、`.next`、`.env` 或 `.vercel`。`.sha256` 文件用于校验压缩包完整性，JSON 清单记录提交号、生成时间、文件大小、校验摘要和复验命令。环境变量交接单用于记录 Supabase、Vercel 和模型通道需要填写的变量，不输出真实密钥值。GitHub 仓库交接单用于创建仓库、绑定远程、推送、检查 Actions 和下载交付附件。AI 模型通道交接单用于配置 KIE 回调、KIE 图像模型和后续 OpenAI、即梦、可灵、通义预留密钥。上线执行核对单用于正式发布当天逐项执行 GitHub、Supabase、Vercel、模型和验收动作。上线摘要用于汇总当前提交、交付物、外部配置缺口和下一步动作。Supabase 初始化 SQL 可直接复制到 Supabase SQL Editor 执行；Supabase 验收 SQL 用于执行初始化后检查表、RLS、RLS 策略、存储桶配置、存储对象策略、模型通道和种子数据。Vercel 环境变量模板用于在 Vercel 面板逐项填写生产变量。Vercel 部署交接单用于导入项目时核对框架、Node、安装命令、构建命令和部署后检查。`release:package` 会生成源码包后立即复核源码包、校验文件和清单是否一致，并确认压缩包内包含上线所需的关键源码、文档、Supabase 初始化文件、GitHub Actions 工作流、Vercel 配置、Node 版本锁定、pnpm 配置和线上素材连通性检查脚本。需要排查时，可拆开运行 `release:archive`、`release:verify-archive`、`release:env-handoff`、`release:github-handoff`、`release:supabase-sql`、`release:supabase-verify-sql`、`release:vercel-env-template`、`release:vercel-handoff`、`release:model-handoff`、`release:launch-runbook` 和 `release:launch-summary`。
+该压缩包只包含 Git 已提交文件，不包含 `node_modules`、`.next`、`.env` 或 `.vercel`。交接单统一覆盖 Supabase、Vercel、火山方舟、Seedream、后台 Worker 与任务能力路由，不输出真实密钥值。Supabase 初始化 SQL 包含持久任务表和原子领取函数，验收 SQL 会检查这些结构。`release:package` 会复核源码包、校验文件、清单和全部交接文档。
 
 推送到 GitHub 后，也可以在 Actions 页面手动运行“大吉形象源码包交付”，工作流会先执行完整 CI 验证和线上素材连通性检查，再生成并上传源码包附件。
 
@@ -81,17 +81,23 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_APP_URL=
+AI_EXECUTION_MODE=real
+CRON_SECRET=
+AI_WORKER_SECRET=
+AI_WORKER_BATCH_SIZE=1
 ```
 
-至少配置一个真实模型通道密钥，例如：
+配置 AI 应用 1.0 默认模型：
 
 ```env
-KIE_BASE_URL=https://api.kie.ai
-KIE_API_KEY=
-KIE_CALLBACK_SECRET=
+ARK_BASE_URL=https://ark.cn-beijing.volces.com/api/v3
+ARK_API_KEY=
+ARK_TEXT_MODEL_ID=
+ARK_IMAGE_MODEL_ID=
+ARK_VIDEO_MODEL_ID=
 ```
 
-后续可继续补：
+后续多模型通道可继续补：
 
 ```env
 OPENAI_API_KEY=
@@ -172,4 +178,4 @@ SMOKE_BASE_URL=https://你的域名 pnpm run smoke:url
 - 在 Vercel 导入 GitHub 仓库。
 - 在 Vercel 配置正式环境变量。
 - 配置线上域名。
-- 配置至少一个真实 AI 模型密钥。
+- 配置火山方舟 API Key 和三个豆包模型 ID。

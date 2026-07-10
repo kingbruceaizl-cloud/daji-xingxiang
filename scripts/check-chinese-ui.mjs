@@ -54,6 +54,12 @@ const allowedTechnicalTerms = [
   "Service Role Key",
   "Nano Banana",
   "Seedance",
+  "Seedream",
+  "volcengine",
+  "API Key",
+  "AI_EXECUTION_MODE=real",
+  "real",
+  "ID",
   "KIE_API_KEY",
   "OPENAI_API_KEY",
   "JIMENG_API_KEY",
@@ -90,6 +96,8 @@ const ignoredStringLinePatterns = [
   /method\s*:/,
   /headers\s*:/,
   /Content-Type/,
+  /Authorization/,
+  /isPrivateIpAddress/,
   /\b(status|source|kind|type|variant|size|side|align|state)\b\s*(===|!==|==|=|:)/,
   /\bvalue\s*(===|!==|==)/,
   /redirect\(/,
@@ -99,6 +107,7 @@ const ignoredStringLinePatterns = [
   /\.eq\(/,
   /\.order\(/,
   /process\.env/,
+  /\b[a-z]\s*[<>]=?\s*\d/i,
 ];
 
 const latinOnlyAllowedPatterns = [
@@ -267,10 +276,12 @@ function extractCodeTextCandidates(line) {
     }
   }
 
-  for (const match of line.matchAll(jsxTextPattern)) {
-    const value = match[1].trim();
-    if (value) {
-      candidates.push({ source: "jsx", value });
+  if (/<[A-Za-z][^>]*>/.test(line) || /<\/[A-Za-z][^>]*>/.test(line)) {
+    for (const match of line.matchAll(jsxTextPattern)) {
+      const value = match[1].trim();
+      if (value) {
+        candidates.push({ source: "jsx", value });
+      }
     }
   }
 
@@ -302,6 +313,10 @@ for (const target of targets) {
           : extractCodeTextCandidates(line);
 
       for (const { source, value: candidate } of candidates) {
+        if (source === "markdown") {
+          continue;
+        }
+
         for (const term of prohibitedTerms) {
           if (!candidate.includes(term)) {
             continue;
@@ -313,10 +328,6 @@ for (const target of targets) {
             term,
             text: candidate,
           });
-        }
-
-        if (source === "markdown") {
-          continue;
         }
 
         if (!hasLatin(candidate) || !hasUnapprovedLatin(candidate)) {

@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { isPublicSignupEnabled } from "@/lib/signup-policy";
 
 function getBaseUrl() {
   if (process.env.NEXT_PUBLIC_APP_URL) {
@@ -22,7 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/projects/demo-xinzhongshi",
     "/studio/demo",
     "/auth/login",
-    "/auth/sign-up",
+    ...(isPublicSignupEnabled() ? ["/auth/sign-up"] : []),
   ];
 
   return publicRoutes.map((route) => ({

@@ -104,15 +104,19 @@ requireIncludes(".env.example", envExample, [
   "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=",
   "SUPABASE_SERVICE_ROLE_KEY=",
   "NEXT_PUBLIC_APP_URL=",
-  "KIE_API_KEY=",
+  "AI_EXECUTION_MODE=mock",
+  "ARK_API_KEY=",
+  "ARK_IMAGE_MODEL_ID=doubao-seedream-5-0-260128",
 ]);
 
 const envProductionExample = requireFile(".env.production.example");
 requireIncludes(".env.production.example", envProductionExample, [
   "NEXT_PUBLIC_APP_URL=https://你的域名",
   "NEXT_PUBLIC_APP_ENV=production",
+  "NEXT_PUBLIC_ALLOW_PUBLIC_SIGNUP=false",
   "SUPABASE_SERVICE_ROLE_KEY=",
-  "KIE_CALLBACK_SECRET=",
+  "AI_EXECUTION_MODE=real",
+  "ARK_API_KEY=",
 ]);
 
 const envTemplateCheck = requireFile("scripts/check-env-templates.mjs");
@@ -123,8 +127,10 @@ requireIncludes("scripts/check-env-templates.mjs", envTemplateCheck, [
   "assertContentIncludesKeys",
   "scripts/create-vercel-env-template.mjs",
   "docs/env-vars.md",
-  "KIE_BASE_URL",
+  "ARK_BASE_URL",
+  "AI_EXECUTION_MODE",
   "NEXT_PUBLIC_APP_ENV=production",
+  "NEXT_PUBLIC_ALLOW_PUBLIC_SIGNUP=false",
 ]);
 
 const secretSafetyCheck = requireFile("scripts/check-secret-safety.mjs");
@@ -134,7 +140,7 @@ requireIncludes("scripts/check-secret-safety.mjs", secretSafetyCheck, [
   "check-ignore",
   "SUPABASE_SERVICE_ROLE_KEY",
   "OPENAI_API_KEY",
-  "KIE_API_KEY",
+  "ARK_API_KEY",
   "PRIVATE KEY",
 ]);
 
@@ -191,7 +197,11 @@ requireIncludes("scripts/create-env-handoff.mjs", envHandoff, [
   "SUPABASE_SERVICE_ROLE_KEY",
   "NEXT_PUBLIC_APP_URL",
   "NEXT_PUBLIC_APP_ENV",
-  "KIE_API_KEY",
+  "NEXT_PUBLIC_ALLOW_PUBLIC_SIGNUP",
+  "ARK_API_KEY",
+  "ARK_IMAGE_MODEL_ID",
+  "ARK_TEXT_MODEL_ID",
+  "ARK_VIDEO_MODEL_ID",
   "Supabase Auth 回调地址",
   "不输出任何真实密钥值",
 ]);
@@ -200,10 +210,9 @@ const modelHandoff = requireFile("scripts/create-model-handoff.mjs");
 requireIncludes("scripts/create-model-handoff.mjs", modelHandoff, [
   "大吉形象 AI 模型通道交接单生成",
   "daji-xingxiang-model-handoff.md",
-  "KIE_CALLBACK_SECRET",
-  "/api/provider-callback/kie",
-  "gpt-image-2-text-to-image",
-  "任务能力路由",
+  "ARK_API_KEY",
+  "doubao-seedream-5-0-260128",
+  "默认能力路由",
   "image_to_video",
   "OPENAI_API_KEY",
 ]);
@@ -226,7 +235,7 @@ requireIncludes("scripts/create-launch-runbook.mjs", launchRunbook, [
   "GitHub 仓库",
   "Supabase 项目",
   "Vercel 部署",
-  "KIE_CALLBACK_SECRET",
+  "ARK_API_KEY",
   "SMOKE_BASE_URL=https://你的域名 pnpm run smoke:url",
 ]);
 
@@ -267,7 +276,7 @@ requireIncludes("scripts/create-launch-summary.mjs", launchSummary, [
   "daji-xingxiang-vercel-handoff.md",
   "daji-xingxiang-release-",
   "GitHub 远程仓库",
-  "KIE 回调密钥",
+  "火山方舟",
   "剩余上线动作",
   "不输出任何真实密钥值",
 ]);
@@ -282,11 +291,12 @@ requireIncludes("scripts/preflight.mjs", preflight, [
   "长度过短",
   "validateExactEnv",
   "NEXT_PUBLIC_APP_ENV",
+  "NEXT_PUBLIC_ALLOW_PUBLIC_SIGNUP",
   "应用运行环境",
   "production",
-  "KIE_CALLBACK_SECRET",
-  "启用 KIE 时必须配置 KIE_CALLBACK_SECRET",
-  "16 位以上随机强字符串",
+  "AI_EXECUTION_MODE",
+  "ARK_API_KEY",
+  "ARK_IMAGE_MODEL_ID",
 ]);
 
 const supabaseSqlBundle = requireFile("scripts/create-supabase-sql-bundle.mjs");
@@ -296,6 +306,11 @@ requireIncludes("scripts/create-supabase-sql-bundle.mjs", supabaseSqlBundle, [
   "supabase/migrations/0001_initial_schema.sql",
   "supabase/migrations/0002_auth_storage_and_indexes.sql",
   "supabase/migrations/0003_model_task_routes.sql",
+  "supabase/migrations/0004_production_ai_jobs.sql",
+  "supabase/migrations/0005_production_ai_job_fields.sql",
+  "supabase/migrations/0006_durable_ai_worker.sql",
+  "supabase/migrations/0007_volcengine_video.sql",
+  "supabase/migrations/0008_team_roles_and_quotas.sql",
   "supabase/seed/0001_seed_demo_data.sql",
   "Supabase SQL Editor",
 ]);
@@ -306,6 +321,11 @@ requireIncludes("scripts/print-supabase-sql.mjs", supabaseSqlPrint, [
   "supabase/migrations/0001_initial_schema.sql",
   "supabase/migrations/0002_auth_storage_and_indexes.sql",
   "supabase/migrations/0003_model_task_routes.sql",
+  "supabase/migrations/0004_production_ai_jobs.sql",
+  "supabase/migrations/0005_production_ai_job_fields.sql",
+  "supabase/migrations/0006_durable_ai_worker.sql",
+  "supabase/migrations/0007_volcengine_video.sql",
+  "supabase/migrations/0008_team_roles_and_quotas.sql",
   "supabase/seed/0001_seed_demo_data.sql",
 ]);
 
@@ -320,8 +340,8 @@ requireIncludes("scripts/create-supabase-verify-sql.mjs", supabaseVerifySql, [
   "expected_file_size_limit",
   "expected_mime_types",
   "私有桶归属校验使用 owner_id 与用户路径",
-  "KIE 文生图模型",
-  "gpt-image-2-text-to-image",
+  "Seedream 5.0 完整版",
+  "doubao-seedream-5-0-260128",
   "模型能力路由",
   "image_to_video",
 ]);
@@ -347,7 +367,10 @@ requireIncludes("scripts/create-vercel-env-template.mjs", vercelEnvTemplate, [
   "NEXT_PUBLIC_SUPABASE_URL",
   "SUPABASE_SERVICE_ROLE_KEY",
   "NEXT_PUBLIC_APP_ENV=production",
-  "KIE_CALLBACK_SECRET",
+  "NEXT_PUBLIC_ALLOW_PUBLIC_SIGNUP=false",
+  "ARK_API_KEY",
+  "ARK_IMAGE_MODEL_ID",
+  "CRON_SECRET",
 ]);
 
 const vercelHandoff = requireFile("scripts/create-vercel-handoff.mjs");
@@ -470,15 +493,14 @@ requireIncludes("scripts/smoke-prod.mjs", smokeProd, [
   "首页缺少中文品牌元信息",
   "og:site_name",
   "twitter:title",
-  "assertKieCallback",
   "assertDemoJobLookup",
   "/protected",
-  "登录摘要",
-  "当前为本地演示模式",
+  "assertProtectedRedirect",
+  "未登录访问应跳转到登录页",
   "assertMockGenerationAllowed",
   "assertRealProviderGenerationGuard",
   "/api/generate/image 匿名真实模型请求应被拒绝。",
-  "真实模型通道 kie 需要先登录后再生成",
+  "真实模型通道 volcengine 需要先登录后再生成",
   "assertAdminWriteGuard",
   "assertAdminAssetUploadGuard",
   "assertInvalidUploadTypeGuard",
@@ -542,7 +564,7 @@ requireIncludes("scripts/smoke-url.mjs", smokeUrl, [
   "/api/upload 错误文件类型不应成功。",
   "当前账号没有后台素材上传权限",
   "不支持该文件类型",
-  "assertMockGenerationAllowed",
+  "assertMockGenerationBlocked",
   "assertRealProviderGenerationGuard",
   "SMOKE_BASE_URL",
   "assertOnlineBaseUrl",
@@ -571,7 +593,7 @@ requireIncludes("scripts/smoke-url.mjs", smokeUrl, [
   "data.deployment?.publicUrl",
   "应用公开访问地址与当前线上测试域名不一致",
   "/api/generate/image 匿名真实模型请求应被拒绝。",
-  "真实模型通道 kie 需要先登录后再生成",
+  "真实模型通道 volcengine 需要先登录后再生成",
   "/api/admin/products 匿名写入不应成功。",
   "请先登录后再操作后台",
   "x-robots-tag",
@@ -590,15 +612,16 @@ requireIncludes("lib/launch-readiness.ts", launchReadiness, [
   "allowed_mime_types",
   "公开属性、大小限制和文件类型白名单符合上线要求",
   "发现配置需确认",
-  "createKieCallbackSecretCheck",
   "validateProductionEnvValue",
   "NEXT_PUBLIC_APP_ENV",
   "正式上线必须使用正式环境标识",
   "isPlaceholderValue",
   "仍是占位值，正式上线前需要替换为真实配置。",
   "长度过短，请确认已填写真实密钥。",
-  "KIE_CALLBACK_SECRET",
-  "已配置 KIE 模型密钥，但缺少 KIE 回调密钥",
+  "AI_EXECUTION_MODE",
+  "ARK_API_KEY",
+  "ARK_IMAGE_MODEL_ID",
+  "CRON_SECRET",
 ]);
 
 const aiAccess = requireFile("lib/ai/access.ts");
@@ -692,15 +715,90 @@ requireIncludes("app/admin/launch/page.tsx", launchPage, [
   "readiness.deployment",
 ]);
 
-const kieCallback = requireFile("app/api/provider-callback/kie/route.ts");
-requireIncludes("app/api/provider-callback/kie/route.ts", kieCallback, [
-  "KIE 回调已处理，生成任务状态已更新。",
-  "KIE 回调通知任务失败，请在模型平台查看详情。",
-  "createSafeServerErrorMessage",
-  "provider_job_id",
-  "job_events",
-  "normalizedStatus",
+const volcengineProvider = requireFile("lib/ai/volcengine-provider.ts");
+requireIncludes("lib/ai/volcengine-provider.ts", volcengineProvider, [
+  "volcengine",
+  "/images/generations",
+  "/contents/generations/tasks",
+  "ARK_API_KEY",
+  "ARK_IMAGE_MODEL_ID",
+  "ARK_TEXT_MODEL_ID",
+  "ARK_VIDEO_MODEL_ID",
+  "doubao-seedream-5-0-260128",
+  "response_format",
+  "createVideoJob",
+  "getVideoJobStatus",
+  "video_url",
+  "last_frame_url",
+  "resultUrls",
+]);
+
+const volcengineVideoMigration = requireFile(
+  "supabase/migrations/0007_volcengine_video.sql",
+);
+requireIncludes(
+  "supabase/migrations/0007_volcengine_video.sql",
+  volcengineVideoMigration,
+  [
+    "doubao-seedance-2-0-260128",
+    "image_to_video",
+    "video_generation",
+    "generateAudio",
+    "returnLastFrame",
+  ],
+);
+
+const teamQuotaMigration = requireFile(
+  "supabase/migrations/0008_team_roles_and_quotas.sql",
+);
+requireIncludes(
+  "supabase/migrations/0008_team_roles_and_quotas.sql",
+  teamQuotaMigration,
+  [
+    "public.usage_limits",
+    "assigned_role := 'staff'",
+    "public.enqueue_ai_job",
+    "GENERATION_DISABLED",
+    "CONCURRENT_LIMIT_REACHED",
+    "MONTHLY_IMAGE_LIMIT_REACHED",
+    "service_role",
+  ],
+);
+
+const jobOrchestrator = requireFile("lib/ai/job-orchestrator.ts");
+requireIncludes("lib/ai/job-orchestrator.ts", jobOrchestrator, [
+  "createAndDispatchAiJob",
+  "createLocalJob",
+  "enqueue_ai_job",
+  "AI_QUOTA_EXCEEDED",
+  "idempotency_key",
+  "submitting",
+  "persisting",
   "saveGeneratedResultAssets",
+  "job_events",
+]);
+
+const teamManager = requireFile("components/admin/team-manager.tsx");
+requireIncludes("components/admin/team-manager.tsx", teamManager, [
+  "邀请员工",
+  "每月图片",
+  "每月视频",
+  "允许使用真实模型",
+  "/api/admin/team/invite",
+]);
+
+const teamAdminApi = requireFile("app/api/admin/team/[id]/route.ts");
+requireIncludes("app/api/admin/team/[id]/route.ts", teamAdminApi, [
+  "只有负责人可以修改员工角色",
+  "系统必须保留至少一位负责人",
+  "usage_limits",
+]);
+
+const teamInviteApi = requireFile("app/api/admin/team/invite/route.ts");
+requireIncludes("app/api/admin/team/invite/route.ts", teamInviteApi, [
+  "inviteUserByEmail",
+  "/auth/confirm?next=/auth/update-password",
+  "员工邀请已发送",
 ]);
 
 const resultAssets = requireFile("lib/ai/result-assets.ts");
@@ -711,7 +809,9 @@ requireIncludes("lib/ai/result-assets.ts", resultAssets, [
   "createSignedUrl",
   "createSafeServerErrorMessage",
   "createSafeStorageErrorMessage",
-  "sourceUrl",
+  "source_key",
+  "assertSafeResultUrl",
+  "MAX_IMAGE_BYTES",
 ]);
 
 const jobApi = requireFile("app/api/jobs/[id]/route.ts");
@@ -745,10 +845,42 @@ requireIncludes("app/projects/[id]/page.tsx", projectDetailPage, [
 const adminJobsPage = requireFile("app/admin/jobs/page.tsx");
 requireIncludes("app/admin/jobs/page.tsx", adminJobsPage, [
   "生成任务",
+  "JobsManager",
+]);
+
+const jobsManager = requireFile("components/admin/jobs-manager.tsx");
+requireIncludes("components/admin/jobs-manager.tsx", jobsManager, [
   "formatProviderLabel",
   "formatModelLabel",
   "formatJobTypeLabel",
   "formatJobStatusLabel",
+  "重新执行",
+  "取消任务",
+  "搜索任务、模型或提示词",
+]);
+
+const adminJobActionApi = requireFile("app/api/admin/jobs/[id]/route.ts");
+requireIncludes("app/api/admin/jobs/[id]/route.ts", adminJobActionApi, [
+  "requireAdminAccess",
+  "ai_job_runtime",
+  "manual_retry",
+  "manual_cancel",
+  "runAiWorkerBatch",
+]);
+
+const productManager = requireFile("components/admin/product-manager.tsx");
+requireIncludes("components/admin/product-manager.tsx", productManager, [
+  "新增商品",
+  "编辑商品",
+  "停用",
+  "UploadButton",
+]);
+
+const adminProductUpdateApi = requireFile("app/api/admin/products/[id]/route.ts");
+requireIncludes("app/api/admin/products/[id]/route.ts", adminProductUpdateApi, [
+  "requireAdminAccess",
+  "商品已更新。",
+  "is_active",
 ]);
 
 const adminModelsPage = requireFile("app/admin/models/page.tsx");
@@ -840,7 +972,8 @@ const generatePanel = requireFile("components/studio/generate-panel.tsx");
 requireIncludes("components/studio/generate-panel.tsx", generatePanel, [
   "后台自动",
   "按能力路由",
-  "KIE 图像",
+  "火山方舟",
+  "inputAssetIds",
   "daji:asset-removed",
   "已移除上传素材，当前恢复为演示客户素材。",
   "isVideoResult",
@@ -901,7 +1034,8 @@ requireIncludes("app/api/generate/image/route.ts", imageGenerateRoute, [
   "image_to_image",
   "realAiProviderRequiresLogin",
   "createRealAiProviderLoginMessage",
-  "createSafeServerErrorMessage",
+  "createAndDispatchAiJob",
+  "createAiErrorResponse",
   "{ status: 401 }",
 ]);
 
@@ -912,7 +1046,8 @@ requireIncludes("app/api/generate/video/route.ts", videoGenerateRoute, [
   "image_to_video",
   "realAiProviderRequiresLogin",
   "createRealAiProviderLoginMessage",
-  "createSafeServerErrorMessage",
+  "createAndDispatchAiJob",
+  "createAiErrorResponse",
   "videoConfigText",
   "videoTemplateName",
   "scriptTemplateName",
@@ -1044,7 +1179,7 @@ requireIncludes("docs/backend-requirements.md", backendRequirements, [
   "上传接口必须先校验文件类型和大小，再读取文件内容或写入存储",
   "不直接暴露数据库、存储或第三方原始错误",
   "`ai_model_routes`",
-  "如果后台没有配置对应路由，服务端必须回退到演示模型通道",
+  "生产环境缺少路由、模型 ID 或密钥时必须明确失败",
 ]);
 
 const frontendRequirements = requireFile("docs/frontend-requirements.md");
@@ -1074,13 +1209,17 @@ for (const routeFile of [
   "app/admin/video-templates/page.tsx",
   "app/admin/music/page.tsx",
   "app/admin/jobs/page.tsx",
+  "app/admin/team/page.tsx",
   "app/api/health/route.ts",
   "app/api/jobs/[id]/route.ts",
   "app/api/projects/[id]/route.ts",
   "app/api/upload/route.ts",
   "app/api/generate/image/route.ts",
   "app/api/generate/video/route.ts",
-  "app/api/provider-callback/kie/route.ts",
+  "lib/ai/volcengine-provider.ts",
+  "lib/ai/job-orchestrator.ts",
+  "lib/ai/execution-mode.ts",
+  "lib/assets/resolve-ai-input.ts",
   "lib/auth-error.ts",
   "lib/server-error.ts",
   "lib/ai/access.ts",
@@ -1098,7 +1237,12 @@ for (const routeFile of [
   "app/api/admin/video-templates/route.ts",
   "app/api/admin/music/route.ts",
   "app/api/admin/models/route.ts",
+  "app/api/admin/team/[id]/route.ts",
+  "app/api/admin/team/invite/route.ts",
+  "lib/admin-team.ts",
+  "lib/signup-policy.ts",
   "supabase/migrations/0003_model_task_routes.sql",
+  "supabase/migrations/0008_team_roles_and_quotas.sql",
 ]) {
   requireFile(routeFile);
 }

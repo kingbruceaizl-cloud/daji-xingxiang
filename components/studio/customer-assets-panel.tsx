@@ -32,8 +32,9 @@ export function CustomerAssetsPanel({
   function handleUploaded(nextAsset: UploadedAsset) {
     setAsset(nextAsset);
 
-    if (nextAsset.public_url) {
-      setPreviewUrl(nextAsset.public_url);
+    const nextPreviewUrl = nextAsset.preview_url || nextAsset.public_url;
+    if (nextPreviewUrl) {
+      setPreviewUrl(nextPreviewUrl);
     }
   }
 

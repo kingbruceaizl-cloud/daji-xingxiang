@@ -1,14 +1,16 @@
-import { createAiJob, buildImagePrompt } from "@/lib/ai";
+import { buildImagePrompt } from "@/lib/ai";
 import {
   createRealAiProviderLoginMessage,
   normalizeAiProvider,
   realAiProviderRequiresLogin,
 } from "@/lib/ai/access";
 import { resolveAiModelRoute } from "@/lib/ai/model-routing";
-import { persistAiJob } from "@/lib/ai/persistence";
-import { createSafeServerErrorMessage } from "@/lib/server-error";
+import { createAiErrorResponse } from "@/lib/ai/errors";
+import { createAndDispatchAiJob } from "@/lib/ai/job-orchestrator";
 import { getCurrentUserId } from "@/lib/supabase/current-user";
-import { NextResponse } from "next/server";
+import { resolveAiInputAssets } from "@/lib/assets/resolve-ai-input";
+import { after, NextResponse } from "next/server";
+import { runAiWorkerBatch } from "@/lib/ai/job-orchestrator";
 
 export async function POST(request: Request) {
   try {
@@ -21,10 +23,14 @@ export async function POST(request: Request) {
         extraPrompt: body.extraPrompt,
       });
 
-    const inputImageUrls: string[] = Array.isArray(body.inputImageUrls)
+    const requestedInputImageUrls: string[] = Array.isArray(body.inputImageUrls)
       ? body.inputImageUrls.map(String)
       : [];
-    const jobType = inputImageUrls.length ? "image_to_image" : "text_to_image";
+    const inputAssetIds: string[] = Array.isArray(body.inputAssetIds)
+      ? body.inputAssetIds.map(String)
+      : [];
+    const hasInput = inputAssetIds.length || requestedInputImageUrls.length;
+    const jobType = hasInput ? "image_to_image" : "text_to_image";
     const ownerId = await getCurrentUserId();
     const modelRoute = await resolveAiModelRoute(jobType, {
       provider: body.provider,
@@ -38,23 +44,23 @@ export async function POST(request: Request) {
       );
     }
 
-    if (provider === "kie" && inputImageUrls.some((url) => url.startsWith("data:"))) {
+    const inputImageUrls =
+      provider === "mock"
+        ? requestedInputImageUrls
+        : await resolveAiInputAssets({
+            assetIds: inputAssetIds,
+            ownerId,
+            projectId: body.projectId,
+          });
+
+    if (provider !== "mock" && requestedInputImageUrls.length && !inputAssetIds.length) {
       return NextResponse.json(
         {
           ok: false,
-          message:
-            "KIE 图生图需要线上可访问的客户素材；请配置 Supabase 后上传素材，或先使用演示通道。",
+          message: "真实生成只接受已上传素材的编号，请重新上传客户图片。",
         },
         { status: 400 },
       );
-    }
-
-    const callbackUrl = new URL(
-      `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/provider-callback/kie`,
-    );
-
-    if (process.env.KIE_CALLBACK_SECRET) {
-      callbackUrl.searchParams.set("secret", process.env.KIE_CALLBACK_SECRET);
     }
 
     const input = {
@@ -64,23 +70,34 @@ export async function POST(request: Request) {
       prompt,
       projectId: body.projectId,
       inputImageUrls,
+      inputAssetIds,
       selectedProducts: body.selectedProducts,
       styleName: body.styleName,
       ownerId,
-      callbackUrl: callbackUrl.toString(),
+      idempotencyKey:
+        request.headers.get("idempotency-key") || body.idempotencyKey || undefined,
       modelRouteKey: modelRoute.taskKey,
       modelRouteSource: modelRoute.source,
       modelRouteParams: modelRoute.defaultParams,
     } as const;
 
-    const job = await createAiJob(input);
-    const persistence = await persistAiJob(input, job);
+    const job = await createAndDispatchAiJob(input);
 
-    return NextResponse.json({ ok: true, job, persistence });
-  } catch {
+    if (job.provider !== "mock" && job.status === "pending") {
+      after(async () => {
+        await runAiWorkerBatch({ limit: 1 });
+      });
+    }
+
     return NextResponse.json(
-      { ok: false, message: createSafeServerErrorMessage("创建生图任务") },
-      { status: 400 },
+      { ok: true, job },
+      { status: job.status === "pending" ? 202 : 200 },
+    );
+  } catch (error) {
+    const response = createAiErrorResponse(error);
+    return NextResponse.json(
+      response.body,
+      { status: response.status },
     );
   }
 }

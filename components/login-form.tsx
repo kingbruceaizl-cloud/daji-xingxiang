@@ -12,8 +12,9 @@ import { useState } from "react";
 
 export function LoginForm({
   className,
+  allowPublicSignup = false,
   ...props
-}: React.ComponentPropsWithoutRef<"div">) {
+}: React.ComponentPropsWithoutRef<"div"> & { allowPublicSignup?: boolean }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -94,12 +95,18 @@ export function LoginForm({
             {isLoading ? "正在登录..." : "登录"}
           </Button>
         </div>
-        <div className="mt-5 text-center text-sm text-[#6f6a65]">
-          还没有账号？{" "}
-          <Link href="/auth/sign-up" className="font-semibold text-[#c91d16] hover:underline">
-            注册
-          </Link>
-        </div>
+        {allowPublicSignup ? (
+          <div className="mt-5 text-center text-sm text-[#6f6a65]">
+            还没有账号？{" "}
+            <Link href="/auth/sign-up" className="font-semibold text-[#c91d16] hover:underline">
+              注册
+            </Link>
+          </div>
+        ) : (
+          <p className="mt-5 text-center text-sm text-[#6f6a65]">
+            当前仅限团队邀请账号登录。
+          </p>
+        )}
       </form>
     </div>
   );

@@ -4,6 +4,8 @@ import {
   createSafeStorageErrorMessage,
 } from "@/lib/server-error";
 import type { AiJobType } from "./types";
+import { lookup } from "node:dns/promises";
+import { isIP } from "node:net";
 
 const GENERATED_BUCKET = "generated-assets";
 
@@ -24,6 +26,16 @@ type SaveGeneratedResultOutput = {
   assetIds: string[];
   failures: string[];
 };
+
+const ALLOWED_IMAGE_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+]);
+const ALLOWED_VIDEO_TYPES = new Set(["video/mp4"]);
+const MAX_IMAGE_BYTES = 25 * 1024 * 1024;
+const MAX_VIDEO_BYTES = 250 * 1024 * 1024;
+const MAX_REDIRECTS = 3;
 
 export type GeneratedResultAsset = {
   id: string;
@@ -73,6 +85,86 @@ function isVideoContentType(contentType?: string | null) {
   return Boolean(contentType?.startsWith("video/"));
 }
 
+function normalizedContentType(contentType?: string | null) {
+  return contentType?.split(";")[0]?.trim().toLowerCase() || "";
+}
+
+function isPrivateIpAddress(address: string) {
+  if (address === "::1" || address === "0.0.0.0") {
+    return true;
+  }
+
+  if (address.includes(":")) {
+    const value = address.toLowerCase();
+    return value.startsWith("fc") || value.startsWith("fd") || value.startsWith("fe80:");
+  }
+
+  const [a, b] = address.split(".").map(Number);
+  return (
+    a === 10 ||
+    a === 127 ||
+    (a === 169 && b === 254) ||
+    (a === 172 && b >= 16 && b <= 31) ||
+    (a === 192 && b === 168)
+  );
+}
+
+async function assertSafeResultUrl(value: string) {
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error("生成结果地址无效");
+  }
+
+  if (url.protocol !== "https:" || url.username || url.password) {
+    throw new Error("生成结果地址不安全");
+  }
+
+  const hostname = url.hostname.toLowerCase();
+  if (hostname === "localhost" || hostname.endsWith(".localhost")) {
+    throw new Error("生成结果主机不安全");
+  }
+
+  if (isIP(hostname)) {
+    if (isPrivateIpAddress(hostname)) {
+      throw new Error("生成结果指向私有网络");
+    }
+    return url;
+  }
+
+  const addresses = await lookup(hostname, { all: true, verbatim: true });
+  if (!addresses.length || addresses.some((item) => isPrivateIpAddress(item.address))) {
+    throw new Error("生成结果指向私有网络");
+  }
+
+  return url;
+}
+
+async function fetchSafeResult(value: string) {
+  let url = await assertSafeResultUrl(value);
+
+  for (let redirects = 0; redirects <= MAX_REDIRECTS; redirects += 1) {
+    const response = await fetch(url, {
+      redirect: "manual",
+      signal: AbortSignal.timeout(60_000),
+    });
+
+    if (![301, 302, 303, 307, 308].includes(response.status)) {
+      return { response, finalUrl: url };
+    }
+
+    const location = response.headers.get("location");
+    if (!location || redirects === MAX_REDIRECTS) {
+      throw new Error("生成结果重定向次数过多");
+    }
+
+    url = await assertSafeResultUrl(new URL(location, url).toString());
+  }
+
+  throw new Error("生成结果下载失败");
+}
+
 function assetKind(jobType: AiJobType, contentType: string | null) {
   if (isVideoJob(jobType) || isVideoContentType(contentType)) {
     return "generated_video";
@@ -112,18 +204,46 @@ export async function saveGeneratedResultAssets(
   const failures: string[] = [];
 
   for (const [index, resultUrl] of resultUrls.entries()) {
+    const sourceKey = `${input.provider}:${input.providerJobId}:${index}`;
     try {
-      const response = await fetch(resultUrl);
-
-      if (!response.ok) {
-        failures.push(`${resultUrl} 下载失败：${response.status}`);
+      const { data: existingAsset } = await input.supabase
+        .from("asset_files")
+        .select("id")
+        .eq("source_key", sourceKey)
+        .maybeSingle();
+      if (existingAsset?.id) {
+        assetIds.push(existingAsset.id);
         continue;
       }
 
-      const contentType =
-        response.headers.get("content-type") ||
-        (isVideoJob(input.jobType) ? "video/mp4" : "image/jpeg");
+      const { response, finalUrl } = await fetchSafeResult(resultUrl);
+
+      if (!response.ok) {
+        failures.push(`第 ${index + 1} 个生成结果下载失败。`);
+        continue;
+      }
+
+      const contentType = normalizedContentType(response.headers.get("content-type"));
+      const isVideo = isVideoJob(input.jobType);
+      const allowedTypes = isVideo ? ALLOWED_VIDEO_TYPES : ALLOWED_IMAGE_TYPES;
+      if (!allowedTypes.has(contentType)) {
+        failures.push(`第 ${index + 1} 个生成结果格式不受支持。`);
+        continue;
+      }
+
+      const maxBytes = isVideo ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES;
+      const declaredSize = Number(response.headers.get("content-length") || 0);
+      if (declaredSize > maxBytes) {
+        failures.push(`第 ${index + 1} 个生成结果超过保存大小限制。`);
+        continue;
+      }
+
       const bytes = await response.arrayBuffer();
+      if (bytes.byteLength > maxBytes) {
+        failures.push(`第 ${index + 1} 个生成结果超过保存大小限制。`);
+        continue;
+      }
+
       const extension = extensionFromContentType(contentType, resultUrl);
       const path = buildStoragePath({
         ownerId: input.ownerId,
@@ -150,13 +270,14 @@ export async function saveGeneratedResultAssets(
         .insert({
           owner_id: input.ownerId,
           project_id: input.projectId,
+          source_key: sourceKey,
           kind: assetKind(input.jobType, contentType),
           bucket: GENERATED_BUCKET,
           path,
           public_url: null,
           title: `生成结果 ${index + 1}`,
           metadata: {
-            sourceUrl: resultUrl,
+            sourceHost: finalUrl.hostname,
             provider: input.provider,
             providerJobId: input.providerJobId,
             contentType,
@@ -167,6 +288,7 @@ export async function saveGeneratedResultAssets(
         .single();
 
       if (assetError) {
+        await input.supabase.storage.from(GENERATED_BUCKET).remove([path]);
         failures.push(createSafeServerErrorMessage("生成结果素材记录创建"));
         continue;
       }

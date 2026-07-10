@@ -127,10 +127,11 @@ status("Vercel Token", hasEnv("VERCEL_TOKEN"));
 status("Supabase Access Token", hasEnv("SUPABASE_ACCESS_TOKEN"));
 status("Supabase 项目地址", hasEnv("NEXT_PUBLIC_SUPABASE_URL"));
 status("Supabase 服务端密钥", hasEnv("SUPABASE_SERVICE_ROLE_KEY"));
+status("后台任务密钥", hasEnv("CRON_SECRET") || hasEnv("AI_WORKER_SECRET"));
 status(
   "AI 模型密钥",
   [
-    "KIE_API_KEY",
+    "ARK_API_KEY",
     "OPENAI_API_KEY",
     "JIMENG_API_KEY",
     "KLING_API_KEY",
@@ -180,12 +181,12 @@ if (!hasEnv("NEXT_PUBLIC_APP_URL")) {
 
 if (
   ![
-    "KIE_API_KEY",
+    "ARK_API_KEY",
     "OPENAI_API_KEY",
     "JIMENG_API_KEY",
     "KLING_API_KEY",
     "TONGYI_API_KEY",
   ].some(hasEnv)
 ) {
-  console.log(`${nextStep}. 至少配置一个真实 AI 模型通道密钥，例如 KIE_API_KEY。`);
+  console.log(`${nextStep}. 配置火山方舟 ARK_API_KEY 和 Seedream 模型 ID。`);
 }

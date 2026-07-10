@@ -18,10 +18,15 @@ const requiredEnvKeys = [
   "SUPABASE_SERVICE_ROLE_KEY",
   "NEXT_PUBLIC_APP_URL",
   "NEXT_PUBLIC_APP_ENV",
+  "AI_EXECUTION_MODE",
+  "ARK_BASE_URL",
+  "ARK_API_KEY",
+  "ARK_TEXT_MODEL_ID",
+  "ARK_IMAGE_MODEL_ID",
+  "ARK_VIDEO_MODEL_ID",
 ];
 const aiEnvKeys = [
-  "KIE_API_KEY",
-  "KIE_CALLBACK_SECRET",
+  "ARK_API_KEY",
   "OPENAI_API_KEY",
   "JIMENG_API_KEY",
   "KLING_API_KEY",
@@ -138,11 +143,7 @@ const manifest = readLatestManifest();
 const env = getMergedEnv();
 const missingRequiredEnv = requiredEnvKeys.filter((key) => isPlaceholder(env[key]));
 const configuredAiKeys = aiEnvKeys.filter((key) => !isPlaceholder(env[key]));
-const enabledAiKeys = configuredAiKeys.filter((key) => key !== "KIE_CALLBACK_SECRET");
-const kieCallbackReady =
-  isPlaceholder(env.KIE_API_KEY) ||
-  (!isPlaceholder(env.KIE_CALLBACK_SECRET) &&
-    String(env.KIE_CALLBACK_SECRET).trim().length >= 16);
+const enabledAiKeys = configuredAiKeys;
 
 const archiveFile = manifest?.archive?.file || "待生成";
 const checksumFile = manifest?.archive?.file
@@ -164,8 +165,7 @@ const appIsExternallyReady =
   origin.ok &&
   Boolean(origin.stdout) &&
   !missingRequiredEnv.length &&
-  Boolean(enabledAiKeys.length) &&
-  kieCallbackReady;
+  Boolean(enabledAiKeys.length);
 
 const lines = [
   "# 大吉形象上线摘要",
@@ -180,7 +180,7 @@ const lines = [
   `- GitHub 远程仓库：${mark(origin.ok && Boolean(origin.stdout))}`,
   `- 正式环境变量：${missingRequiredEnv.length ? "待配置" : "已配置"}`,
   `- AI 模型通道：${enabledAiKeys.length ? "已配置" : "待配置至少一个"}`,
-  `- KIE 回调密钥：${kieCallbackReady ? "无需处理或已配置" : "待配置"}`,
+  `- 火山方舟：${enabledAiKeys.includes("ARK_API_KEY") ? "已配置" : "待配置"}`,
   `- 公网上线状态：${appIsExternallyReady ? "可进入部署验证" : "仍需外部配置"}`,
   "",
   "## 代码状态",
@@ -248,7 +248,7 @@ lines.push(
   "",
   "3. 在 Vercel 导入 GitHub 仓库，按环境变量交接单填写生产环境变量。",
   "",
-  "4. 至少配置一个真实 AI 模型密钥，第一阶段建议优先配置 `KIE_API_KEY`。",
+  "4. 配置火山方舟 `ARK_API_KEY` 和三个模型 ID。",
   "",
   "5. 部署完成后执行线上检查：",
   "",
@@ -276,18 +276,9 @@ lines.push(
   "",
   enabledAiKeys.length
     ? `- 已配置：${enabledAiKeys.join("、")}`
-    : "- 待配置至少一个：KIE_API_KEY、OPENAI_API_KEY、JIMENG_API_KEY、KLING_API_KEY、TONGYI_API_KEY",
+    : "- 待配置：ARK_API_KEY",
   "",
 );
-
-if (!kieCallbackReady) {
-  lines.push(
-    "## 当前 KIE 回调密钥状态",
-    "",
-    "- 已配置 `KIE_API_KEY`，但缺少有效的 `KIE_CALLBACK_SECRET`。正式上线前需要配置 16 位以上随机强字符串。",
-    "",
-  );
-}
 
 writeFileSync(outputPath, `${lines.join("\n")}\n`);
 

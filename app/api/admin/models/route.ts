@@ -9,10 +9,13 @@ import { NextResponse } from "next/server";
 
 function parseCapabilities(value: unknown) {
   const allowed = new Set([
+    "text_generation",
+    "image_understanding",
     "text_to_image",
     "image_to_image",
     "image_to_video",
     "video_generation",
+    "long_video_generation",
     "copywriting",
   ]);
 

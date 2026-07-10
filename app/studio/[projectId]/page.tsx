@@ -1,7 +1,14 @@
 import { StudioWorkspace } from "@/components/studio/studio-workspace";
-import { getProjectById } from "@/lib/projects";
+import { getProjectDetailById } from "@/lib/projects";
 import { connection } from "next/server";
 import { Suspense } from "react";
+
+function structuredOutput(response?: Record<string, unknown>) {
+  const value = response?.structuredOutput;
+  return value && typeof value === "object"
+    ? (value as Record<string, unknown>)
+    : undefined;
+}
 
 async function StudioProjectContent({
   params,
@@ -16,16 +23,59 @@ async function StudioProjectContent({
     params,
     searchParams,
   ]);
-  const { project, source } = await getProjectById(projectId);
+  const { project, source, assets, jobs } = await getProjectDetailById(projectId);
   const queryName = Array.isArray(resolvedSearchParams.name)
     ? resolvedSearchParams.name[0]
     : resolvedSearchParams.name;
   const projectTitle = queryName?.trim() || project.name;
+  const mediaJob = jobs.find((job) =>
+    [
+      "text_to_image",
+      "image_to_image",
+      "image_to_video",
+      "video_generation",
+      "video_render",
+    ].includes(job.rawType || ""),
+  );
+  const structuredJobs = jobs
+    .map((job) => ({ job, output: structuredOutput(job.responsePayload) }))
+    .filter((item) => item.output);
+  const initialAnalysis = structuredJobs.find(
+    ({ job, output }) =>
+      job.rawType === "image_understanding" && typeof output?.faceShape === "string",
+  )?.output;
+  const initialPlan = structuredJobs.find(
+    ({ output }) => typeof output?.styleDirection === "string",
+  )?.output;
+  const initialPromptPackage = structuredJobs.find(
+    ({ output }) => typeof output?.imagePrompt === "string",
+  )?.output;
 
   return (
     <StudioWorkspace
       projectId={project.id || projectId}
       projectTitle={projectTitle}
+      initialAssets={assets}
+      initialJob={source === "supabase" ? mediaJob : undefined}
+      initialAnalysis={source === "supabase" ? initialAnalysis : undefined}
+      initialPlan={source === "supabase" ? initialPlan : undefined}
+      initialPromptPackage={
+        source === "supabase"
+          ? (initialPromptPackage as
+              | {
+                  imagePrompt: string;
+                  negativePrompt: string;
+                  videoPrompt: string;
+                  shotPlan: Array<{
+                    order: number;
+                    durationSeconds: number;
+                    description: string;
+                  }>;
+                  reviewNotes: string[];
+                }
+              | undefined)
+          : undefined
+      }
       subtitle={
         source === "supabase"
           ? "真实项目"

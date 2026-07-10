@@ -45,10 +45,42 @@ const requiredEnv = [
     key: "NEXT_PUBLIC_APP_ENV",
     label: "应用运行环境",
   },
+  {
+    key: "NEXT_PUBLIC_ALLOW_PUBLIC_SIGNUP",
+    label: "公开注册开关",
+  },
+  {
+    key: "AI_EXECUTION_MODE",
+    label: "AI 执行模式",
+  },
+  {
+    key: "CRON_SECRET",
+    label: "后台任务密钥",
+  },
+  {
+    key: "ARK_BASE_URL",
+    label: "火山方舟 API 地址",
+  },
+  {
+    key: "ARK_API_KEY",
+    label: "火山方舟 API Key",
+  },
+  {
+    key: "ARK_TEXT_MODEL_ID",
+    label: "文字模型 ID",
+  },
+  {
+    key: "ARK_IMAGE_MODEL_ID",
+    label: "生图模型 ID",
+  },
+  {
+    key: "ARK_VIDEO_MODEL_ID",
+    label: "视频模型 ID",
+  },
 ];
 
 const modelChannels = [
-  { key: "KIE_API_KEY", label: "KIE 模型通道" },
+  { key: "ARK_API_KEY", label: "火山方舟（豆包）" },
   { key: "OPENAI_API_KEY", label: "OpenAI 模型通道" },
   { key: "JIMENG_API_KEY", label: "即梦模型通道" },
   { key: "KLING_API_KEY", label: "可灵模型通道" },
@@ -180,12 +212,20 @@ function createEnvChecks(): LaunchCheckItem[] {
   return requiredEnv.map((item) => {
     const value = envValue(item.key);
     const issue =
-      item.key === "NEXT_PUBLIC_SUPABASE_URL"
+      item.key === "NEXT_PUBLIC_SUPABASE_URL" || item.key === "ARK_BASE_URL"
         ? validateUrlValue(value)
         : item.key === "NEXT_PUBLIC_APP_URL"
           ? validateUrlValue(value)
           : item.key === "NEXT_PUBLIC_APP_ENV"
             ? validateProductionEnvValue(value)
+            : item.key === "NEXT_PUBLIC_ALLOW_PUBLIC_SIGNUP"
+              ? value === "false"
+                ? ""
+                : "团队内测阶段必须关闭公开注册。"
+            : item.key === "AI_EXECUTION_MODE"
+              ? value === "real"
+                ? ""
+                : "正式上线必须设置为 real。"
             : validateSecretValue(value);
 
     return {
@@ -209,49 +249,6 @@ function createModelCheck(): LaunchCheckItem {
     detail: configured.length
       ? `已配置：${configured.map((item) => item.label).join("、")}。`
       : "未配置真实模型通道，当前只能使用演示模型通道。",
-  };
-}
-
-function createKieCallbackSecretCheck(): LaunchCheckItem {
-  const kieEnabled = envConfigured("KIE_API_KEY");
-  const callbackSecret = process.env.KIE_CALLBACK_SECRET?.trim();
-
-  if (!kieEnabled) {
-    return {
-      key: "KIE_CALLBACK_SECRET",
-      label: "KIE 回调密钥",
-      required: false,
-      status: "ready",
-      detail: "未启用 KIE 模型通道，暂不需要校验 KIE 回调密钥。",
-    };
-  }
-
-  if (!callbackSecret) {
-    return {
-      key: "KIE_CALLBACK_SECRET",
-      label: "KIE 回调密钥",
-      required: true,
-      status: "missing",
-      detail: "已配置 KIE 模型密钥，但缺少 KIE 回调密钥，正式上线前必须配置。",
-    };
-  }
-
-  if (callbackSecret.length < 16) {
-    return {
-      key: "KIE_CALLBACK_SECRET",
-      label: "KIE 回调密钥",
-      required: true,
-      status: "warning",
-      detail: "KIE 回调密钥过短，建议使用 16 位以上随机强字符串。",
-    };
-  }
-
-  return {
-    key: "KIE_CALLBACK_SECRET",
-    label: "KIE 回调密钥",
-    required: true,
-    status: "ready",
-    detail: "已配置 KIE 回调密钥，回调入口具备基础可信校验。",
   };
 }
 
@@ -393,7 +390,6 @@ export async function getLaunchReadiness(): Promise<LaunchReadiness> {
   const checks = [
     ...createEnvChecks(),
     createModelCheck(),
-    createKieCallbackSecretCheck(),
     await createDatabaseCheck(),
     await createStorageCheck(),
   ];

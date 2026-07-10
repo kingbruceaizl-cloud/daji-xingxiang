@@ -24,6 +24,7 @@ async function AdminContent() {
 
   const catalog = await getCatalogData();
   const moduleLinks: Record<string, string> = {
+    团队权限: "/admin/team",
     商品库: "/admin/products",
     风格模板: "/admin/styles",
     视频脚本: "/admin/video-templates",
@@ -62,7 +63,7 @@ async function AdminContent() {
           </p>
         </section>
 
-        <section className="mb-8 grid gap-3 md:grid-cols-3 xl:grid-cols-7">
+        <section className="mb-8 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           {adminModules.map((module) => {
             const Icon = module.icon;
             const href = moduleLinks[module.name] || "/admin";

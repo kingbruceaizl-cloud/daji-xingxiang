@@ -5,6 +5,11 @@ const requiredFiles = [
   "supabase/migrations/0001_initial_schema.sql",
   "supabase/migrations/0002_auth_storage_and_indexes.sql",
   "supabase/migrations/0003_model_task_routes.sql",
+  "supabase/migrations/0004_production_ai_jobs.sql",
+  "supabase/migrations/0005_production_ai_job_fields.sql",
+  "supabase/migrations/0006_durable_ai_worker.sql",
+  "supabase/migrations/0007_volcengine_video.sql",
+  "supabase/migrations/0008_team_roles_and_quotas.sql",
   "supabase/seed/0001_seed_demo_data.sql",
 ];
 
@@ -23,6 +28,8 @@ const requiredTables = [
   "ai_model_routes",
   "ai_jobs",
   "job_events",
+  "ai_job_runtime",
+  "usage_limits",
 ];
 
 const requiredBucketSettings = [
@@ -52,7 +59,7 @@ const requiredBucketSettings = [
   },
 ];
 
-const requiredProviders = ["kie", "openai", "jimeng", "kling", "tongyi"];
+const requiredProviders = ["volcengine", "openai", "jimeng", "kling", "tongyi"];
 
 const requiredTablePolicies = [
   "用户可读取自己的资料",
@@ -70,6 +77,7 @@ const requiredTablePolicies = [
   "登录用户可读取模型路由",
   "用户可管理自己的生成任务",
   "用户可读取自己任务事件",
+  "用户可读取自己的用量限制",
 ];
 
 const requiredStoragePolicies = [
@@ -111,11 +119,16 @@ for (const file of requiredFiles) {
   }
 }
 
-const initialSchema = readProjectFile(requiredFiles[0]) || "";
-const storageSchema = readProjectFile(requiredFiles[1]) || "";
-const modelRouteSchema = readProjectFile(requiredFiles[2]) || "";
-const seedData = readProjectFile(requiredFiles[3]) || "";
-const tableSchema = `${initialSchema}\n${modelRouteSchema}`;
+const initialSchema = readProjectFile("supabase/migrations/0001_initial_schema.sql") || "";
+const storageSchema = readProjectFile("supabase/migrations/0002_auth_storage_and_indexes.sql") || "";
+const modelRouteSchema = readProjectFile("supabase/migrations/0003_model_task_routes.sql") || "";
+const productionEnumSchema = readProjectFile("supabase/migrations/0004_production_ai_jobs.sql") || "";
+const productionJobSchema = readProjectFile("supabase/migrations/0005_production_ai_job_fields.sql") || "";
+const durableWorkerSchema = readProjectFile("supabase/migrations/0006_durable_ai_worker.sql") || "";
+const volcengineVideoSchema = readProjectFile("supabase/migrations/0007_volcengine_video.sql") || "";
+const teamQuotaSchema = readProjectFile("supabase/migrations/0008_team_roles_and_quotas.sql") || "";
+const seedData = readProjectFile("supabase/seed/0001_seed_demo_data.sql") || "";
+const tableSchema = `${initialSchema}\n${modelRouteSchema}\n${productionEnumSchema}\n${productionJobSchema}\n${durableWorkerSchema}\n${teamQuotaSchema}`;
 
 for (const table of requiredTables) {
   if (!tableSchema.includes(`create table if not exists public.${table}`) && !tableSchema.includes(`create table public.${table}`)) {
@@ -185,6 +198,29 @@ if (!initialSchema.includes("usage_note text")) {
   findings.push("音乐库缺少使用场景字段：usage_note。");
 }
 
+if (!durableWorkerSchema.includes("public.claim_ai_jobs")) {
+  findings.push("缺少后台 Worker 原子领取函数：claim_ai_jobs。");
+}
+
+if (!durableWorkerSchema.includes("revoke all on table public.ai_job_runtime from anon, authenticated")) {
+  findings.push("任务运行表必须禁止浏览器角色直接读取。");
+}
+
+if (
+  !volcengineVideoSchema.includes("doubao-seedance-2-0-260128") ||
+  !volcengineVideoSchema.includes("image_to_video")
+) {
+  findings.push("缺少火山方舟 Seedance 视频模型与能力路由。");
+}
+
+if (
+  !teamQuotaSchema.includes("public.enqueue_ai_job") ||
+  !teamQuotaSchema.includes("CONCURRENT_LIMIT_REACHED") ||
+  !teamQuotaSchema.includes("assigned_role := 'staff'")
+) {
+  findings.push("缺少团队角色和真实模型用量限制。");
+}
+
 for (const provider of requiredProviders) {
   if (!seedData.includes(`'${provider}'`)) {
     findings.push(`缺少模型通道种子数据：${provider}`);
@@ -207,12 +243,8 @@ if (!seedData.includes("松弛低能量节拍")) {
   findings.push("缺少默认音乐库种子数据。");
 }
 
-if (!seedData.includes("gpt-image-2-text-to-image")) {
-  findings.push("缺少 KIE 文生图模型种子数据。");
-}
-
-if (!seedData.includes("gpt-image-2-image-to-image")) {
-  findings.push("缺少 KIE 图生图模型种子数据。");
+if (!seedData.includes("doubao-seedream-5-0-260128")) {
+  findings.push("缺少 Seedream 5.0 完整版模型种子数据。");
 }
 
 for (const routeKey of [

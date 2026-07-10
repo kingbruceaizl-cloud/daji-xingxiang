@@ -26,7 +26,7 @@ export async function requireAdminAccess() {
   const { supabase, response } = requireAdminClient();
 
   if (!supabase) {
-    return { supabase: null, userId: null, response };
+    return { supabase: null, userId: null, role: null, response };
   }
 
   const userId = await getCurrentUserId();
@@ -35,6 +35,7 @@ export async function requireAdminAccess() {
     return {
       supabase: null,
       userId: null,
+      role: null,
       response: NextResponse.json(
         { ok: false, message: "请先登录后再操作后台。" },
         { status: 401 },
@@ -52,6 +53,7 @@ export async function requireAdminAccess() {
     return {
       supabase: null,
       userId,
+      role: null,
       response: NextResponse.json(
         { ok: false, message: createSafeServerErrorMessage("权限校验") },
         { status: 403 },
@@ -63,6 +65,7 @@ export async function requireAdminAccess() {
     return {
       supabase: null,
       userId,
+      role: profile?.role || null,
       response: NextResponse.json(
         { ok: false, message: "当前账号没有后台管理权限。" },
         { status: 403 },
@@ -70,7 +73,7 @@ export async function requireAdminAccess() {
     };
   }
 
-  return { supabase, userId, response: null };
+  return { supabase, userId, role: profile.role, response: null };
 }
 
 export function parseTags(value: unknown) {

@@ -22,6 +22,8 @@ const requiredTables = [
   "ai_model_routes",
   "ai_jobs",
   "job_events",
+  "ai_job_runtime",
+  "usage_limits",
 ];
 
 const requiredBucketSettings = [
@@ -51,7 +53,7 @@ const requiredBucketSettings = [
   },
 ];
 
-const requiredProviders = ["kie", "openai", "jimeng", "kling", "tongyi"];
+const requiredProviders = ["volcengine", "openai", "jimeng", "kling", "tongyi"];
 
 const requiredModelRoutes = [
   "text_generation",
@@ -135,7 +137,11 @@ table_policy_checks as (
   select
     'RLS 策略'::text as check_group,
     expected_tables.name as check_item,
-    case when count(pg_policies.policyname) > 0 then '通过' else '未通过' end as result,
+    case
+      when expected_tables.name = 'ai_job_runtime' and count(pg_policies.policyname) = 0 then '通过'
+      when expected_tables.name <> 'ai_job_runtime' and count(pg_policies.policyname) > 0 then '通过'
+      else '未通过'
+    end as result,
     count(pg_policies.policyname)::text as current_value,
     '确认初始化 SQL 中的 create policy 已执行。'::text as suggestion
   from expected_tables
@@ -260,29 +266,16 @@ seed_checks as (
 model_checks as (
   select
     '模型配置'::text as check_group,
-    'KIE 文生图模型'::text as check_item,
+    'Seedream 5.0 完整版'::text as check_item,
     case when exists (
       select 1
       from public.ai_models
       join public.ai_providers on public.ai_providers.id = public.ai_models.provider_id
-      where public.ai_providers.name = 'kie'
-        and public.ai_models.name = 'gpt-image-2-text-to-image'
+      where public.ai_providers.name = 'volcengine'
+        and public.ai_models.name = 'doubao-seedream-5-0-260128'
     ) then '通过' else '未通过' end as result,
-    'gpt-image-2-text-to-image'::text as current_value,
+    'doubao-seedream-5-0-260128'::text as current_value,
     '重新执行种子数据 SQL。'::text as suggestion
-  union all
-  select
-    '模型配置',
-    'KIE 图生图模型',
-    case when exists (
-      select 1
-      from public.ai_models
-      join public.ai_providers on public.ai_providers.id = public.ai_models.provider_id
-      where public.ai_providers.name = 'kie'
-        and public.ai_models.name = 'gpt-image-2-image-to-image'
-    ) then '通过' else '未通过' end,
-    'gpt-image-2-image-to-image',
-    '重新执行种子数据 SQL。'
 ),
 model_route_checks as (
   select
@@ -304,6 +297,32 @@ function_checks as (
     case when to_regprocedure('public.handle_new_user()') is not null then '通过' else '未通过' end as result,
     case when to_regprocedure('public.handle_new_user()') is not null then '已创建' else '缺失' end as current_value,
     '重新执行 Supabase 初始化 SQL 中的认证触发器函数。'::text as suggestion
+  union all
+  select
+    '后台任务'::text,
+    'claim_ai_jobs 原子领取函数'::text,
+    case when to_regprocedure('public.claim_ai_jobs(text,integer,integer)') is not null then '通过' else '未通过' end,
+    case when to_regprocedure('public.claim_ai_jobs(text,integer,integer)') is not null then '已创建' else '缺失' end,
+    '重新执行 durable AI worker 迁移。'::text
+  union all
+  select
+    '团队额度'::text,
+    'enqueue_ai_job 原子入队函数'::text,
+    case when exists (
+      select 1
+      from pg_proc
+      join pg_namespace on pg_namespace.oid = pg_proc.pronamespace
+      where pg_namespace.nspname = 'public'
+        and pg_proc.proname = 'enqueue_ai_job'
+    ) then '通过' else '未通过' end,
+    case when exists (
+      select 1
+      from pg_proc
+      join pg_namespace on pg_namespace.oid = pg_proc.pronamespace
+      where pg_namespace.nspname = 'public'
+        and pg_proc.proname = 'enqueue_ai_job'
+    ) then '已创建' else '缺失' end,
+    '重新执行团队角色与额度迁移。'::text
 ),
 trigger_checks as (
   select

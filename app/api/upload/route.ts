@@ -94,6 +94,32 @@ async function validateBucketAccess(
   return null;
 }
 
+async function validateProjectAccess(
+  supabase: NonNullable<ReturnType<typeof createAdminClient>> | null,
+  ownerId: string | null,
+  projectId: string | null,
+) {
+  if (!projectId || !supabase || !ownerId) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("projects")
+    .select("id")
+    .eq("id", projectId)
+    .eq("owner_id", ownerId)
+    .maybeSingle();
+
+  if (error || !data) {
+    return NextResponse.json(
+      { ok: false, message: "当前账号不能向这个项目上传素材。" },
+      { status: 403 },
+    );
+  }
+
+  return null;
+}
+
 export async function POST(request: Request) {
   const formData = await request.formData();
   const file = formData.get("file");
@@ -124,6 +150,14 @@ export async function POST(request: Request) {
   const accessResponse = await validateBucketAccess(supabase, ownerId, bucket);
   if (accessResponse) {
     return accessResponse;
+  }
+  const projectAccessResponse = await validateProjectAccess(
+    supabase,
+    ownerId,
+    projectId,
+  );
+  if (projectAccessResponse) {
+    return projectAccessResponse;
   }
 
   const bytes = await file.arrayBuffer();
@@ -197,10 +231,11 @@ export async function POST(request: Request) {
         type: file.type,
       },
     })
-    .select("id,bucket,path,public_url,title,kind,created_at")
+    .select("id,bucket,path,public_url,title,kind,metadata,created_at")
     .single();
 
   if (assetError) {
+    await supabase.storage.from(bucket).remove([path]);
     return NextResponse.json(
       {
         ok: false,
@@ -210,9 +245,15 @@ export async function POST(request: Request) {
     );
   }
 
+  const previewUrl = asset.public_url
+    ? asset.public_url
+    : (
+        await supabase.storage.from(bucket).createSignedUrl(asset.path, 60 * 60)
+      ).data?.signedUrl || null;
+
   return NextResponse.json({
     ok: true,
-    asset,
+    asset: { ...asset, preview_url: previewUrl },
     message: "素材已上传。",
   });
 }

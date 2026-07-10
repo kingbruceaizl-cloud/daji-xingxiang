@@ -2,9 +2,15 @@
 
 这里存放第三方 API 文档、接口约定和环境变量说明。
 
-## 当前计划接入
+## AI 应用 1.0 默认接入
 
-- KIE：第一批图像和视频生成候选。
+- 火山方舟（豆包）：已确认为 1.0 默认生产模型通道，接入约定见 `docs/api/volcengine-ark.md`。
+- Doubao-Seed-2.1-Pro：文字、方案、提示词、图片理解和图片转文字。
+- Doubao-Seedream-5.0 完整版：文生图和图生图。
+- Doubao-Seedance-2.0：文生视频、图生视频和变装短视频。
+
+## 兼容与预留通道
+
 - OpenAI：预留文案、生图、多模态能力。
 - 即梦：预留图像/视频生成能力。
 - 可灵：预留视频生成能力。
@@ -22,8 +28,12 @@
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
-KIE_API_KEY=
-KIE_CALLBACK_SECRET=
+AI_EXECUTION_MODE=mock
+ARK_BASE_URL=https://ark.cn-beijing.volces.com/api/v3
+ARK_API_KEY=
+ARK_TEXT_MODEL_ID=
+ARK_IMAGE_MODEL_ID=doubao-seedream-5-0-260128
+ARK_VIDEO_MODEL_ID=
 OPENAI_API_KEY=
 JIMENG_API_KEY=
 KLING_API_KEY=

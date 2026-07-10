@@ -1,14 +1,19 @@
-import { createAiJob } from "@/lib/ai";
 import {
   createRealAiProviderLoginMessage,
   normalizeAiProvider,
   realAiProviderRequiresLogin,
 } from "@/lib/ai/access";
 import { resolveAiModelRoute } from "@/lib/ai/model-routing";
-import { persistAiJob } from "@/lib/ai/persistence";
-import { createSafeServerErrorMessage } from "@/lib/server-error";
+import { createAiErrorResponse } from "@/lib/ai/errors";
+import {
+  createAndDispatchAiJob,
+  runAiWorkerBatch,
+} from "@/lib/ai/job-orchestrator";
 import { getCurrentUserId } from "@/lib/supabase/current-user";
-import { NextResponse } from "next/server";
+import { resolveAiInputAssets } from "@/lib/assets/resolve-ai-input";
+import { after, NextResponse } from "next/server";
+
+export const maxDuration = 300;
 
 export async function POST(request: Request) {
   try {
@@ -24,8 +29,11 @@ export async function POST(request: Request) {
       body.prompt ||
       `基于选中的形象图生成 9:16 变装短视频，纯白棚拍背景，快速旋转换装，商品清单卡片叠加。${videoConfigText}`;
 
-    const inputImageUrls: string[] = Array.isArray(body.inputImageUrls)
+    const requestedInputImageUrls: string[] = Array.isArray(body.inputImageUrls)
       ? body.inputImageUrls.map(String)
+      : [];
+    const inputAssetIds: string[] = Array.isArray(body.inputAssetIds)
+      ? body.inputAssetIds.map(String)
       : [];
     const ownerId = await getCurrentUserId();
     const modelRoute = await resolveAiModelRoute("image_to_video", {
@@ -40,22 +48,23 @@ export async function POST(request: Request) {
       );
     }
 
-    if (provider === "kie" && inputImageUrls.some((url) => url.startsWith("data:"))) {
+    const inputImageUrls =
+      provider === "mock"
+        ? requestedInputImageUrls
+        : await resolveAiInputAssets({
+            assetIds: inputAssetIds,
+            ownerId,
+            projectId: body.projectId,
+          });
+
+    if (provider !== "mock" && requestedInputImageUrls.length && !inputAssetIds.length) {
       return NextResponse.json(
         {
           ok: false,
-          message: "KIE 视频任务需要线上可访问的形象图；请先使用已转存的生成结果。",
+          message: "真实视频任务需要使用已经保存到素材库的形象图。",
         },
         { status: 400 },
       );
-    }
-
-    const callbackUrl = new URL(
-      `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/provider-callback/kie`,
-    );
-
-    if (process.env.KIE_CALLBACK_SECRET) {
-      callbackUrl.searchParams.set("secret", process.env.KIE_CALLBACK_SECRET);
     }
 
     const input = {
@@ -65,23 +74,38 @@ export async function POST(request: Request) {
       prompt,
       projectId: body.projectId,
       inputImageUrls,
+      inputAssetIds,
       selectedProducts: body.selectedProducts,
       styleName: body.styleName,
       ownerId,
-      callbackUrl: callbackUrl.toString(),
+      idempotencyKey:
+        request.headers.get("idempotency-key") || body.idempotencyKey || undefined,
       modelRouteKey: modelRoute.taskKey,
       modelRouteSource: modelRoute.source,
       modelRouteParams: modelRoute.defaultParams,
     } as const;
 
-    const job = await createAiJob(input);
-    const persistence = await persistAiJob(input, job);
+    const job = await createAndDispatchAiJob(input);
 
-    return NextResponse.json({ ok: true, job, persistence });
-  } catch {
+    if (job.provider !== "mock" && job.status === "pending") {
+      after(async () => {
+        try {
+          await runAiWorkerBatch({ limit: 1 });
+        } catch {
+          // The scheduled worker remains the durable fallback.
+        }
+      });
+    }
+
     return NextResponse.json(
-      { ok: false, message: createSafeServerErrorMessage("创建视频任务") },
-      { status: 400 },
+      { ok: true, job },
+      { status: job.status === "pending" ? 202 : 200 },
+    );
+  } catch (error) {
+    const response = createAiErrorResponse(error);
+    return NextResponse.json(
+      response.body,
+      { status: response.status },
     );
   }
 }

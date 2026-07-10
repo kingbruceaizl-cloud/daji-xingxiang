@@ -77,10 +77,14 @@ pnpm run preflight
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `NEXT_PUBLIC_APP_URL`
 - `NEXT_PUBLIC_APP_ENV=production`
-- 至少一个 AI 模型通道密钥，例如 `KIE_API_KEY`
-- 如果使用 KIE，必须配置 `KIE_CALLBACK_SECRET`
-
-启用 KIE 时，`preflight` 会要求 `KIE_CALLBACK_SECRET` 为 16 位以上随机强字符串，避免第三方回调入口缺少可信校验。
+- `NEXT_PUBLIC_ALLOW_PUBLIC_SIGNUP=false`
+- `AI_EXECUTION_MODE=real`
+- `CRON_SECRET`
+- `ARK_API_KEY`
+- `ARK_TEXT_MODEL_ID`
+- `ARK_IMAGE_MODEL_ID`
+- `ARK_VIDEO_MODEL_ID`
+`preflight` 会要求 `CRON_SECRET` 为至少 24 位的非占位随机字符串，避免公开接口被他人唤醒并消耗模型额度。
 
 ## 4. 系统内体检
 
@@ -100,6 +104,7 @@ Vercel 已读取 `vercel.json`：
 - 构建命令：`pnpm run build`
 - 框架：Next.js
 - Node.js：20.18.0 或更高版本
+- Cron：每分钟调用 `/api/internal/ai-worker`
 
 项目根目录提供 `.node-version`，本地和部署平台建议使用 Node.js 20.18.0 或更高版本。
 
@@ -133,9 +138,11 @@ SMOKE_BASE_URL=https://你的域名 pnpm run smoke:url
 
 线上冒烟测试也会检查 API 防索引和私有缓存响应头；后台、登录后页面和 API 应返回 `X-Robots-Tag: noindex, nofollow, noarchive` 与 `Cache-Control: no-store, max-age=0`。
 
-线上冒烟测试还会验证匿名请求不能写入后台商品接口，防止后台配置接口被公开误用。
+在 Supabase Auth 设置中关闭公开注册，并通过 `/admin/team` 邀请员工。执行 `0008_team_roles_and_quotas.sql` 后，还要确认首位账号保留负责人角色、后续账号默认是员工、`usage_limits` 与 `enqueue_ai_job` 验收项通过。
 
-线上冒烟测试还会验证匿名用户不能调用 `kie` 真实模型通道，但仍可使用 `mock` 演示通道。
+线上冒烟测试还会验证匿名请求不能写入后台商品或邀请员工，防止后台配置和团队接口被公开误用。
+
+线上冒烟测试需要验证匿名用户不能调用 `volcengine` 等真实模型通道，但仍可使用 `mock` 演示通道；未携带 Worker 密钥时也不能执行 `/api/internal/ai-worker`。
 
 如果 Vercel 域名已经写入 `NEXT_PUBLIC_APP_URL`，也可以直接重新运行：
 

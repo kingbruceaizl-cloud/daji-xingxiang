@@ -1,5 +1,10 @@
 import { publicImages } from "@/lib/demo-data";
 import type { AiProvider, CreateJobInput, CreateJobResult } from "./types";
+import {
+  mockAppearanceAnalysis,
+  mockAppearancePlan,
+  mockPromptPackage,
+} from "./structured-schemas";
 
 function createReadableId(prefix: string) {
   return `${prefix}_${Date.now().toString(36)}_${Math.random()
@@ -10,6 +15,30 @@ function createReadableId(prefix: string) {
 export const mockProvider: AiProvider = {
   name: "mock",
   async createJob(input: CreateJobInput): Promise<CreateJobResult> {
+    const structuredTask = input.modelRouteParams?.structuredTask;
+    const structuredOutput =
+      input.jobType === "image_understanding"
+        ? mockAppearanceAnalysis
+        : structuredTask === "appearance_plan"
+          ? mockAppearancePlan
+          : structuredTask === "prompt_package"
+            ? mockPromptPackage
+            : undefined;
+    if (structuredOutput) {
+      return {
+        jobId: createReadableId("dj_job"),
+        provider: "mock",
+        model: input.model || "mock-structured-v1",
+        jobType: input.jobType,
+        status: "succeeded",
+        message: "演示结构化结果已生成。接入真实文字与视觉模型后会返回实际分析。",
+        textOutput: JSON.stringify(structuredOutput),
+        structuredOutput,
+        providerJobId: createReadableId("mock"),
+        createdAt: new Date().toISOString(),
+      };
+    }
+
     const isVideo = input.jobType === "image_to_video" || input.jobType === "video_render";
     const inputImageUrl = input.inputImageUrls?.[0];
 

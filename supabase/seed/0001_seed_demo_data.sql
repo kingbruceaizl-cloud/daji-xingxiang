@@ -158,7 +158,7 @@ insert into public.music_tracks (name, usage_note, mood_tags) values
 on conflict do nothing;
 
 insert into public.ai_providers (name, display_name) values
-  ('kie', 'KIE'),
+  ('volcengine', '火山方舟（豆包）'),
   ('openai', 'OpenAI'),
   ('jimeng', '即梦'),
   ('kling', '可灵'),
@@ -166,20 +166,10 @@ insert into public.ai_providers (name, display_name) values
 on conflict (name) do update set display_name = excluded.display_name;
 
 insert into public.ai_models (provider_id, name, display_name, capabilities, default_params)
-select id, 'gpt-image-2-text-to-image', 'GPT Image 2 文生图',
-  array['text_to_image']::public.model_capability[],
-  '{"aspectRatio":"3:4","quality":"high"}'::jsonb
-from public.ai_providers where name = 'kie'
-on conflict (provider_id, name) do update set
-  display_name = excluded.display_name,
-  capabilities = excluded.capabilities,
-  default_params = excluded.default_params;
-
-insert into public.ai_models (provider_id, name, display_name, capabilities, default_params)
-select id, 'gpt-image-2-image-to-image', 'GPT Image 2 图生图',
-  array['image_to_image']::public.model_capability[],
-  '{"aspectRatio":"3:4","quality":"high"}'::jsonb
-from public.ai_providers where name = 'kie'
+select id, 'doubao-seedream-5-0-260128', 'Seedream 5.0 完整版',
+  array['text_to_image', 'image_to_image']::public.model_capability[],
+  '{"size":"2K","sequential_image_generation":"disabled","watermark":false}'::jsonb
+from public.ai_providers where name = 'volcengine'
 on conflict (provider_id, name) do update set
   display_name = excluded.display_name,
   capabilities = excluded.capabilities,
@@ -208,33 +198,33 @@ values
     'text_to_image',
     '文生图',
     '用于没有客户参考图时，根据提示词生成形象图。',
-    'kie',
-    'gpt-image-2-text-to-image',
-    '{"aspectRatio":"3:4","quality":"high"}'::jsonb
+    'volcengine',
+    'doubao-seedream-5-0-260128',
+    '{"size":"2K","sequential_image_generation":"disabled","watermark":false}'::jsonb
   ),
   (
     'image_to_image',
     '图生图',
     '用于基于客户照片生成换装图、风格写真和商品搭配图。',
-    'kie',
-    'gpt-image-2-image-to-image',
-    '{"aspectRatio":"3:4","quality":"high"}'::jsonb
+    'volcengine',
+    'doubao-seedream-5-0-260128',
+    '{"size":"2K","sequential_image_generation":"disabled","watermark":false}'::jsonb
   ),
   (
     'image_to_video',
     '图生视频',
     '用于把生成形象图或客户素材生成变装短视频。',
-    'mock',
-    'mock-video-v1',
-    '{"aspectRatio":"9:16","durationSeconds":13}'::jsonb
+    'volcengine',
+    'doubao-seedance-2-0-260128',
+    '{"resolution":"720p","ratio":"9:16","duration":13,"generateAudio":true,"returnLastFrame":true,"cameraFixed":false,"watermark":false,"imageRole":"first_frame"}'::jsonb
   ),
   (
     'video_generation',
     '视频生成',
     '用于直接根据脚本和镜头方案生成视频。',
-    'mock',
-    'mock-video-v1',
-    '{"aspectRatio":"9:16"}'::jsonb
+    'volcengine',
+    'doubao-seedance-2-0-260128',
+    '{"resolution":"720p","ratio":"9:16","duration":13,"generateAudio":true,"returnLastFrame":true,"cameraFixed":false,"watermark":false}'::jsonb
   ),
   (
     'long_video_generation',

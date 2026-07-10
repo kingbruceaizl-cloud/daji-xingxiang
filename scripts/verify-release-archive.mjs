@@ -204,6 +204,11 @@ if (!manifestName) {
           "supabase/migrations/0001_initial_schema.sql",
           "supabase/migrations/0002_auth_storage_and_indexes.sql",
           "supabase/migrations/0003_model_task_routes.sql",
+          "supabase/migrations/0004_production_ai_jobs.sql",
+          "supabase/migrations/0005_production_ai_job_fields.sql",
+          "supabase/migrations/0006_durable_ai_worker.sql",
+          "supabase/migrations/0007_volcengine_video.sql",
+          "supabase/migrations/0008_team_roles_and_quotas.sql",
           "supabase/seed/0001_seed_demo_data.sql",
         ]);
         assertForbiddenEntries(entries);

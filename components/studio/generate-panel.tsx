@@ -10,7 +10,16 @@ import { Clapperboard, Download, Loader2, Save, Send, Sparkles } from "lucide-re
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-type JobStatus = "queued" | "running" | "succeeded" | "failed";
+type JobStatus =
+  | "pending"
+  | "queued"
+  | "submitting"
+  | "running"
+  | "persisting"
+  | "retrying"
+  | "succeeded"
+  | "failed"
+  | "canceled";
 
 type OutputAsset = {
   id: string;
@@ -19,7 +28,7 @@ type OutputAsset = {
   url?: string | null;
 };
 
-type JobResult = {
+export type StudioJobResult = {
   jobId: string;
   provider: string;
   model: string;
@@ -35,6 +44,8 @@ type GeneratePanelProps = {
   prompt: string;
   projectId?: string;
   initialInputImageUrl?: string;
+  initialInputAssetId?: string;
+  initialJob?: StudioJobResult;
   selectedProducts: string[];
   styleName: string;
   videoTemplates: CatalogData["videoTemplates"];
@@ -53,13 +64,11 @@ async function createJob(endpoint: string, payload: Record<string, unknown>) {
   if (!response.ok || !data.ok) {
     throw new Error(data.message || "生成任务创建失败");
   }
-  return data.job as JobResult;
+  return data.job as StudioJobResult;
 }
 
-async function lookupJob(job: JobResult) {
-  const lookupId = job.providerJobId || job.jobId;
-  const query = job.provider ? `?provider=${encodeURIComponent(job.provider)}` : "";
-  const response = await fetch(`/api/jobs/${encodeURIComponent(lookupId)}${query}`);
+async function lookupJob(job: StudioJobResult) {
+  const response = await fetch(`/api/jobs/${encodeURIComponent(job.jobId)}`);
   const data = await response.json();
 
   if (!response.ok || !data.ok) {
@@ -76,13 +85,25 @@ function statusText(status: JobStatus) {
   if (status === "failed") {
     return "失败";
   }
+  if (status === "canceled") {
+    return "已取消";
+  }
+  if (status === "persisting") {
+    return "正在保存";
+  }
+  if (status === "submitting") {
+    return "正在提交";
+  }
+  if (status === "retrying") {
+    return "正在重试";
+  }
   if (status === "running") {
     return "生成中";
   }
   return "排队中";
 }
 
-function bestPreviewUrl(job: Partial<JobResult>) {
+function bestPreviewUrl(job: Partial<StudioJobResult>) {
   return (
     job.previewUrl ||
     job.outputAssets?.find((asset) => asset.url)?.url ||
@@ -90,7 +111,7 @@ function bestPreviewUrl(job: Partial<JobResult>) {
   );
 }
 
-function isVideoResult(job: JobResult | null, resultUrl?: string) {
+function isVideoResult(job: StudioJobResult | null, resultUrl?: string) {
   const normalizedUrl = resultUrl?.split("?")[0].toLowerCase() || "";
 
   return Boolean(
@@ -100,11 +121,11 @@ function isVideoResult(job: JobResult | null, resultUrl?: string) {
   );
 }
 
-function resultDownloadName(job: JobResult | null) {
+function resultDownloadName(job: StudioJobResult | null) {
   return job ? "大吉形象生成结果" : "大吉形象生成预览";
 }
 
-function normalizeLookupJob(rawJob: Partial<JobResult> & {
+function normalizeLookupJob(rawJob: Partial<StudioJobResult> & {
   id?: string;
   jobType?: string;
   response?: {
@@ -112,7 +133,7 @@ function normalizeLookupJob(rawJob: Partial<JobResult> & {
     previewUrl?: string;
     message?: string;
   };
-}, current: JobResult): JobResult {
+}, current: StudioJobResult): StudioJobResult {
   const resultUrls = rawJob.resultUrls || rawJob.response?.resultUrls || current.resultUrls;
   const nextJob = {
     ...current,
@@ -136,7 +157,7 @@ function normalizeLookupJob(rawJob: Partial<JobResult> & {
     outputAssets: rawJob.outputAssets || current.outputAssets,
   };
 
-  return nextJob as JobResult;
+  return nextJob as StudioJobResult;
 }
 
 const imageProviders = [
@@ -155,10 +176,10 @@ const imageProviders = [
     model: undefined,
   },
   {
-    id: "kie",
-    label: "KIE 图像",
+    id: "volcengine",
+    label: "火山方舟",
     detail: "真实任务",
-    provider: "kie",
+    provider: "volcengine",
     model: undefined,
   },
 ] as const;
@@ -179,10 +200,10 @@ const videoProviders = [
     model: "mock-video-v1",
   },
   {
-    id: "kie",
-    label: "KIE 视频",
-    detail: "待接入",
-    provider: "kie",
+    id: "volcengine",
+    label: "火山方舟视频",
+    detail: "真实任务",
+    provider: "volcengine",
     model: undefined,
   },
 ] as const;
@@ -191,14 +212,17 @@ export function StudioGeneratePanel({
   prompt,
   projectId,
   initialInputImageUrl,
+  initialInputAssetId,
+  initialJob,
   selectedProducts,
   styleName,
   videoTemplates,
   scriptTemplates,
   musicTracks,
 }: GeneratePanelProps) {
-  const [job, setJob] = useState<JobResult | null>(null);
+  const [job, setJob] = useState<StudioJobResult | null>(initialJob || null);
   const [inputImageUrl, setInputImageUrl] = useState(initialInputImageUrl || "");
+  const [inputAssetId, setInputAssetId] = useState(initialInputAssetId || "");
   const [isImageLoading, setIsImageLoading] = useState(false);
   const [isVideoLoading, setIsVideoLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -210,14 +234,20 @@ export function StudioGeneratePanel({
   const [selectedScriptName, setSelectedScriptName] = useState(scriptTemplates[0]?.name || "");
   const [selectedMusicName, setSelectedMusicName] = useState(musicTracks[0]?.name || "");
   const [isPolling, setIsPolling] = useState(false);
-  const latestJobRef = useRef<JobResult | null>(null);
+  const latestJobRef = useRef<StudioJobResult | null>(initialJob || null);
 
   useEffect(() => {
     function handleUploaded(event: Event) {
-      const detail = (event as CustomEvent<{ previewUrl?: string | null }>).detail;
+      const detail = (
+        event as CustomEvent<{
+          previewUrl?: string | null;
+          asset?: { id?: string };
+        }>
+      ).detail;
 
       if (detail?.previewUrl) {
         setInputImageUrl(detail.previewUrl);
+        setInputAssetId(detail.asset?.id || "");
         setJob(null);
         setSaveMessage(null);
       }
@@ -226,6 +256,7 @@ export function StudioGeneratePanel({
     function handleRemoved(event: Event) {
       const detail = (event as CustomEvent<{ previewUrl?: string | null }>).detail;
       setInputImageUrl(detail?.previewUrl || initialInputImageUrl || "");
+      setInputAssetId("");
       setJob(null);
       setError(null);
       setSaveMessage("已移除上传素材，当前恢复为演示客户素材。");
@@ -244,7 +275,10 @@ export function StudioGeneratePanel({
   }, [job]);
 
   const pollingJobKey =
-    job && job.status !== "succeeded" && job.status !== "failed"
+    job &&
+    job.status !== "succeeded" &&
+    job.status !== "failed" &&
+    job.status !== "canceled"
       ? `${job.provider}:${job.providerJobId || job.jobId}`
       : "";
 
@@ -264,6 +298,7 @@ export function StudioGeneratePanel({
         !activeJob ||
         activeJob.status === "succeeded" ||
         activeJob.status === "failed" ||
+        activeJob.status === "canceled" ||
         isRequesting
       ) {
         return;
@@ -291,7 +326,7 @@ export function StudioGeneratePanel({
     }
 
     const timer = window.setInterval(() => {
-      if (attempts >= 24) {
+      if (attempts >= 360) {
         window.clearInterval(timer);
         setIsPolling(false);
         return;
@@ -341,6 +376,7 @@ export function StudioGeneratePanel({
     projectId,
     styleName,
     inputImageUrls: inputImageUrl ? [inputImageUrl] : [],
+    inputAssetIds: inputAssetId ? [inputAssetId] : [],
     selectedProducts,
     prompt: finalPrompt,
     extraPrompt: cleanedExtraPrompt,
@@ -350,11 +386,10 @@ export function StudioGeneratePanel({
     setError(null);
     setIsImageLoading(true);
     try {
-      if (imageProvider.provider === "kie" && inputImageUrl.startsWith("data:")) {
-        throw new Error("KIE 图生图需要线上可访问的客户素材；请配置 Supabase 后上传素材，或先使用演示通道。");
-      }
-
-      const result = await createJob("/api/generate/image", payload);
+      const result = await createJob("/api/generate/image", {
+        ...payload,
+        idempotencyKey: crypto.randomUUID(),
+      });
       setJob(result);
       setSaveMessage(null);
     } catch (err) {
@@ -369,10 +404,6 @@ export function StudioGeneratePanel({
     setIsVideoLoading(true);
     try {
       const videoInputUrl = bestPreviewUrl(job || {}) || inputImageUrl;
-      if (videoProvider.provider === "kie" && videoInputUrl.startsWith("data:")) {
-        throw new Error("KIE 视频任务需要线上可访问的形象图；请先使用已转存的生成结果。");
-      }
-
       const result = await createJob("/api/generate/video", {
         provider: videoProvider.provider,
         model: videoProvider.model,
@@ -385,6 +416,10 @@ export function StudioGeneratePanel({
         scriptTemplateName: selectedScript?.name,
         musicTrackName: selectedMusic?.name,
         inputImageUrls: videoInputUrl ? [videoInputUrl] : [],
+        inputAssetIds:
+          job?.outputAssets?.map((asset) => asset.id) ||
+          (inputAssetId ? [inputAssetId] : []),
+        idempotencyKey: crypto.randomUUID(),
       });
       setJob(result);
       setSaveMessage(null);

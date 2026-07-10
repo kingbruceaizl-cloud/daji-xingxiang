@@ -6,6 +6,7 @@ import {
 import { formatJobStatusLabel, formatJobTypeLabel } from "@/lib/ai/display";
 import { createClient } from "@/lib/supabase/server";
 import { hasEnvVars } from "@/lib/utils";
+import type { AiJobStatus } from "@/lib/ai/types";
 
 export type ProjectSummary = {
   id?: string;
@@ -20,6 +21,7 @@ export type ProjectAssetSummary = {
   id: string;
   title: string;
   kind: string;
+  rawKind?: string;
   previewUrl: string | null;
   createdAt: string;
 };
@@ -29,9 +31,21 @@ export type ProjectJobSummary = {
   provider: string;
   model: string;
   type: string;
+  rawType?: string;
   status: string;
+  rawStatus?: AiJobStatus;
   prompt: string;
   updatedAt: string;
+  providerJobId?: string | null;
+  message?: string;
+  outputAssetIds?: string[];
+  outputAssets?: Array<{
+    id: string;
+    kind: string;
+    title: string | null;
+    url: string | null;
+  }>;
+  responsePayload?: Record<string, unknown>;
 };
 
 export type ProjectDetail = {
@@ -63,6 +77,19 @@ function formatUpdatedAt(value?: string | null) {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(value));
+}
+
+function formatAssetKind(value?: string | null) {
+  const labels: Record<string, string> = {
+    customer_image: "客户图片",
+    customer_video: "客户视频",
+    product_image: "商品素材",
+    generated_image: "生成图片",
+    generated_video: "生成视频",
+    music: "音乐素材",
+  };
+
+  return labels[value || ""] || "项目素材";
 }
 
 export async function getProjectsData(): Promise<{
@@ -260,16 +287,16 @@ export async function getProjectDetailById(projectId: string): Promise<ProjectDe
     const [{ data: assetData }, { data: jobData }] = await Promise.all([
       supabase
         .from("asset_files")
-        .select("id,title,kind,public_url,created_at")
+        .select("id,title,kind,bucket,path,public_url,created_at")
         .eq("project_id", projectId)
         .order("created_at", { ascending: false })
-        .limit(8),
+        .limit(50),
       supabase
         .from("ai_jobs")
-        .select("id,provider,model,job_type,status,prompt,updated_at")
+        .select("id,provider,model,job_type,status,prompt,provider_job_id,error_message,response_payload,output_asset_ids,updated_at")
         .eq("project_id", projectId)
         .order("updated_at", { ascending: false })
-        .limit(8),
+        .limit(50),
     ]);
 
     const project = {
@@ -281,26 +308,63 @@ export async function getProjectDetailById(projectId: string): Promise<ProjectDe
       cover: publicImages.portrait,
     };
 
+    const resolvedAssets = await Promise.all(
+      (assetData || []).map(async (asset) => {
+        let previewUrl = asset.public_url || null;
+        if (!previewUrl && asset.bucket && asset.path) {
+          const { data: signed } = await supabase.storage
+            .from(asset.bucket)
+            .createSignedUrl(asset.path, 60 * 60);
+          previewUrl = signed?.signedUrl || null;
+        }
+
+        return {
+          id: asset.id,
+          title: asset.title || "项目素材",
+          kind: formatAssetKind(asset.kind),
+          rawKind: String(asset.kind || ""),
+          previewUrl,
+          createdAt: formatUpdatedAt(asset.created_at),
+        };
+      }),
+    );
+    const assetsById = new Map(resolvedAssets.map((asset) => [asset.id, asset]));
+    project.cover =
+      resolvedAssets.find((asset) => asset.previewUrl)?.previewUrl || project.cover;
+
     return {
       source: "supabase",
       project,
-      assets:
-        assetData?.map((asset) => ({
-          id: asset.id,
-          title: asset.title || "项目素材",
-          kind: String(asset.kind || "素材"),
-          previewUrl: asset.public_url || null,
-          createdAt: formatUpdatedAt(asset.created_at),
-        })) || [],
+      assets: resolvedAssets,
       jobs:
         jobData?.map((job) => ({
           id: job.id,
           provider: job.provider,
           model: job.model,
           type: formatJobTypeLabel(String(job.job_type || "")),
+          rawType: String(job.job_type || ""),
           status: formatJobStatusLabel(String(job.status || "")),
+          rawStatus: job.status as AiJobStatus,
           prompt: job.prompt || "暂无提示词",
           updatedAt: formatUpdatedAt(job.updated_at),
+          providerJobId: job.provider_job_id,
+          message:
+            job.error_message ||
+            (job.status === "succeeded" ? "任务已完成。" : "任务状态已恢复。"),
+          outputAssetIds: (job.output_asset_ids || []) as string[],
+          responsePayload:
+            job.response_payload && typeof job.response_payload === "object"
+              ? (job.response_payload as Record<string, unknown>)
+              : undefined,
+          outputAssets: ((job.output_asset_ids || []) as string[])
+            .map((id) => assetsById.get(id))
+            .filter(Boolean)
+            .map((asset) => ({
+              id: asset!.id,
+              kind: asset!.rawKind || asset!.kind,
+              title: asset!.title,
+              url: asset!.previewUrl,
+            })),
         })) || [],
     };
   } catch {

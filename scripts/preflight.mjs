@@ -24,16 +24,7 @@ function loadEnvFile(fileName) {
 loadEnvFile(".env.local");
 loadEnvFile(".env.production");
 
-const aiProviders = [
-  "KIE_API_KEY",
-  "OPENAI_API_KEY",
-  "JIMENG_API_KEY",
-  "KLING_API_KEY",
-  "TONGYI_API_KEY",
-];
-
 const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-const kieCallbackSecret = process.env.KIE_CALLBACK_SECRET?.trim();
 const placeholderTokens = [
   "你的",
   "填写",
@@ -133,10 +124,15 @@ const envIssues = [
   ...validateSecretEnv("SUPABASE_SERVICE_ROLE_KEY", "Supabase 服务端密钥"),
   ...validateUrlEnv("NEXT_PUBLIC_APP_URL", "应用公开访问地址"),
   ...validateExactEnv("NEXT_PUBLIC_APP_ENV", "production", "应用运行环境"),
+  ...validateExactEnv("NEXT_PUBLIC_ALLOW_PUBLIC_SIGNUP", "false", "公开注册开关"),
+  ...validateExactEnv("AI_EXECUTION_MODE", "real", "AI 执行模式"),
+  ...validateSecretEnv("CRON_SECRET", "后台任务密钥", 24),
+  ...validateUrlEnv("ARK_BASE_URL", "火山方舟 API 地址"),
+  ...validateSecretEnv("ARK_API_KEY", "火山方舟 API Key", 8),
+  ...validateSecretEnv("ARK_TEXT_MODEL_ID", "文字模型 ID", 8),
+  ...validateSecretEnv("ARK_IMAGE_MODEL_ID", "生图模型 ID", 8),
+  ...validateSecretEnv("ARK_VIDEO_MODEL_ID", "视频模型 ID", 8),
 ];
-const configuredProviders = aiProviders.filter(
-  (key) => validateSecretEnv(key, key, 8).length === 0,
-);
 const failures = [...envIssues];
 
 console.log("大吉形象上线前检查");
@@ -151,24 +147,11 @@ if (envIssues.length) {
   console.log("正式环境变量：已配置且未发现明显占位值");
 }
 
-if (configuredProviders.length) {
-  console.log(`AI 模型通道：已配置 ${configuredProviders.join("、")}`);
-} else {
-  console.log("AI 模型通道：未配置，将只能使用演示模型通道");
-  failures.push("至少一个 AI 模型通道密钥");
-}
-
-if (envValue("KIE_API_KEY")) {
-  if (!kieCallbackSecret) {
-    console.log("KIE 回调密钥：未配置");
-    failures.push("启用 KIE 时必须配置 KIE_CALLBACK_SECRET");
-  } else if (kieCallbackSecret.length < 16) {
-    console.log("KIE 回调密钥：长度过短");
-    failures.push("KIE_CALLBACK_SECRET 建议使用 16 位以上随机强字符串");
-  } else {
-    console.log("KIE 回调密钥：已配置");
-  }
-}
+console.log(
+  envIssues.some((item) => item.includes("ARK_"))
+    ? "火山方舟模型通道：配置不完整"
+    : "火山方舟模型通道：API Key 与模型 ID 已配置",
+);
 
 if (appUrl) {
   try {

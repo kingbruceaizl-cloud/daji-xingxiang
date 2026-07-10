@@ -1,5 +1,7 @@
-import { kieProvider } from "./kie-provider";
+import { assertProviderAllowed } from "./execution-mode";
+import { AiServiceError } from "./errors";
 import { mockProvider } from "./mock-provider";
+import { volcengineProvider } from "./volcengine-provider";
 import type {
   AiProvider,
   CreateJobInput,
@@ -9,12 +11,21 @@ import type {
 
 const providers: Record<string, AiProvider> = {
   mock: mockProvider,
-  kie: kieProvider,
+  volcengine: volcengineProvider,
 };
 
 export async function createAiJob(input: CreateJobInput): Promise<CreateJobResult> {
   const requestedProvider = input.provider || "mock";
-  const provider = providers[requestedProvider] || mockProvider;
+  const provider = providers[requestedProvider];
+  if (!provider) {
+    throw new AiServiceError(
+      "AI_PROVIDER_NOT_SUPPORTED",
+      "所选模型通道尚未接入，任务没有执行。",
+      400,
+    );
+  }
+
+  assertProviderAllowed(requestedProvider);
   return provider.createJob(input);
 }
 

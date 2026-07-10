@@ -17,6 +17,7 @@ import {
   ShoppingBag,
   Sparkles,
   WandSparkles,
+  UsersRound,
 } from "lucide-react";
 
 export const publicImages = {
@@ -230,9 +231,9 @@ export const projects = [
 
 export const providerCards = [
   {
-    name: "KIE",
-    status: "优先接入",
-    ability: "文生图、图生图、视频生成",
+    name: "火山方舟（豆包）",
+    status: "正式通道",
+    ability: "文字理解、Seedream 生图、Seedance 视频",
     icon: Camera,
   },
   {
@@ -342,16 +343,17 @@ export const generationJobs = [
   },
   {
     id: "demo-image-002",
-    provider: "KIE",
-    model: "gpt-image-2-image-to-image",
+    provider: "火山方舟（豆包）",
+    model: "Seedream 5.0 完整版",
     type: "图生图",
-    status: "待接入",
+    status: "配置中",
     prompt: "新中式轻礼服，缎面材质，低饱和红金点缀。",
     updatedAt: "昨天 23:08",
   },
 ];
 
 export const adminModules = [
+  { name: "团队权限", detail: "员工角色与模型用量", icon: UsersRound },
   { name: "商品库", detail: "真实商品与搭配素材", icon: Boxes },
   { name: "风格模板", detail: "提示词、封面、标签", icon: Palette },
   { name: "视频脚本", detail: "转场、运镜、字幕、时长", icon: Clapperboard },

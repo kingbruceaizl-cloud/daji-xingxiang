@@ -112,6 +112,19 @@ async function assertCatalog() {
   if (!Array.isArray(data.products) || data.products.length < 8) {
     failures.push("/api/catalog 示例商品不足。");
   }
+
+  if (!Array.isArray(data.jobs) || data.jobs.length !== 0) {
+    failures.push("/api/catalog 公共目录不应返回生成任务。");
+  }
+}
+
+async function assertWorkerGuard() {
+  const response = await fetch(`${baseUrl}/api/internal/ai-worker`);
+  const payload = await response.json().catch(() => ({}));
+
+  if (![401, 503].includes(response.status) || payload.ok) {
+    failures.push("/api/internal/ai-worker 未携带密钥时不应执行任务。");
+  }
 }
 
 async function assertProjectDetail() {
@@ -128,53 +141,12 @@ async function assertProjectDetail() {
   }
 }
 
-async function assertKieCallback() {
-  const headers = {
-    "Content-Type": "application/json",
-  };
-
-  if (process.env.KIE_CALLBACK_SECRET) {
-    headers["x-daji-callback-secret"] = process.env.KIE_CALLBACK_SECRET;
-  }
-
-  const response = await fetch(`${baseUrl}/api/provider-callback/kie`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      code: 200,
-      msg: "success",
-      data: {
-        taskId: "smoke-kie-callback",
-        state: "success",
-        resultJson: JSON.stringify({
-          resultUrls: ["https://example.com/generated-image.jpg"],
-        }),
-      },
-    }),
-  });
-  const text = await response.text();
-
-  if (!response.ok) {
-    failures.push(`/api/provider-callback/kie 返回状态异常：${response.status}`);
-    return;
-  }
-
-  if (!text.includes("KIE 回调")) {
-    failures.push("/api/provider-callback/kie 未返回中文确认信息。");
-  }
-}
-
 async function assertDemoJobLookup() {
   const response = await fetch(`${baseUrl}/api/jobs/smoke-job-id`);
   const payload = await response.json();
 
-  if (!response.ok || !payload.ok) {
-    failures.push("/api/jobs/smoke-job-id 返回异常。");
-    return;
-  }
-
-  if (!payload.job || payload.job.status !== "succeeded") {
-    failures.push("/api/jobs/smoke-job-id 未返回演示任务状态。");
+  if (response.status !== 400 || payload.ok) {
+    failures.push("/api/jobs/smoke-job-id 应拒绝无效任务编号。");
   }
 }
 
@@ -201,6 +173,66 @@ async function assertMockGenerationAllowed() {
   }
 }
 
+async function postMockStructuredJob(path, body) {
+  const response = await fetch(`${baseUrl}${path}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      ...body,
+      provider: "mock",
+      idempotencyKey: crypto.randomUUID(),
+    }),
+  });
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok || !payload.ok || !payload.job?.structuredOutput) {
+    failures.push(`${path} 演示结构化任务未正常返回。`);
+    return null;
+  }
+
+  if (payload.job.provider !== "mock" || payload.job.status !== "succeeded") {
+    failures.push(`${path} 演示结构化任务状态异常。`);
+  }
+
+  return payload.job.structuredOutput;
+}
+
+async function assertMockAppearanceWorkflow() {
+  const analysis = await postMockStructuredJob("/api/ai/analyze-image", {
+    inputImageUrls: [
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+    ],
+  });
+  if (analysis && (!analysis.faceShape || !Array.isArray(analysis.preservedFeatures))) {
+    failures.push("/api/ai/analyze-image 缺少客户特征或保留特征。");
+  }
+
+  const plan = await postMockStructuredJob("/api/ai/appearance-plan", {
+    analysis: analysis || {},
+    styleName: "高级通勤",
+    selectedProducts: ["缎面上衣", "珍珠耳饰"],
+  });
+  if (plan && (!plan.styleDirection || !Array.isArray(plan.productMatches))) {
+    failures.push("/api/ai/appearance-plan 缺少风格方向或商品搭配。");
+  }
+
+  const prompts = await postMockStructuredJob("/api/ai/prompts", {
+    plan: plan || {},
+    aspectRatio: "9:16",
+    durationSeconds: 13,
+  });
+  if (
+    prompts &&
+    (!prompts.imagePrompt ||
+      !prompts.videoPrompt ||
+      !Array.isArray(prompts.shotPlan))
+  ) {
+    failures.push("/api/ai/prompts 缺少生图、视频提示词或镜头方案。");
+  }
+}
+
 async function assertRealProviderGenerationGuard() {
   const response = await fetch(`${baseUrl}/api/generate/image`, {
     method: "POST",
@@ -208,7 +240,7 @@ async function assertRealProviderGenerationGuard() {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      provider: "kie",
+      provider: "volcengine",
       prompt: "大吉形象生产冒烟真实模型保护",
     }),
   });
@@ -220,7 +252,7 @@ async function assertRealProviderGenerationGuard() {
     return;
   }
 
-  if (!message.includes("真实模型通道 kie 需要先登录后再生成")) {
+  if (!message.includes("真实模型通道 volcengine 需要先登录后再生成")) {
     failures.push("/api/generate/image 匿名真实模型请求未返回中文登录提示。");
   }
 }
@@ -255,6 +287,36 @@ async function assertAdminWriteGuard() {
 
   if (!allowedMessages.some((item) => message.includes(item))) {
     failures.push("/api/admin/products 匿名写入未返回中文权限提示。");
+  }
+}
+
+async function assertTeamAdminGuard() {
+  const response = await fetch(`${baseUrl}/api/admin/team/invite`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email: "smoke-team@example.com" }),
+  });
+  const payload = await response.json().catch(() => ({}));
+  const message = typeof payload.message === "string" ? payload.message : "";
+  const allowedMessages = [
+    "请先配置 Supabase Service Role Key",
+    "请先登录后再操作后台",
+    "当前账号没有后台管理权限",
+  ];
+
+  if (response.ok || payload.ok) {
+    failures.push("/api/admin/team/invite 匿名邀请员工不应成功。");
+    return;
+  }
+
+  if (![400, 401, 403].includes(response.status)) {
+    failures.push(`/api/admin/team/invite 匿名访问返回状态异常：${response.status}`);
+  }
+
+  if (!allowedMessages.some((item) => message.includes(item))) {
+    failures.push("/api/admin/team/invite 匿名访问未返回中文权限提示。");
   }
 }
 
@@ -373,7 +435,7 @@ async function assertSecurityHeaders() {
 
 async function assertPrivateIndexingHeaders(paths) {
   for (const path of paths) {
-    const response = await fetch(`${baseUrl}${path}`);
+    const response = await fetch(`${baseUrl}${path}`, { redirect: "manual" });
     const robotsHeader = response.headers.get("x-robots-tag") || "";
     const normalized = robotsHeader.toLowerCase();
 
@@ -387,7 +449,7 @@ async function assertPrivateIndexingHeaders(paths) {
 
 async function assertPrivateCacheHeaders(paths) {
   for (const path of paths) {
-    const response = await fetch(`${baseUrl}${path}`);
+    const response = await fetch(`${baseUrl}${path}`, { redirect: "manual" });
     const cacheControl = response.headers.get("cache-control") || "";
     const normalized = cacheControl.toLowerCase();
 
@@ -401,12 +463,20 @@ async function assertPrivateCacheHeaders(paths) {
   }
 }
 
+async function assertProtectedRedirect(path) {
+  const response = await fetch(`${baseUrl}${path}`, { redirect: "manual" });
+  const location = response.headers.get("location") || "";
+
+  if (![307, 308].includes(response.status) || !location.includes("/auth/login")) {
+    failures.push(`${path} 未登录访问应跳转到登录页。`);
+  }
+}
+
 async function runSmokeChecks() {
   await assertPage("/", "大吉形象");
   await assertHomeMetadata();
-  await assertPage("/protected", "登录摘要");
-  await assertPage("/protected", "当前为本地演示模式");
-  await assertPage("/projects/new", "创建客户形象设计项目");
+  await assertProtectedRedirect("/protected");
+  await assertProtectedRedirect("/projects/new");
   await assertPage("/projects/demo-xinzhongshi", "项目详情");
   await assertPage("/projects/demo-xinzhongshi", "进入形象大师");
   await assertPage("/projects/demo-xinzhongshi", "演示生图模型");
@@ -422,16 +492,25 @@ async function runSmokeChecks() {
   await assertPage("/studio/demo", "音乐选择");
   await assertPage("/studio/demo", "移除素材");
   await assertPage("/studio/demo", "下载结果");
-  await assertPage("/studio/demo", "KIE 图像");
-  await assertPage("/admin/launch", "上线体检");
+  await assertPage("/studio/demo", "火山方舟");
+  await assertPage("/studio/demo", "AI 形象方案");
+  await assertPage("/studio/demo", "分析客户素材");
+  await assertPage("/studio/demo", "确认并生成方案");
+  await assertPage("/studio/demo", "生成提示词");
+  await assertPage("/auth/login", "当前仅限团队邀请账号登录");
+  await assertPage("/auth/sign-up", "当前仅限邀请注册");
+  await assertProtectedRedirect("/admin/launch");
+  await assertProtectedRedirect("/admin/team");
   await assertHealth();
   await assertCatalog();
+  await assertWorkerGuard();
   await assertProjectDetail();
-  await assertKieCallback();
   await assertDemoJobLookup();
   await assertMockGenerationAllowed();
+  await assertMockAppearanceWorkflow();
   await assertRealProviderGenerationGuard();
   await assertAdminWriteGuard();
+  await assertTeamAdminGuard();
   await assertAdminAssetUploadGuard();
   await assertInvalidUploadTypeGuard();
   await assertTextEndpoint("/robots.txt", "sitemap.xml");
@@ -451,6 +530,7 @@ const server = spawn("pnpm", ["exec", "next", "start", "-p", String(port)], {
     ...process.env,
     PORT: String(port),
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || baseUrl,
+    AI_EXECUTION_MODE: "mock",
   },
   stdio: ["ignore", "pipe", "pipe"],
 });

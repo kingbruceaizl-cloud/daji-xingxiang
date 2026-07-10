@@ -24,8 +24,9 @@ const textExtensions = new Set([
 const ignoredPaths = [".env", ".env.local", ".env.production", ".vercel"];
 const secretEnvKeys = [
   "SUPABASE_SERVICE_ROLE_KEY",
-  "KIE_API_KEY",
-  "KIE_CALLBACK_SECRET",
+  "CRON_SECRET",
+  "AI_WORKER_SECRET",
+  "ARK_API_KEY",
   "OPENAI_API_KEY",
   "JIMENG_API_KEY",
   "KLING_API_KEY",

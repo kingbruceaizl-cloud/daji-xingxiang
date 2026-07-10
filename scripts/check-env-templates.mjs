@@ -5,15 +5,22 @@ const requiredKeys = [
   "NEXT_PUBLIC_SUPABASE_URL",
   "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
   "SUPABASE_SERVICE_ROLE_KEY",
-  "KIE_BASE_URL",
-  "KIE_API_KEY",
-  "KIE_CALLBACK_SECRET",
+  "AI_EXECUTION_MODE",
+  "CRON_SECRET",
+  "AI_WORKER_SECRET",
+  "AI_WORKER_BATCH_SIZE",
+  "ARK_BASE_URL",
+  "ARK_API_KEY",
+  "ARK_TEXT_MODEL_ID",
+  "ARK_IMAGE_MODEL_ID",
+  "ARK_VIDEO_MODEL_ID",
   "OPENAI_API_KEY",
   "JIMENG_API_KEY",
   "KLING_API_KEY",
   "TONGYI_API_KEY",
   "NEXT_PUBLIC_APP_URL",
   "NEXT_PUBLIC_APP_ENV",
+  "NEXT_PUBLIC_ALLOW_PUBLIC_SIGNUP",
 ];
 
 const templateFiles = [".env.example", ".env.production.example"];
@@ -41,12 +48,14 @@ const preflightKeys = [
   "SUPABASE_SERVICE_ROLE_KEY",
   "NEXT_PUBLIC_APP_URL",
   "NEXT_PUBLIC_APP_ENV",
-  "KIE_API_KEY",
-  "KIE_CALLBACK_SECRET",
-  "OPENAI_API_KEY",
-  "JIMENG_API_KEY",
-  "KLING_API_KEY",
-  "TONGYI_API_KEY",
+  "NEXT_PUBLIC_ALLOW_PUBLIC_SIGNUP",
+  "AI_EXECUTION_MODE",
+  "CRON_SECRET",
+  "ARK_BASE_URL",
+  "ARK_API_KEY",
+  "ARK_TEXT_MODEL_ID",
+  "ARK_IMAGE_MODEL_ID",
+  "ARK_VIDEO_MODEL_ID",
 ];
 const findings = [];
 
@@ -121,6 +130,12 @@ if (productionContent.includes("localhost")) {
 
 if (!productionContent.includes("NEXT_PUBLIC_APP_ENV=production")) {
   findings.push(".env.production.example 需要设置 NEXT_PUBLIC_APP_ENV=production。");
+}
+
+if (!productionContent.includes("NEXT_PUBLIC_ALLOW_PUBLIC_SIGNUP=false")) {
+  findings.push(
+    ".env.production.example 需要设置 NEXT_PUBLIC_ALLOW_PUBLIC_SIGNUP=false。",
+  );
 }
 
 for (const item of envContractFiles) {

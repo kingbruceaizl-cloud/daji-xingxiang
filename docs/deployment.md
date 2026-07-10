@@ -41,7 +41,6 @@ SUPABASE_SERVICE_ROLE_KEY=
 
 - `profiles`
 - `projects`
-- `project_assets`
 - `asset_files`
 - `product_categories`
 - `products`
@@ -53,6 +52,8 @@ SUPABASE_SERVICE_ROLE_KEY=
 - `ai_models`
 - `ai_jobs`
 - `job_events`
+- `ai_job_runtime`
+- `usage_limits`
 
 详细操作见 `docs/supabase-setup.md`。
 
@@ -94,6 +95,7 @@ pnpm install --frozen-lockfile
 
 ```env
 NEXT_PUBLIC_APP_URL=
+NEXT_PUBLIC_ALLOW_PUBLIC_SIGNUP=false
 ```
 
 9. 部署前可以运行：
@@ -144,7 +146,7 @@ pnpm run release:package
 
 还会生成 `dist/daji-xingxiang-vercel-handoff.md`，用于核对 Vercel 导入时的框架、Node、安装命令、构建命令、环境变量和部署后检查。
 
-还会生成 `dist/daji-xingxiang-model-handoff.md`，用于核对 KIE、OpenAI、即梦、可灵、通义等模型通道的密钥、任务能力路由、回调地址和部署后验证步骤。
+还会生成 `dist/daji-xingxiang-model-handoff.md`，用于核对火山方舟密钥、Seedream 模型、任务能力路由、后台 Worker 和部署后验证步骤。
 
 还会生成 `dist/daji-xingxiang-launch-runbook.md`，用于正式发布当天逐项执行 GitHub、Supabase、Vercel、模型通道和验收动作。
 
@@ -176,18 +178,24 @@ http://localhost:3000/auth/update-password
 
 ## 5. AI 模型通道配置
 
-至少需要先配置一个模型通道才能真实生成图片或视频。
+AI 应用 1.0 正式运行需要配置火山方舟 API Key，以及文字、图片和视频三个完整模型 ID。
 
 未配置模型通道时，系统会使用演示模型通道走通页面流程，但不会产生真实 AI 结果。
 
-第一阶段建议优先接入 KIE：
+1.0 默认配置：
 
 ```env
-KIE_API_KEY=
-KIE_CALLBACK_SECRET=
+ARK_BASE_URL=https://ark.cn-beijing.volces.com/api/v3
+ARK_API_KEY=
+ARK_TEXT_MODEL_ID=
+ARK_IMAGE_MODEL_ID=
+ARK_VIDEO_MODEL_ID=
+CRON_SECRET=
+AI_WORKER_SECRET=
+AI_WORKER_BATCH_SIZE=1
 ```
 
-启用 KIE 时，`KIE_CALLBACK_SECRET` 是正式上线必填项，建议使用 16 位以上随机强字符串，并和 KIE 回调配置保持一致。
+三个模型 ID 必须从当前火山方舟账号的控制台复制，不根据展示名称自行拼接。详细约定见 `docs/api/volcengine-ark.md`。
 
 真实模型通道默认要求登录后才能调用；未登录用户只能使用 `mock` 演示通道，避免公开部署后被匿名请求消耗模型额度。
 
@@ -197,7 +205,7 @@ KIE_CALLBACK_SECRET=
 pnpm run release:model-handoff
 ```
 
-后续预留：
+后续多模型预留：
 
 ```env
 OPENAI_API_KEY=
@@ -206,6 +214,8 @@ KLING_API_KEY=
 TONGYI_API_KEY=
 ```
 
+`CRON_SECRET` 是正式上线必填项，建议使用至少 24 位随机强字符串。Vercel Cron 会携带该密钥调用后台 Worker；`AI_WORKER_SECRET` 可选，用于未来的独立 Worker。
+
 ## 6. 当前阻塞项
 
 真正发布到公网需要外部账号和密钥，无法只靠本地代码完成：
@@ -213,7 +223,7 @@ TONGYI_API_KEY=
 - Supabase 项目 URL 和 Publishable Key。
 - Supabase Service Role Key。
 - Vercel 项目或 GitHub 仓库权限。
-- KIE 或其他模型通道密钥。
+- 火山方舟 API Key、三个完整模型 ID，以及对应账号的模型开通与配额。
 
 拿到这些信息后，即可继续完成数据库迁移、存储配置和正式部署。
 

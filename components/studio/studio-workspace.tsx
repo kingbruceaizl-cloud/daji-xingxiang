@@ -1,7 +1,9 @@
 import { ProductHeader } from "@/components/brand/product-header";
 import { StudioCreationFlow } from "@/components/studio/studio-creation-flow";
+import type { PromptPackage } from "@/components/studio/appearance-workflow-panel";
 import { getCatalogData } from "@/lib/catalog";
 import { workflowSteps } from "@/lib/demo-data";
+import type { ProjectAssetSummary, ProjectJobSummary } from "@/lib/projects";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -9,12 +11,22 @@ type StudioWorkspaceProps = {
   projectId?: string;
   projectTitle: string;
   subtitle: string;
+  initialAssets?: ProjectAssetSummary[];
+  initialJob?: ProjectJobSummary;
+  initialAnalysis?: Record<string, unknown>;
+  initialPlan?: Record<string, unknown>;
+  initialPromptPackage?: PromptPackage;
 };
 
 export async function StudioWorkspace({
   projectId,
   projectTitle,
   subtitle,
+  initialAssets = [],
+  initialJob,
+  initialAnalysis,
+  initialPlan,
+  initialPromptPackage,
 }: StudioWorkspaceProps) {
   const catalog = await getCatalogData();
 
@@ -59,7 +71,15 @@ export async function StudioWorkspace({
           })}
         </aside>
 
-        <StudioCreationFlow catalog={catalog} projectId={projectId} />
+        <StudioCreationFlow
+          catalog={catalog}
+          projectId={projectId}
+          initialAssets={initialAssets}
+          initialJob={initialJob}
+          initialAnalysis={initialAnalysis}
+          initialPlan={initialPlan}
+          initialPromptPackage={initialPromptPackage}
+        />
       </div>
     </main>
   );

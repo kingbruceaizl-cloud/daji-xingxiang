@@ -135,7 +135,8 @@ if (!findings.length) {
     "大吉形象环境变量交接单",
     "NEXT_PUBLIC_SUPABASE_URL",
     "SUPABASE_SERVICE_ROLE_KEY",
-    "KIE_API_KEY",
+    "ARK_API_KEY",
+    "CRON_SECRET",
     "不输出任何真实密钥值",
   ]);
 
@@ -174,9 +175,9 @@ if (!findings.length) {
   const modelHandoff = readDistFile("daji-xingxiang-model-handoff.md");
   requireIncludes("daji-xingxiang-model-handoff.md", modelHandoff, [
     "大吉形象 AI 模型通道交接单",
-    "KIE_API_KEY",
-    "/api/provider-callback/kie",
-    "gpt-image-2-text-to-image",
+    "ARK_API_KEY",
+    "CRON_SECRET",
+    "doubao-seedream-5-0-260128",
     "任务能力路由",
     "image_to_video",
     "OPENAI_API_KEY",
@@ -189,7 +190,9 @@ if (!findings.length) {
     "create table public.ai_jobs",
     "customer-assets",
     "低能量穿搭变装",
-    "gpt-image-2-text-to-image",
+    "doubao-seedream-5-0-260128",
+    "create table if not exists public.ai_job_runtime",
+    "public.claim_ai_jobs",
   ]);
 
   const supabaseVerifySql = readDistFile("daji-xingxiang-supabase-verify.sql");
@@ -203,8 +206,9 @@ if (!findings.length) {
     "expected_file_size_limit",
     "expected_mime_types",
     "私有桶归属校验使用 owner_id 与用户路径",
-    "KIE 文生图模型",
-    "gpt-image-2-text-to-image",
+    "Seedream 5.0 完整版",
+    "doubao-seedream-5-0-260128",
+    "claim_ai_jobs 原子领取函数",
   ]);
 
   const vercelEnvTemplate = readDistFile("daji-xingxiang-vercel-env-template.env");
@@ -213,7 +217,8 @@ if (!findings.length) {
     "NEXT_PUBLIC_SUPABASE_URL=https://<你的 Supabase 项目编号>.supabase.co",
     "SUPABASE_SERVICE_ROLE_KEY=<填写 Supabase Service Role Key>",
     "NEXT_PUBLIC_APP_ENV=production",
-    "KIE_API_KEY=<填写 KIE API Key>",
+    "ARK_API_KEY=<填写火山方舟 API Key>",
+    "CRON_SECRET=<填写至少 24 位随机后台任务密钥>",
   ]);
 
   const vercelHandoff = readDistFile("daji-xingxiang-vercel-handoff.md");

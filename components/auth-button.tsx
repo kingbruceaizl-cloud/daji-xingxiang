@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import { createClient } from "@/lib/supabase/server";
 import { LogoutButton } from "./logout-button";
+import { isPublicSignupEnabled } from "@/lib/signup-policy";
 
 export async function AuthButton() {
   const supabase = await createClient();
@@ -20,9 +21,11 @@ export async function AuthButton() {
       <Button asChild size="sm" variant={"outline"}>
         <Link href="/auth/login">登录</Link>
       </Button>
-      <Button asChild size="sm" variant={"default"} className="rounded-full px-4">
-        <Link href="/auth/sign-up">注册</Link>
-      </Button>
+      {isPublicSignupEnabled() ? (
+        <Button asChild size="sm" variant={"default"} className="rounded-full px-4">
+          <Link href="/auth/sign-up">注册</Link>
+        </Button>
+      ) : null}
     </div>
   );
 }

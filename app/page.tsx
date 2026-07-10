@@ -267,7 +267,7 @@ async function HomeContent() {
               多模型能力，按任务自动选择
             </h2>
             <p className="mt-4 text-base leading-7 text-[#6f6a65]">
-              第一阶段接入 KIE，同时预留 OpenAI、即梦、可灵与通义。
+              第一阶段直连火山方舟，同时预留 OpenAI、即梦、可灵与通义。
             </p>
           </div>
 
