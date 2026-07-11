@@ -286,7 +286,7 @@ as $$
       from scoped
     ), 0),
     'avgDurationSeconds', coalesce((
-      select round(avg(extract(epoch from completed_at - coalesce(started_at, created_at))))::numeric, 1)
+      select round(avg(extract(epoch from completed_at - coalesce(started_at, created_at)))::numeric, 1)
       from scoped
       where status = 'succeeded' and completed_at is not null
     ), 0),
